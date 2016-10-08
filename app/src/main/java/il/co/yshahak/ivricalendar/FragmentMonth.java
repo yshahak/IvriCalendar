@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import il.co.yshahak.ivricalendar.calendar.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 
@@ -47,7 +47,8 @@ public class FragmentMonth extends Fragment{
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         int offset = position - CURRENT_PAGE;
-        Month month = MainActivity.year.getMonth(offset);
+//        Month month = MainActivity.year.getMonth(offset);
+        Month month = new Month(offset);
         if (month != null) {
             recyclerView.setAdapter(new CalendarRecyclerAdapter(month));
             myToolbar.setTitle(month.getMonthName() + " , " + month.getYearName());

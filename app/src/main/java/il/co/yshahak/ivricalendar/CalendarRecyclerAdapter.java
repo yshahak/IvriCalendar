@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import il.co.yshahak.ivricalendar.calendar.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 
 /**
  * Created by yshahak on 07/10/2016.

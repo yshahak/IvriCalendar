@@ -18,7 +18,7 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Log.d("TAG", "getItem, position: "  + position);
+//        Log.d("TAG", "getItem, position: "  + position);
         return FragmentMonth.newInstance(position);
     }
 

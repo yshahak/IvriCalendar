@@ -1,4 +1,4 @@
-package il.co.yshahak.ivricalendar.calendar;
+package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
