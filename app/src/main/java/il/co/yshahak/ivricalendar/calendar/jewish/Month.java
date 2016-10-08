@@ -1,10 +1,16 @@
 package il.co.yshahak.ivricalendar.calendar.jewish;
 
+import android.app.Activity;
+import android.content.Context;
+
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import il.co.yshahak.ivricalendar.calendar.google.Contract;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -16,27 +22,38 @@ public class Month {
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
+    private final Day[] days;
     private final String yearName;
     private final String monthName;
     private final int monthNumberOfDays;
     private final int headOffsetMonth;
     private boolean isFullMonth;
 
-    public Month(JewishCalendar jewishCalendar) {
+     /*public Month(Context context,  JewishCalendar jewishCalendar) {
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
         this.headOffsetMonth = setHeadOffset(jewishCalendar);
         this.isFullMonth = (monthNumberOfDays == 30);
-    }
 
-    public Month(int offset) {
+    }*/
+
+    public Month(Context context, int offset) {
         JewishCalendar jewishCalendar = shiftMonth(offset);
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
         this.headOffsetMonth = setHeadOffset(jewishCalendar);
         this.isFullMonth = (monthNumberOfDays == 30);
+        days = isFullMonth ? new Day[30] : new Day[29];
+        for (int i = 0 ; i < days.length ; i++){
+            jewishCalendar.setJewishDayOfMonth(i + 1);
+            String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(jewishCalendar.getTime());
+            ArrayList<String> events = Contract.getInstancesForDate((Activity) context, calendar);
+            days[i] = new Day(events, label);
+        }
     }
 
     private int setHeadOffset(JewishCalendar jewishCalendar) {
@@ -77,5 +94,9 @@ public class Month {
 
     public int getHeadOffsetMonth() {
         return headOffsetMonth;
+    }
+
+    public Day[] getDays() {
+        return days;
     }
 }

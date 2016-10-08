@@ -11,13 +11,12 @@ import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -192,41 +191,48 @@ public class Contract {
         cur.close();
     }
 
-    /**
-     * @param cr The ContentResolver to use for the query
-     * @param projection The columns to return
-     * @param startDay The start of the time range to query in UTC millis since
-     *            epoch
-     * @param endDay The end of the time range to query in UTC millis since
-     *            epoch
-     * @param selection Filter on the query as an SQL WHERE statement
-     * @param selectionArgs Args to replace any '?'s in the selection
-     * @param orderBy How to order the rows as an SQL ORDER BY statement
-     * @return A Cursor of instances matching the selection
-     */
-    private static final Cursor instancesQuery(ContentResolver cr, String[] projection,
-                                               int startDay, int endDay, String selection, String[] selectionArgs, String orderBy) {
-        String WHERE_CALENDARS_SELECTED = Calendars.VISIBLE + "=?";
-        String[] WHERE_CALENDARS_ARGS = {"1"};
-        String DEFAULT_SORT_ORDER = "begin ASC";
+    public static ArrayList<String> getInstancesForDate(Activity activity, Calendar cal){
+        // Specify the date range you want to search for recurring
+// event instances
+        Time time = new Time();
+        time.set(cal.getTimeInMillis());
+        time.monthDay +=1;
+        time.allDay = true;
+        time.hour = 0;
+        time.minute = 0;
+        time.second = 0;
+        long begin = Time.getJulianDay(time.toMillis(true), 0);
+        time.monthDay +=1;
+        long end = Time.getJulianDay(time.toMillis(true), 0);
+        Calendar beginTime = Calendar.getInstance();
+        beginTime.set(Calendar.DAY_OF_MONTH, 9);
+        Cursor cur ;
+        ContentResolver cr = activity.getContentResolver();
 
+// Construct the query with the desired date range.
         Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon();
-        ContentUris.appendId(builder, startDay);
-        ContentUris.appendId(builder, endDay);
-        if (TextUtils.isEmpty(selection)) {
-            selection = WHERE_CALENDARS_SELECTED;
-            selectionArgs = WHERE_CALENDARS_ARGS;
-        } else {
-            selection = "(" + selection + ") AND " + WHERE_CALENDARS_SELECTED;
-            if (selectionArgs != null && selectionArgs.length > 0) {
-                selectionArgs = Arrays.copyOf(selectionArgs, selectionArgs.length + 1);
-                selectionArgs[selectionArgs.length - 1] = WHERE_CALENDARS_ARGS[0];
-            } else {
-                selectionArgs = WHERE_CALENDARS_ARGS;
-            }
+        ContentUris.appendId(builder, begin);
+        ContentUris.appendId(builder, end);
+
+// Submit the query
+        cur =  cr.query(builder.build(),
+                INSTANCE_PROJECTION,
+                null,
+                null,
+                null);
+        if (cur == null) {
+            return null;
         }
-        return cr.query(builder.build(), projection, selection, selectionArgs,
-                orderBy == null ? DEFAULT_SORT_ORDER : orderBy);
+        ArrayList<String> arrayList = new ArrayList<>();
+        while (cur.moveToNext()) {
+            String title;
+            title = cur.getString(PROJECTION_TITLE_INDEX);
+            arrayList.add(title);
+            Log.i("TAG", "Event:  " + title);
+        }
+        cur.close();
+        return arrayList;
     }
+
 
 }

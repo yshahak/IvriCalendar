@@ -13,10 +13,10 @@ public class YearsManager {
     private static ArrayList<Year> years = new ArrayList<>();
     private static JewishCalendar currentCalendar = new JewishCalendar();
     private static Year currentYear;
-    static {
-        currentYear = new Year();
-        years.add(currentYear);
-    }
+//    static {
+//        currentYear = new Year();
+//        years.add(currentYear);
+//    }
 
     public static Month[] getMonth(int offset){
         Month[] months = new Month[3];

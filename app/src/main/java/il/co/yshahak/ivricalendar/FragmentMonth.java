@@ -48,7 +48,7 @@ public class FragmentMonth extends Fragment{
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         int offset = position - CURRENT_PAGE;
 //        Month month = MainActivity.year.getMonth(offset);
-        Month month = new Month(offset);
+        Month month = new Month(getActivity(), offset);
         if (month != null) {
             recyclerView.setAdapter(new CalendarRecyclerAdapter(month));
             myToolbar.setTitle(month.getMonthName() + " , " + month.getYearName());

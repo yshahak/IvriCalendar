@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 
 /**
@@ -48,7 +49,12 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             case VIEW_TYPE_DAY_ENPTY:
                 break;
             case VIEW_TYPE_DAY_CELL:
-                holder.label.setText(Month.hebrewDateFormatter.formatHebrewNumber(++position - DAYS_IN_WEEK - month.getHeadOffsetMonth()));
+//                holder.label.setText(Month.hebrewDateFormatter.formatHebrewNumber(++position - DAYS_IN_WEEK - month.getHeadOffsetMonth()));
+                Day day = month.getDays()[position - DAYS_IN_WEEK - month.getHeadOffsetMonth()];
+                holder.label.setText(day.getLabel());
+                for (String event : day.getGoogleEvents()){
+                    holder.label.append("\n" + event);
+                }
                 break;
         }
     }

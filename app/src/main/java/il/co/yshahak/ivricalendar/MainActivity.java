@@ -7,15 +7,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
-import il.co.yshahak.ivricalendar.calendar.jewish.Year;
 
 public class MainActivity extends AppCompatActivity{
 
     private ViewPager viewPager;
     private int pagerPosition;
-    public static Year year = new Year();
-    public static Month currentMonth = year.getCurrentMonth();
+//    public static Year year = new Year();
+//    public static Month currentMonth = year.getCurrentMonth();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +23,6 @@ public class MainActivity extends AppCompatActivity{
         viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
         viewPager.setCurrentItem(500);
 //        Contract.getCalendars(this);
-        Contract.getInstances(this, 3L);
 
     }
 
