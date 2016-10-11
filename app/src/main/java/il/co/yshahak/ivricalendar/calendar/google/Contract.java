@@ -14,10 +14,14 @@ import android.support.v4.app.ActivityCompat;
 import android.text.format.Time;
 import android.util.Log;
 
+import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static android.provider.CalendarContract.Instances.CONTENT_BY_DAY_URI;
 
 /**
  * Created by yshahak on 08/10/2016.
@@ -90,7 +94,7 @@ public class Contract {
         // Specify the date range you want to search for recurring
 // event instances
         // Construct the query with the desired date range.
-        Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon();
+        Uri.Builder builder = CONTENT_BY_DAY_URI.buildUpon();
 
         Cursor cur ;
         ContentResolver cr = activity.getContentResolver();
@@ -125,16 +129,18 @@ public class Contract {
     }
 
 
-    private static final String[] INSTANCE_PROJECTION = new String[] {
+    public static final String[] INSTANCE_PROJECTION = new String[] {
             Instances.EVENT_ID,      // 0
-            Instances.BEGIN,         // 1
-            Instances.TITLE          // 2
+            Instances.BEGIN,        // 1
+            Instances.END,        //2
+            Instances.TITLE          // 3
     };
 
 
     // The indices for the projection array above.
-    private static final int PROJECTION_BEGIN_INDEX = 1;
-    private static final int PROJECTION_TITLE_INDEX = 2;
+    public static final int PROJECTION_BEGIN_INDEX = 1;
+    public static final int PROJECTION_END_INDEX = 2;
+    public static final int PROJECTION_TITLE_INDEX = 3;
 
     public static void getInstances(Activity activity, Long eventId){
         // Specify the date range you want to search for recurring
@@ -158,7 +164,7 @@ public class Contract {
         String[] selectionArgs = new String[] {eventId.toString()};
 
 // Construct the query with the desired date range.
-        Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon();
+        Uri.Builder builder = CONTENT_BY_DAY_URI.buildUpon();
         ContentUris.appendId(builder, begin);
         ContentUris.appendId(builder, end);
 
@@ -210,7 +216,7 @@ public class Contract {
         ContentResolver cr = activity.getContentResolver();
 
 // Construct the query with the desired date range.
-        Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon();
+        Uri.Builder builder = CONTENT_BY_DAY_URI.buildUpon();
         ContentUris.appendId(builder, begin);
         ContentUris.appendId(builder, end);
 
@@ -234,5 +240,29 @@ public class Contract {
         return arrayList;
     }
 
+    public static Uri asSyncAdapter(JewishCalendar jewishCalendar) {
+        jewishCalendar.setJewishDayOfMonth(1);
+        Time time = new Time();
+        time.set(jewishCalendar.getTime().getTime());
+        time.allDay = true;
+        time.hour = 0;
+        time.minute = 0;
+        time.second = 0;
+        long begin = Time.getJulianDay(time.toMillis(true), 0);
+        if (jewishCalendar.getDaysInJewishMonth() == 29){
+            time.monthDay += 29;
+        } else {
+            time.monthDay += 30;
+        }
+        long end = Time.getJulianDay(time.toMillis(true), 0);
+
+        Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon()
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+                .appendQueryParameter(Calendars.ACCOUNT_NAME, "yshahak@gmail.com")
+                .appendQueryParameter(Calendars.ACCOUNT_TYPE, "com.google");
+        ContentUris.appendId(builder, begin);
+        ContentUris.appendId(builder, end);
+        return builder.build();
+    }
 
 }

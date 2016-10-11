@@ -1,5 +1,7 @@
 package il.co.yshahak.ivricalendar.calendar.jewish;
 
+import android.app.Activity;
+
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
 import java.util.ArrayList;
@@ -10,21 +12,20 @@ import java.util.ArrayList;
 
 public class YearsManager {
 
-    private static ArrayList<Year> years = new ArrayList<>();
+    private final ArrayList<Year> years = new ArrayList<>();
     private static JewishCalendar currentCalendar = new JewishCalendar();
     private static Year currentYear;
-//    static {
-//        currentYear = new Year();
-//        years.add(currentYear);
-//    }
 
-    public static Month[] getMonth(int offset){
+
+    public YearsManager(Activity context) {
+        currentYear = new Year(context);
+    }
+
+    public static Month[] getMonthes(Activity context, int offset){
         Month[] months = new Month[3];
-        int currentMonth = currentCalendar.getJewishMonth();
-        int desired = currentMonth + offset;
-        months[0] = addMonth(desired - 1);
-        months[1] = addMonth(desired);
-        months[2] = addMonth(desired + 1);
+        months[0] = new Month(context, offset - 1);
+        months[1] = new Month(context, offset);
+        months[2] = new Month(context, offset + 1);
         return months;
     }
 

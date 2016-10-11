@@ -21,8 +21,8 @@ public class Year {
         this.jewishYear = jewishCalendar.getJewishYear();
         for (int i = 0 ; i < months.length; i++){
             jewishCalendar.setJewishMonth(i + 1);
-//            Month month = new Month(ativity, jewishCalendar);
-//            months[i] = month;
+            Month month = new Month(ativity, jewishCalendar);
+            months[i] = month;
         }
     }
 

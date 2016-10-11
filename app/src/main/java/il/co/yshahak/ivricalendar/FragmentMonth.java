@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.YearsManager;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 
@@ -42,15 +43,25 @@ public class FragmentMonth extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
-        RecyclerView recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
         Toolbar myToolbar = (Toolbar) root.findViewById(R.id.my_toolbar);
+        RecyclerView days = (RecyclerView) root.findViewById(R.id.recycler_view_days);
+        days.setLayoutManager(new GridLayoutManager(getActivity(), 7));
+        days.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        days.setHasFixedSize(true);
+        days.setAdapter(new DaysHeaderAdapter());
+
+        RecyclerView recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        recyclerView.setHasFixedSize(true);
+
+
         int offset = position - CURRENT_PAGE;
 //        Month month = MainActivity.year.getMonth(offset);
         Month month = new Month(getActivity(), offset);
-        if (month != null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapter(month));
+        Month[] months = YearsManager.getMonthes(getActivity(), offset);
+        if (months != null) {
+//            recyclerView.setAdapter(new CalendarRecyclerAdapter(months));
             myToolbar.setTitle(month.getMonthName() + " , " + month.getYearName());
         }
         ((AppCompatActivity)getActivity()).setSupportActionBar(myToolbar);

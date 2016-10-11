@@ -13,26 +13,25 @@ import il.co.yshahak.ivricalendar.calendar.jewish.Month;
  * Created by yshahak on 07/10/2016.
  */
 public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecyclerAdapter.ViewHolder> {
-    private final static String[] dayHeaders= {"ראשון" , "שני"  , "שלישי", "רביעי", "חמישי", "שישי", "שבת"};
-    private final static int DAYS_IN_WEEK = 7;
-    private final static int VIEW_TYPE_HEADER_WEEK = 0;
     private final static int VIEW_TYPE_DAY_CELL = 1;
-    private final static int VIEW_TYPE_DAY_ENPTY = 2;
+    private final static int VIEW_TYPE_HEAD = 2;
+    private static final int VIEW_TYPE_TAIL = 3;
     private Month month;
 
-    public CalendarRecyclerAdapter(Month month) {
-        this.month = month;
+    public CalendarRecyclerAdapter(Month monthes) {
+        this.month = monthes;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position < DAYS_IN_WEEK){
-            return VIEW_TYPE_HEADER_WEEK;
+
+        if (position  <  month.getHeadOffsetMonth()){
+            return VIEW_TYPE_HEAD;
         }
-        if (position - DAYS_IN_WEEK < month.getHeadOffsetMonth()){
-            return VIEW_TYPE_DAY_ENPTY;
+        if (position <  month.getHeadOffsetMonth() + month.getMonthNumberOfDays()) {
+            return VIEW_TYPE_DAY_CELL;
         }
-        return VIEW_TYPE_DAY_CELL;
+        return VIEW_TYPE_TAIL;
     }
 
     @Override
@@ -42,33 +41,40 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Day day = null;
         switch (holder.getItemViewType()){
-            case VIEW_TYPE_HEADER_WEEK:
-                holder.label.setText(dayHeaders[position]);
-                break;
-            case VIEW_TYPE_DAY_ENPTY:
+            case VIEW_TYPE_HEAD:
+//                Month month = months[0];
+//                day = month.getDays()[month.getMonthNumberOfDays() - 1 - position];
                 break;
             case VIEW_TYPE_DAY_CELL:
-//                holder.label.setText(Month.hebrewDateFormatter.formatHebrewNumber(++position - DAYS_IN_WEEK - month.getHeadOffsetMonth()));
-                Day day = month.getDays()[position - DAYS_IN_WEEK - month.getHeadOffsetMonth()];
-                holder.label.setText(day.getLabel());
-                for (String event : day.getGoogleEvents()){
-                    holder.label.append("\n" + event);
-                }
+                day = month.getDays()[position - month.getHeadOffsetMonth()];
+                setDay(holder, day);
                 break;
+            case VIEW_TYPE_TAIL:
+//                day = months[2].getDays()[position - months[1].getHeadOffsetMonth() - months[1].getMonthNumberOfDays()];
+                break;
+        }
+
+    }
+
+    private void setDay(ViewHolder holder, Day day){
+        holder.label.setText(day.getLabel());
+        for (String event : day.getGoogleEvents()){
+            holder.label.append("\n" + event);
         }
     }
 
     @Override
     public int getItemCount() {
-        return month.getMonthNumberOfDays() + month.getHeadOffsetMonth() + DAYS_IN_WEEK;
+        return  month.getHeadOffsetMonth() + month.getMonthNumberOfDays() + month.getTrailOffsetMonth() ;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView label;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             label = (TextView) itemView.findViewById(R.id.cell_label);
         }
