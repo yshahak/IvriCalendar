@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity{
         viewPager = (ViewPager)findViewById(R.id.view_pager);
         viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
         viewPager.setCurrentItem(500);
-//        Contract.getCalendars(this);
+        Contract.getCalendars(this);
 
     }
 

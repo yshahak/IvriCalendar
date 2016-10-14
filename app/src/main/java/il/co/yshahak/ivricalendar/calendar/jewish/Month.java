@@ -1,16 +1,12 @@
 package il.co.yshahak.ivricalendar.calendar.jewish;
 
-import android.app.Activity;
 import android.content.Context;
 
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import il.co.yshahak.ivricalendar.calendar.google.Contract;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -65,14 +61,14 @@ public class Month {
         this.trailOffsetMonth = setTrailOffset(jewishCalendar);
         this.isFullMonth = (monthNumberOfDays == 30);
         days = isFullMonth ? new Day[30] : new Day[29];
-        for (int i = 0; i < days.length; i++) {
-            jewishCalendar.setJewishDayOfMonth(i + 1);
-            String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(jewishCalendar.getTime());
-            ArrayList<String> events = Contract.getInstancesForDate((Activity) context, calendar);
-            days[i] = new Day(events, label);
-        }
+//        for (int i = 0; i < days.length; i++) {
+//            jewishCalendar.setJewishDayOfMonth(i + 1);
+//            String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTime(jewishCalendar.getTime());
+//            ArrayList<String> events = Contract.getInstancesForDate((Activity) context, calendar);
+//            days[i] = new Day(events, label);
+//        }
     }
 
     private int setHeadOffset(JewishCalendar jewishCalendar) {

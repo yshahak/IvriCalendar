@@ -16,7 +16,7 @@ public class DaysHeaderAdapter extends RecyclerView.Adapter<DaysHeaderAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_header, parent, false));
     }
 
     @Override

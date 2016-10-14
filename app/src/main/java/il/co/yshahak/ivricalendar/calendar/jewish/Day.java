@@ -2,18 +2,20 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import java.util.ArrayList;
 
+import il.co.yshahak.ivricalendar.calendar.google.Event;
+
 /**
  * Created by yshahak on 09/10/2016.
  */
 
 public class Day {
 
-    private ArrayList<String> googleEvents = new ArrayList<>();
+    private ArrayList<Event> googleEvents = new ArrayList<>();
     private final String label;
     private long startDayInMillis, endDayInMillis;
 
 
-    public Day(ArrayList<String> googleEvents, String label) {
+    public Day(ArrayList<Event> googleEvents, String label) {
         this.googleEvents = googleEvents;
         this.label = label;
     }
@@ -25,7 +27,7 @@ public class Day {
 //        Log.i("Day", "Event:  " + label + " , start: " + startDayInMillis + " ,end " + endDayInMillis );
     }
 
-    public ArrayList<String> getGoogleEvents() {
+    public ArrayList<Event> getGoogleEvents() {
         return googleEvents;
     }
 

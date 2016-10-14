@@ -40,8 +40,8 @@ public class Contract {
     };
 
     // The indices for the projection array above.
-    private static final int PROJECTION_ID_INDEX = 0;
-    private static final int PROJECTION_ACCOUNT_NAME_INDEX = 1;
+    public static final int PROJECTION_ID_INDEX = 0;
+    private static final int PROJECTION_ACCOUNTNAME_INDEX = 1;
     private static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
     private static final int PROJECTION_OWNER_ACCOUNT_INDEX = 3;
 
@@ -55,7 +55,7 @@ public class Contract {
         String[] selectionArgs = new String[]{"Ester&Yaakov"};
         // Submit the query and get a Cursor object back.
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
-            cur = cr.query(uri, Calendar_PROJECTION, selection, selectionArgs, null);
+            cur = cr.query(uri, Calendar_PROJECTION, null, null, null);
             if (cur != null) {
                 while (cur.moveToNext()) {
                     long calID = 0;
@@ -66,9 +66,9 @@ public class Contract {
                     // Get the field values
                     calID = cur.getLong(PROJECTION_ID_INDEX);
                     displayName = cur.getString(PROJECTION_DISPLAY_NAME_INDEX);
-                    accountName = cur.getString(PROJECTION_ACCOUNT_NAME_INDEX);
+                    accountName = cur.getString(PROJECTION_ACCOUNTNAME_INDEX);
                     ownerName = cur.getString(PROJECTION_OWNER_ACCOUNT_INDEX);
-                    Log.d("TAG", "calID: " + calID);
+                    Log.d("TAG", "calID: " + calID + " , displayName: " + displayName + ", accountName: " + accountName + " , ownerName: " + ownerName);
                     getEvent(activity, calID);
                 };
                 cur.close();
@@ -130,17 +130,23 @@ public class Contract {
 
 
     public static final String[] INSTANCE_PROJECTION = new String[] {
-            Instances.EVENT_ID,      // 0
-            Instances.BEGIN,        // 1
-            Instances.END,        //2
-            Instances.TITLE          // 3
-    };
+            Instances.EVENT_ID,       // 0
+            Instances.BEGIN,          // 1
+            Instances.END,            // 2
+            Instances.TITLE ,         // 3
+            Instances.DISPLAY_COLOR,   // 4
+            Calendars.CALENDAR_DISPLAY_NAME,     //5
+            Calendars.CALENDAR_COLOR,   //6
+            Calendars.OWNER_ACCOUNT };   //7
 
 
     // The indices for the projection array above.
     public static final int PROJECTION_BEGIN_INDEX = 1;
     public static final int PROJECTION_END_INDEX = 2;
     public static final int PROJECTION_TITLE_INDEX = 3;
+    public static final int PROJECTION_DISPLAY_COLOR_INDEX = 4;
+    public static final int PROJECTION_CALENDAR_DISPLAY_NAME_INDEX = 5;
+    public static final int PROJECTION_CALENDAR_COLOR_INDEX = 6;
 
     public static void getInstances(Activity activity, Long eventId){
         // Specify the date range you want to search for recurring
@@ -160,8 +166,8 @@ public class Contract {
         Cursor cur ;
         ContentResolver cr = activity.getContentResolver();
 
-        String selection = Instances.EVENT_ID + " = ?";
-        String[] selectionArgs = new String[] {eventId.toString()};
+//        String selection = OWNER_ACCOUNT + " = ?";
+//        String[] selectionArgs = new String[] {"yshahak@gmail.com"};
 
 // Construct the query with the desired date range.
         Uri.Builder builder = CONTENT_BY_DAY_URI.buildUpon();
