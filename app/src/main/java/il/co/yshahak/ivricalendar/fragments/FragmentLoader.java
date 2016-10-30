@@ -1,4 +1,4 @@
-package il.co.yshahak.ivricalendar.calendar;
+package il.co.yshahak.ivricalendar.fragments;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import il.co.yshahak.ivricalendar.CalendarRecyclerAdapter;
-import il.co.yshahak.ivricalendar.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapter;
+import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
@@ -108,9 +108,10 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // We only have one loader, so we can ignore the value of i.
         // (It'll be '0', as set in onCreate().)
-        String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? AND " +
-                CalendarContract.Calendars.ACCOUNT_NAME +  " = ? ";
-        String[] WHERE_CALENDARS_ARGS = {"1", "yshahak@gmail.com"};
+        Log.d("TAG", "onCreateLoader: " + position);
+        String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
+//                CalendarContract.Calendars.ACCOUNT_NAME +  " = ? ";
+        String[] WHERE_CALENDARS_ARGS = {"1"};//, "yshahak@gmail.com"};
         return new CursorLoader(getActivity(),  // Context
                 Contract.asSyncAdapter(jewishCalendar), // URI
                 INSTANCE_PROJECTION,                // Projection
@@ -168,17 +169,12 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
                     eventMap.put(calendarName, list);
                 }
                 list.add(event);
-//            DateFormat formatter = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
-//            begin = formatter.format(new Date(start));
-//            finish = formatter.format(new Date(end));
-            Log.i("TAG", "Event:  " + title + " , cal name: " +calendarName  + " , cal color: " + calendarColor + " , display color: " + displayColor);
             }
-            return null;
+             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
             setRecyclerView();
         }
     }

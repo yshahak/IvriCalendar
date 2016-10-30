@@ -32,9 +32,9 @@ public class Month {
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
+        this.isFullMonth = (monthNumberOfDays == 30);
         this.headOffsetMonth = setHeadOffset(jewishCalendar);
         this.trailOffsetMonth = setTrailOffset(jewishCalendar);
-        this.isFullMonth = (monthNumberOfDays == 30);
         days = isFullMonth ? new Day[30] : new Day[29];
         for (int i = 0; i < days.length; i++) {
             jewishCalendar.setJewishDayOfMonth(i + 1);
@@ -57,9 +57,9 @@ public class Month {
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
+        this.isFullMonth = (monthNumberOfDays == 30);
         this.headOffsetMonth = setHeadOffset(jewishCalendar);
         this.trailOffsetMonth = setTrailOffset(jewishCalendar);
-        this.isFullMonth = (monthNumberOfDays == 30);
         days = isFullMonth ? new Day[30] : new Day[29];
 //        for (int i = 0; i < days.length; i++) {
 //            jewishCalendar.setJewishDayOfMonth(i + 1);

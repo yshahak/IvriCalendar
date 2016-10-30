@@ -1,4 +1,4 @@
-package il.co.yshahak.ivricalendar;
+package il.co.yshahak.ivricalendar.adapters;
 
 import android.app.Activity;
 import android.content.ContentUris;
@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
@@ -20,6 +22,8 @@ import il.co.yshahak.ivricalendar.calendar.jewish.Month;
  * Created by yshahak on 07/10/2016.
  */
 public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecyclerAdapter.ViewHolder> {
+    private static final int REQUEST_CODE_EDIT_EVENT = 100;
+
     private final static int VIEW_TYPE_DAY_CELL = 1;
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
@@ -75,6 +79,7 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             holder.cellContainer.addView(textView);
             textView.setTag(event);
             textView.setOnClickListener(holder);
+            textView.setOnLongClickListener(holder);
         }
     }
 
@@ -83,7 +88,7 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
         return  month.getHeadOffsetMonth() + month.getMonthNumberOfDays() + month.getTrailOffsetMonth() ;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private LinearLayout cellContainer;
         private TextView label;
@@ -99,11 +104,24 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             Event event = (Event) view.getTag();
             if (event != null) {
                 Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
+                Intent intent = new Intent(Intent.ACTION_VIEW)
+                        .setData(uri);
+                itemView.getContext().startActivity(intent);
+                MainActivity.recreateFlag = true;
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            Event event = (Event) view.getTag();
+            if (event != null) {
+                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
                 Intent intent = new Intent(Intent.ACTION_EDIT)
                         .setData(uri)
                         .putExtra(CalendarContract.Events.TITLE, event.getEventTitle());
-                ((Activity)itemView.getContext()).startActivityForResult(intent, 0);
+                ((Activity)itemView.getContext()).startActivityForResult(intent, REQUEST_CODE_EDIT_EVENT);
             }
+            return true;
         }
     }
 }

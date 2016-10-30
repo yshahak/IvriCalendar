@@ -1,10 +1,12 @@
-package il.co.yshahak.ivricalendar;
+package il.co.yshahak.ivricalendar.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import il.co.yshahak.ivricalendar.R;
 
 /**
  * Created by yshahak on 10/10/2016.

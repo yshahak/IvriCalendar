@@ -2,8 +2,6 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import android.app.Activity;
 
-import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
-
 import java.util.ArrayList;
 
 /**
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 public class YearsManager {
 
     private final ArrayList<Year> years = new ArrayList<>();
-    private static JewishCalendar currentCalendar = new JewishCalendar();
     private static Year currentYear;
 
 

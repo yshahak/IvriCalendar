@@ -264,7 +264,7 @@ public class Contract {
 
         Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
-                .appendQueryParameter(Calendars.ACCOUNT_NAME, "yshahak@gmail.com")
+//                .appendQueryParameter(Calendars.ACCOUNT_NAME, "yshahak@gmail.com")
                 .appendQueryParameter(Calendars.ACCOUNT_TYPE, "com.google");
         ContentUris.appendId(builder, begin);
         ContentUris.appendId(builder, end);

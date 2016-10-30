@@ -1,8 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/view_pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="il.co.yshahak.ivricalendar.MainActivity"/>
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="il.co.yshahak.ivricalendar.activities.MainActivity"/>
+
+    <LinearLayout
+        android:id="@+id/add_event_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@color/add_event_bg"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="צור אירוע:"/>
+
+        <RadioGroup
+            android:id="@+id/radio_group_format"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/format_loazi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                style="@style/style_radio_group"
+                android:text="מבוסס תאריך לועזי"/>
+
+            <RadioButton
+                android:id="@+id/format_ivri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/style_radio_group"
+                android:text="מבוסס תאריך עברי"/>
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/event_create_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="צור"/>
+
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_input_add"/>
+</FrameLayout>
 

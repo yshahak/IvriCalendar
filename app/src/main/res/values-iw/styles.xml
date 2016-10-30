@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <!-- <style name="style_radio_group" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:layout_gravity">right|center_vertical</item>
+    </style>-->
+</resources>
