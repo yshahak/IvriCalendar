@@ -15,7 +15,7 @@ public class Event {
 
     public Event(int eventId, String eventTitle, boolean allDayEvent, long begin, long end, int displayColor, String calendarDisplayName) {
         this.eventId = eventId;
-        this.eventTitle = eventTitle;
+        this.eventTitle = (eventTitle != null && eventTitle.length() > 0) ? eventTitle : "(ללא כותרת)";
         this.allDayEvent = allDayEvent;
         this.begin = begin;
         this.end = end;

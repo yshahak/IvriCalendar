@@ -35,7 +35,7 @@
             android:layout_height="wrap_content">
 
             <RadioButton
-                android:id="@+id/format_loazi"
+                android:id="@+id/event_loazi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
@@ -43,7 +43,7 @@
                 android:text="מבוסס תאריך לועזי"/>
 
             <RadioButton
-                android:id="@+id/format_ivri"
+                android:id="@+id/event_ivri"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/style_radio_group"

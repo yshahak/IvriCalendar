@@ -3,7 +3,6 @@ package il.co.yshahak.ivricalendar.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
 import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 
@@ -13,6 +12,7 @@ import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
     public static DIRECTION direction = DIRECTION.NULL;
+    public static boolean dropPages;
 
     public CalendarPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
@@ -20,14 +20,14 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Log.d("TAG", "getItem, position: "  + position);
+//        Log.d("TAG", "getItem, position: "  + position);
         return FragmentLoader.newInstance(position);
     }
 
     @Override
     public int getItemPosition(Object object) {
 //        Log.d("TAG", "getItemPosition: "  + object.toString());
-        return POSITION_NONE;
+        return dropPages ? POSITION_NONE : super.getItemPosition(object) ;
 
 //        if (direction != DIRECTION.NULL){
 //            int currentPosition = ((FragmentMonth)object).getPosition();

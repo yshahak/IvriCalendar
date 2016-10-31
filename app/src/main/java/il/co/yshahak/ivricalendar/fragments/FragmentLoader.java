@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +107,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // We only have one loader, so we can ignore the value of i.
         // (It'll be '0', as set in onCreate().)
-        Log.d("TAG", "onCreateLoader: " + position);
+//        Log.d("TAG", "onCreateLoader: " + position);
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
 //                CalendarContract.Calendars.ACCOUNT_NAME +  " = ? ";
         String[] WHERE_CALENDARS_ARGS = {"1"};//, "yshahak@gmail.com"};

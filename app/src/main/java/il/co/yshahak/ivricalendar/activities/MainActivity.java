@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton fab;
     private Button eventBtnCreate;
     public static boolean recreateFlag;
+    private RadioGroup formatGroupChoiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab.setOnClickListener(this);
         eventBtnCreate = (Button) findViewById(R.id.event_create_btn);
         eventBtnCreate.setOnClickListener(this);
-
+        formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -64,7 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         PagerAdapter pagerAdapter = viewPager.getAdapter();
         if (pagerAdapter != null) {
+            CalendarPagerAdapter.dropPages = true;
             pagerAdapter.notifyDataSetChanged();
+            CalendarPagerAdapter.dropPages = false;
         } else {
             viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
             viewPager.setCurrentItem(500);
@@ -75,40 +79,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.equals(fab)) {
-            floatBtnPressedState = true;
-            v.animate().alpha(0).start();
-            viewPager.animate().alpha(0.15f).start();
-            fab.setClickable(false);
-            createEventFrameLayout.setVisibility(View.VISIBLE);
-            createEventFrameLayout.animate().setListener(null).alpha(1).start();
+            fadeInEventCreationLayout();
         } else if (v.equals(eventBtnCreate)) {
-            Intent intent = new Intent(Intent.ACTION_EDIT)
-                    .setData(CalendarContract.Events.CONTENT_URI);
-            startActivity(intent);
+            switch (formatGroupChoiser.getCheckedRadioButtonId()){
+                case R.id.event_loazi:
+                    Intent intent = new Intent(Intent.ACTION_EDIT)
+                            .setData(CalendarContract.Events.CONTENT_URI);
+                    startActivity(intent);
+                    break;
+                case R.id.event_ivri:
+                    Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
+                    startActivity(intentIvri);
+                    break;
+            }
+            fadeOutEventCreationLayout();
         }
     }
 
     @Override
     public void onBackPressed() {
         if (floatBtnPressedState) {
-            floatBtnPressedState = false;
-            fab.animate().alpha(1).start();
-            viewPager.animate().alpha(1).start();
-            fab.setClickable(true);
-            createEventFrameLayout.animate().alpha(0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    onAnimationEnd(animation);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    createEventFrameLayout.setVisibility(View.GONE);
-                    animation.removeAllListeners();
-                }
-            }).start();
+           fadeOutEventCreationLayout();
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void fadeInEventCreationLayout(){
+        floatBtnPressedState = true;
+        fab.animate().alpha(0).start();
+        viewPager.animate().alpha(0.15f).start();
+        fab.setClickable(false);
+        createEventFrameLayout.setVisibility(View.VISIBLE);
+        createEventFrameLayout.animate().setListener(null).alpha(1).start();
+    }
+
+    private void fadeOutEventCreationLayout(){
+        floatBtnPressedState = false;
+        fab.animate().alpha(1).start();
+        viewPager.animate().alpha(1).start();
+        fab.setClickable(true);
+        createEventFrameLayout.animate().alpha(0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                onAnimationEnd(animation);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                createEventFrameLayout.setVisibility(View.GONE);
+                animation.removeAllListeners();
+            }
+        }).start();
     }
 }
