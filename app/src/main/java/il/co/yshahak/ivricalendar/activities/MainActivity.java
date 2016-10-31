@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewPager = (ViewPager) findViewById(R.id.view_pager);
 
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
-//        Contract.getCalendars(this);
+        Contract.getCalendars(this);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);

@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -44,6 +46,19 @@ public class Contract {
     private static final int PROJECTION_ACCOUNTNAME_INDEX = 1;
     private static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
     private static final int PROJECTION_OWNER_ACCOUNT_INDEX = 3;
+    private static final String HEBREW_CALENDAR_DISPLAY_NAME = "לוח עברי על הבר";
+
+    public void addHebrewCalendarToGoogleServer(Context context){
+        long calID = 2;
+        ContentValues values = new ContentValues();
+        Uri.Builder builder = Calendars.CONTENT_URI.buildUpon()
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true");
+//                .appendQueryParameter(Calendars.ACCOUNT_NAME, "yshahak@gmail.com")
+//                .appendQueryParameter(Calendars.ACCOUNT_TYPE, "com.google");
+        values.put(Calendars.CALENDAR_DISPLAY_NAME, HEBREW_CALENDAR_DISPLAY_NAME);
+        values.put(Calendars.ACCOUNT_TYPE, "com.google");
+        Uri uri = context.getContentResolver().insert(builder.build(), values);
+    }
 
     public static void getCalendars(Activity activity) {
         // Run query

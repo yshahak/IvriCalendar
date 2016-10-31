@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.CreteIvriEventActivity"/>
+        <activity android:name=".activities.CreteIvriEventActivity" android:exported="true"/>
+        <activity android:name=".activities.GoogleSignInActivity" android:exported="true"/>
 
     </application>
 
