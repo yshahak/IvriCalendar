@@ -1,22 +1,31 @@
 package il.co.yshahak.ivricalendar.activities;
 
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -26,32 +35,38 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+
+import il.co.yshahak.ivricalendar.R;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Created by B.E.L on 31/10/2016.
  */
 
-public class GoogleSignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class GoogleSignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks {
     private static final int RC_SIGN_IN = 100;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String TAG = "TAG";
     private GoogleAccountCredential mCredential;
+    private com.google.api.services.calendar.Calendar mService;
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -64,42 +79,54 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.default_web_client_id))
-//                .requestScopes(new Scope("https://www.googleapis.com/auth/calendar"))
-//                .build();
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this , this)
-//                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-//                .build();
-//        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-//        startActivityForResult(signInIntent, RC_SIGN_IN);
-//        mAuth = FirebaseAuth.getInstance();
-//        mAuthListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                FirebaseUser user = firebaseAuth.getCurrentUser();
-//                if (user != null) {
-//                    // User is signed in
-//                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-//                } else {
-//                    // User is signed out
-//                    Log.d(TAG, "onAuthStateChanged:signed_out");
-//                }
-//                // ...
-//            }
-//        };
-        // Initialize credentials and service object.
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff());
-        getResultsFromApi();
+//         Configure sign-in to request the user's ID, email address, and basic
+//         profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestScopes(new Scope(CalendarScopes.CALENDAR))
+                .build();
+//         Build a GoogleApiClient with access to the Google Sign-In API and the
+//         options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this , this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
 
 
+
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 
     /**
@@ -115,7 +142,7 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         }else {
-            new MakeRequestTask(mCredential).execute();
+            new MakeRequestTask().execute();
         }
     }
 
@@ -124,16 +151,10 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-        private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
 
-        MakeRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.calendar.Calendar.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Calendar API Android Quickstart")
-                    .build();
+        MakeRequestTask() {
+
         }
 
         /**
@@ -143,7 +164,37 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
         @Override
         protected List<String> doInBackground(Void... params) {
             try {
-                return getDataFromApi();
+                HttpTransport transport = AndroidHttp.newCompatibleTransport();
+                JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+                mService = new com.google.api.services.calendar.Calendar.Builder(
+                        transport, jsonFactory, mCredential)
+                        .setApplicationName("applicationName")
+                        .build();
+                com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+                calendar.setSummary("לוח שנה עברי");
+                calendar.setTimeZone("America/Los_Angeles");
+
+                // Insert the new calendar
+                com.google.api.services.calendar.model.Calendar createdCalendar;
+                try {
+
+                    //enter statements that can cause exceptio
+                 URL url = new URL("https://www.googleapis.com/calendar/v3/calendars?key={YOUR_API_KEY}");
+                    HttpURLConnection client = (HttpURLConnection) url.openConnection();
+                    client.getResponseMessage();
+
+                } catch (Exception e){
+
+                }
+//                try {
+//                    createdCalendar = mService.calendars().insert(calendar).execute();
+//                    System.out.println(createdCalendar.getId());
+//                } catch (UserRecoverableAuthIOException e) {
+//                    e.printStackTrace();
+//                }
+                return null;
+
+//                return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -211,19 +262,30 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
      * function will be rerun automatically whenever the GET_ACCOUNTS permission
      * is granted.
      */
+    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
-        String accountName = getPreferences(Context.MODE_PRIVATE)
-                .getString(PREF_ACCOUNT_NAME, null);
-        if (accountName != null) {
-            mCredential.setSelectedAccountName(accountName);
-            getResultsFromApi();
+        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED) {
+            String accountName = getPreferences(Context.MODE_PRIVATE)
+                    .getString(PREF_ACCOUNT_NAME, null);
+            if (accountName != null) {
+                mCredential.setSelectedAccountName(accountName);
+                getResultsFromApi();
+            } else {
+                // Start a dialog from which the user can choose an account
+                startActivityForResult(
+                        mCredential.newChooseAccountIntent(),
+                        REQUEST_ACCOUNT_PICKER);
+            }
         } else {
-            // Start a dialog from which the user can choose an account
-            startActivityForResult(
-                    mCredential.newChooseAccountIntent(),
-                    REQUEST_ACCOUNT_PICKER);
+            // Request the GET_ACCOUNTS permission via a user dialog
+            EasyPermissions.requestPermissions(
+                    this,
+                    "This app needs to access your Google account (via Contacts).",
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    Manifest.permission.GET_ACCOUNTS);
         }
     }
+
 
 
     /**
@@ -240,6 +302,21 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
+            case RC_SIGN_IN:        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                if (result.isSuccess()) {
+                    // Google Sign In was successful, authenticate with Firebase
+                    GoogleSignInAccount account = result.getSignInAccount();
+                    if (account != null) {
+                        String token = account.getIdToken();
+                    }
+                    firebaseAuthWithGoogle(account);
+                } else {
+                    // Google Sign In failed, update UI appropriately
+                    // ...
+                }
+                break;
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
 //                    mOutputText.setText(
@@ -272,7 +349,6 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
                 break;
         }
     }
-
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
      * @param requestCode The request code passed in
@@ -286,8 +362,8 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        EasyPermissions.onRequestPermissionsResult(
-//                requestCode, permissions, grantResults, this);
+        EasyPermissions.onRequestPermissionsResult(
+                requestCode, permissions, grantResults, this);
     }
 
     /**
@@ -297,60 +373,35 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
      *         permission
      * @param list The requested permission list. Never null.
      */
-//    @Override
-//    public void onPermissionsGranted(int requestCode, List<String> list) {
-//        // Do nothing.
-//    }
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> list) {
+        // Do nothing.
+    }
 
     /**
-//     * Callback for when a permission is denied using the EasyPermissions
-//     * library.
-//     * @param requestCode The request code associated with the requested
-//     *         permission
-//     * @param list The requested permission list. Never null.
-//     */
-//    @Override
-//    public void onPermissionsDenied(int requestCode, List<String> list) {
-//        // Do nothing.
-//    }
+     * Callback for when a permission is denied using the EasyPermissions
+     * library.
+     * @param requestCode The request code associated with the requested
+     *         permission
+     * @param list The requested permission list. Never null.
+     */
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> list) {
+        // Do nothing.
+    }
+
+    /**
+     * Checks whether the device currently has a network connection.
+     * @return true if the device has a network connection, false otherwise.
+     */
+    private boolean isDeviceOnline() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
 
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        mAuth.addAuthStateListener(mAuthListener);
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        if (mAuthListener != null) {
-//            mAuth.removeAuthStateListener(mAuthListener);
-//        }
-//    }
-
-
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-//        if (requestCode == RC_SIGN_IN) {
-//            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-//            if (result.isSuccess()) {
-//                // Google Sign In was successful, authenticate with Firebase
-//                GoogleSignInAccount account = result.getSignInAccount();
-//                if (account != null) {
-//                    String token = account.getIdToken();
-//                }
-//                firebaseAuthWithGoogle(account);
-//            } else {
-//                // Google Sign In failed, update UI appropriately
-//                // ...
-//            }
-//        }
-//    }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
@@ -361,36 +412,26 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(GoogleSignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            GoogleAccountCredential mCredential = GoogleAccountCredential.usingOAuth2(
-                                    getApplicationContext(), Collections.singletonList("https://www.googleapis.com/auth/calendar"))
+                            mCredential = GoogleAccountCredential.usingOAuth2(
+                                    getApplicationContext(), Arrays.asList(SCOPES))
                                     .setBackOff(new ExponentialBackOff());
-
-                            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-                            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-                            // Initialize Calendar service with valid OAuth credentials
-                            Calendar service = new Calendar.Builder(transport, jsonFactory, mCredential)
-                                    .setApplicationName("applicationName").build();
-
-                            com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-                            calendar.setSummary("לוח שנה עברי");
-                            // Insert the new calendar
-                            com.google.api.services.calendar.model.Calendar createdCalendar;
-                            try {
-                                createdCalendar = service.calendars().insert(calendar).execute();
-                                System.out.println(createdCalendar.getId());
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            getResultsFromApi();
+//                            com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+//                            calendar.setSummary("לוח שנה עברי");
+//                            // Insert the new calendar
+//                            com.google.api.services.calendar.model.Calendar createdCalendar;
+//                            try {
+//                                createdCalendar = mService.calendars().insert(calendar).execute();
+//                                System.out.println(createdCalendar.getId());
+//
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
 
                         }
                     }
