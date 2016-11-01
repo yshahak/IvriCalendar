@@ -1,6 +1,6 @@
 package il.co.yshahak.ivricalendar.calendar.jewish;
 
-import android.content.Context;
+import android.util.Log;
 
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
@@ -19,7 +19,7 @@ public class Month {
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
-
+    private JewishCalendar jewishCalendar;
     private Day[] days;
     private String yearName;
     private String monthName;
@@ -27,8 +27,10 @@ public class Month {
     private int headOffsetMonth;
     private int trailOffsetMonth;
     private boolean isFullMonth;
+    private boolean isCurrentMonth;
 
-    public Month(JewishCalendar jewishCalendar) {
+    public Month(JewishCalendar jewishCalendar, boolean isCurrentMonth) {
+        this.jewishCalendar = (JewishCalendar) jewishCalendar.clone();
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
@@ -39,37 +41,11 @@ public class Month {
         for (int i = 0; i < days.length; i++) {
             jewishCalendar.setJewishDayOfMonth(i + 1);
             String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
-            days[i] = new Day(label, getBeginAndEnd(jewishCalendar));
+            days[i] = new Day(label, getBeginAndEnd(jewishCalendar), jewishCalendar.getJewishDayOfMonth());
         }
+        this.isCurrentMonth = isCurrentMonth;
     }
 
-
-    public Month(Context context, JewishCalendar jewishCalendar) {
-        init(context, jewishCalendar);
-    }
-
-    public Month(Context context, int offset) {
-//        JewishCalendar jewishCalendar = shiftMonth(offset);
-//        init(context, jewishCalendar);
-    }
-
-    private void init(Context context, JewishCalendar jewishCalendar) {
-        this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
-        this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
-        this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
-        this.isFullMonth = (monthNumberOfDays == 30);
-        this.headOffsetMonth = setHeadOffset(jewishCalendar);
-        this.trailOffsetMonth = setTrailOffset(jewishCalendar);
-        days = isFullMonth ? new Day[30] : new Day[29];
-//        for (int i = 0; i < days.length; i++) {
-//            jewishCalendar.setJewishDayOfMonth(i + 1);
-//            String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.setTime(jewishCalendar.getTime());
-//            ArrayList<String> events = Contract.getInstancesForDate((Activity) context, calendar);
-//            days[i] = new Day(events, label);
-//        }
-    }
 
     private int setHeadOffset(JewishCalendar jewishCalendar) {
         int dayInMonth = jewishCalendar.getJewishDayOfMonth() % 7;
@@ -118,15 +94,12 @@ public class Month {
         }
 
         jewishCalendar.setJewishMonth(desire);
+        Log.d("TAG",  hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear()) + " , "
+                + hebrewDateFormatter.formatMonth(jewishCalendar) + " , "
+                + hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()));
         return jewishCalendar;
     }
 
-
-   /* public static JewishCalendar shiftMonth(int offst){
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, offst);
-        return new JewishCalendar(calendar);
-    }*/
 
     public String getYearName() {
         return yearName;
@@ -152,6 +125,14 @@ public class Month {
         return days;
     }
 
+    public JewishCalendar getJewishCalendar() {
+        return jewishCalendar;
+    }
+
+    public boolean isCurrentMonth() {
+        return isCurrentMonth;
+    }
+
     /*private long[] getBeginAndEnd(JewishCalendar jewishCalendar){
         long[] longs = new long[2];
         Time time = new Time();
@@ -175,7 +156,6 @@ public class Month {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         longs[0] = calendar.getTimeInMillis();
-        ;
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);

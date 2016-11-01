@@ -23,6 +23,8 @@ import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import il.co.yshahak.ivricalendar.R;
+
 import static android.provider.CalendarContract.Instances.CONTENT_BY_DAY_URI;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.Calendar_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.HEBREW_CALENDAR_SUMMERY_TITLE;
@@ -34,6 +36,8 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_OWNER_ACCOUNT_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.REQUEST_READ_CALENDAR;
+import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
+import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 /**
  * Created by B.E.L on 01/11/2016.
@@ -157,38 +161,80 @@ public class GoogleManager {
     }
 
     @SuppressWarnings("MissingPermission")
-    public static void addHebrewEventToGoogleServer(Context context, String title, int... times){
+    public static void addHebrewEventToGoogleServer(Context context, String title, int repeatId, Calendar start, Calendar end){
         long calID = PreferenceManager.getDefaultSharedPreferences(context).getLong(KEY_HEBREW_ID, -1L);
         if (calID == -1L){
             return;
         }
-        long startMillis;
-        long endMillis;
-        Calendar beginTime = Calendar.getInstance();
-        beginTime.set(Calendar.HOUR_OF_DAY, times[0]);
-        beginTime.set(Calendar.MINUTE, times[1]);
-        startMillis = beginTime.getTimeInMillis();
-        Calendar endTime = Calendar.getInstance();
-        endTime.set(Calendar.HOUR_OF_DAY, times[2]);
-        endTime.set(Calendar.MINUTE, times[3]);
-        endMillis = endTime.getTimeInMillis();
 
         ContentResolver cr = context.getContentResolver();
+        Uri uri = null;
+        switch (repeatId){
+            case R.id.repeat_single:
+            case R.id.repeat_daily:
+            case R.id.repeat_weekly:
+                ContentValues values = getContentValueForSingleEvent(title, calID, repeatId, start, end);
+                uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+                if (uri != null) {
+                    syncCalendars(context);
+                }
+            case R.id.repeat_monthly:
+                ContentValues[] contentValues = new ContentValues[12];
+                Calendar calStart = (Calendar) start.clone();
+                Calendar endStart = (Calendar) end.clone();
+                for (int i = 0 ; i < contentValues.length ; i++) {
+                    start.setTime(shiftMonth(new JewishCalendar(calStart), i).getTime());
+                    end.setTime(shiftMonth(new JewishCalendar(endStart), i).getTime());
+                    contentValues[i] = getContentValueForSingleEvent(title, calID, R.id.repeat_single, start, end);
+                }
+                cr.bulkInsert(CalendarContract.Events.CONTENT_URI, contentValues);
+                syncCalendars(context);
+                break;
+            case R.id.repeat_yearly:
+                contentValues = new ContentValues[12];
+                JewishCalendar jewishCalendarStart = new JewishCalendar(start);
+                JewishCalendar jewishCalendarEnd = new JewishCalendar(end);
+                for (int i = 0 ; i < contentValues.length ; i++) {
+                    Log.d("TAG",  hebrewDateFormatter.formatHebrewNumber(jewishCalendarStart.getJewishYear()) + " , "
+                            + hebrewDateFormatter.formatMonth(jewishCalendarStart) + " , "
+                            + hebrewDateFormatter.formatHebrewNumber(jewishCalendarStart.getJewishDayOfMonth()));
+                    contentValues[i] = getContentValueForSingleEvent(title, calID, R.id.repeat_single, start, end);
+                    jewishCalendarStart.setJewishYear(jewishCalendarStart.getJewishYear() + 1);
+                    start.setTime(jewishCalendarStart.getTime());
+                    jewishCalendarEnd.setJewishYear(jewishCalendarEnd.getJewishYear() + 1);
+                    end.setTime(jewishCalendarEnd.getTime());
+                }
+                cr.bulkInsert(CalendarContract.Events.CONTENT_URI, contentValues);
+                syncCalendars(context);
+                break;
+        }
+
+
+
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private static ContentValues getContentValueForSingleEvent(String title, long calID, int repeatId, Calendar start, Calendar end){
         ContentValues values = new ContentValues();
-        values.put(CalendarContract.Events.DTSTART, startMillis);
-        values.put(CalendarContract.Events.DTEND, endMillis);
+        values.put(CalendarContract.Events.DTSTART, start.getTimeInMillis());
+
+        switch (repeatId){
+            case R.id.repeat_single:
+                values.put(CalendarContract.Events.DTEND, end.getTimeInMillis());
+                break;
+            case R.id.repeat_daily:
+                values.put(CalendarContract.Events.DURATION, "PT1H0M");
+                values.put(CalendarContract.Events.RRULE, "FREQ=DAILY;COUNT=40");//;BYDAY=TU   "FREQ=WEEKLY;BYDAY=TU;UNTIL=20150428"
+                break;
+            case R.id.repeat_weekly:
+                values.put(CalendarContract.Events.DURATION, "PT1H0M");
+                values.put(CalendarContract.Events.RRULE, "FREQ=WEEKLY;COUNT=16");
+                break;
+        }
         values.put(CalendarContract.Events.TITLE, title);
         values.put(CalendarContract.Events.CALENDAR_ID, calID);
         values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
-        Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
-
-        if (uri != null) {
-            Log.d("TAG", "uri inserted: " + uri.toString());
-            // get the event ID that is the last element in the Uri
-            long eventID = Long.parseLong(uri.getLastPathSegment());
-            Log.d("TAG", "eventID: " + eventID);
-            syncCalendars(context);
-        }
+        return values;
     }
 
 }

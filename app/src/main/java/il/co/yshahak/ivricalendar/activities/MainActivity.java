@@ -21,6 +21,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
+
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
@@ -39,16 +41,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static boolean recreateFlag;
     private RadioGroup formatGroupChoiser;
     private SharedPreferences prefs;
+    public static JewishCalendar currentJewishCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
+        currentJewishCalendar = new JewishCalendar();
         setContentView(R.layout.activity_main);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
-
-
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         eventBtnCreate = (Button) findViewById(R.id.event_create_btn);
         eventBtnCreate.setOnClickListener(this);
         formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
-        GoogleManager.getCalendars(this);
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -68,14 +68,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onRestart() {
         super.onRestart();
-
         Log.d("TAG", "onRestart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (prefs.getLong(KEY_HEBREW_CALENDAR_CLIENT_API_ID, -1L) == -1L){
+        GoogleManager.getCalendars(this);
+        if (prefs.getString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, null) == null){
             startActivity(new Intent(this, GoogleSignInActivity.class));
         }
         PagerAdapter pagerAdapter = viewPager.getAdapter();

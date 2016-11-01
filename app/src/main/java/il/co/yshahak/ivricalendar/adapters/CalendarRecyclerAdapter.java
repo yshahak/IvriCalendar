@@ -29,6 +29,7 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
     private static final int VIEW_TYPE_TAIL = 3;
     private Month month;
 
+
     public CalendarRecyclerAdapter(Month monthes) {
         this.month = monthes;
     }
@@ -52,19 +53,12 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Day day = null;
         switch (holder.getItemViewType()){
-            case VIEW_TYPE_HEAD:
-//                Month month = months[0];
-//                day = month.getDays()[month.getMonthNumberOfDays() - 1 - position];
-                break;
             case VIEW_TYPE_DAY_CELL:
-                day = month.getDays()[position - month.getHeadOffsetMonth()];
+                Day day = month.getDays()[position - month.getHeadOffsetMonth()];
                 setDay(holder, day);
                 break;
-            case VIEW_TYPE_TAIL:
-//                day = months[2].getDays()[position - months[1].getHeadOffsetMonth() - months[1].getMonthNumberOfDays()];
-                break;
+
         }
 
     }
@@ -80,6 +74,11 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             textView.setTag(event);
             textView.setOnClickListener(holder);
             textView.setOnLongClickListener(holder);
+        }
+        if (month.isCurrentMonth() && month.getJewishCalendar().getJewishDayOfMonth() == day.getDayInMonth()){
+            holder.itemView.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
+        } else {
+            holder.itemView.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
         }
     }
 

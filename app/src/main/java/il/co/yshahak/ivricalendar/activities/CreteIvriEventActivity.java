@@ -6,8 +6,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,7 +36,7 @@ import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
  * Created by B.E.L on 31/10/2016.
  */
 
-public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, KeyboardVisibilityEventListener {
+public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, KeyboardVisibilityEventListener, PopupMenu.OnMenuItemClickListener {
 
     @BindView(R.id.header_btn_save) TextView headerBtnSave;
     @BindView(R.id.header_btn_x) ImageView headerBtnX;
@@ -42,6 +46,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @BindView(R.id.event_end_day) TextView eventEndDay;
     @BindView(R.id.event_start_time) TextView eventStartTime;
     @BindView(R.id.event_end_time) TextView eventEndTime;
+    @BindView(R.id.event_instances) TextView textViewRepeat;
 
     private PICKER_STATE pickerState;
     private SimpleDateFormat sdf;
@@ -56,6 +61,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         setSupportActionBar(myToolbar);
         sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         KeyboardVisibilityEvent.setEventListener(this, this);
+        textViewRepeat.setTag(R.id.repeat_single);
 
     }
 
@@ -95,6 +101,40 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     }
 
 
+    @OnClick(R.id.event_instances) void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.setOnMenuItemClickListener(this);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_event_instances, popup.getMenu());
+        int repeatId = (int) textViewRepeat.getTag();
+        int position = 0;
+        switch (repeatId){
+            case R.id.repeat_single:
+                break;
+            case R.id.repeat_daily:
+                position = 1;
+                break;
+            case R.id.repeat_weekly:
+                position = 2;
+                break;
+            case R.id.repeat_monthly:
+                position = 3;
+                break;
+            case R.id.repeat_yearly:
+                position = 4;
+                break;
+        }
+        popup.getMenu().getItem(position).setChecked(true);
+        popup.show();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        textViewRepeat.setText(item.getTitle());
+        textViewRepeat.setTag(item.getItemId());
+        return false;
+    }
+
     @OnClick(R.id.header_btn_x) void clickX(){
         finish();
     }
@@ -122,11 +162,9 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
 
     private void saveEvent() {
         String title = headerTitleEditText.getText().toString();
-        int startHour = calendarStartTime.get(Calendar.HOUR_OF_DAY);
-        int startMinute = calendarStartTime.get(Calendar.MINUTE);
-        int endHour = calendarEndTime.get(Calendar.HOUR_OF_DAY);
-        int endMinute = calendarEndTime.get(Calendar.MINUTE);
-        GoogleManager.addHebrewEventToGoogleServer(this, title, startHour, startMinute, endHour, endMinute);
+
+        int repeatId = (int) textViewRepeat.getTag();
+        GoogleManager.addHebrewEventToGoogleServer(this, title, repeatId, calendarStartTime, calendarEndTime);
         finish();
     }
 
@@ -146,10 +184,12 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         headerTitleEditText.setCursorVisible(isOpen);
     }
 
+
     private enum PICKER_STATE {
         STATE_START_TIME,
         STATE_END_TIME,
         STATE_START_DATE,
         STATE_END_DATE
     }
+
 }

@@ -73,7 +73,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         this.position = getArguments().getInt(KEY_POSITION);
         int offset = position - CURRENT_PAGE;
         jewishCalendar = shiftMonth(new JewishCalendar(), offset);
-        month = new Month(jewishCalendar);
+        month = new Month(jewishCalendar, offset == 0);
 
     }
 

@@ -13,18 +13,14 @@ public class Day {
     private ArrayList<Event> googleEvents = new ArrayList<>();
     private final String label;
     private long startDayInMillis, endDayInMillis;
+    private int dayInMonth;
 
 
-    public Day(ArrayList<Event> googleEvents, String label) {
-        this.googleEvents = googleEvents;
-        this.label = label;
-    }
-
-    public Day(String label, long[] beginAndEnd) {
+    public Day(String label, long[] beginAndEnd, int dayInMonth) {
         this.label = label;
         this.startDayInMillis = beginAndEnd[0];
         this.endDayInMillis = beginAndEnd[1];
-//        Log.i("Day", "Event:  " + label + " , start: " + startDayInMillis + " ,end " + endDayInMillis );
+        this.dayInMonth = dayInMonth;
     }
 
     public ArrayList<Event> getGoogleEvents() {
@@ -37,6 +33,10 @@ public class Day {
 
     public long getStartDayInMillis() {
         return startDayInMillis;
+    }
+
+    public int getDayInMonth() {
+        return dayInMonth;
     }
 
     public long getEndDayInMillis() {

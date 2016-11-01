@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/repeat_single"
+            android:checked="true"
+            android:title="@string/instance_single"/>
+        <item
+            android:id="@+id/repeat_daily"
+            android:title="@string/instance_daily"/>
+        <item
+            android:id="@+id/repeat_weekly"
+            android:title="@string/instance_weekly"/>
+        <item
+            android:id="@+id/repeat_monthly"
+            android:title="@string/instance_monthly"/>
+        <item
+            android:id="@+id/repeat_yearly"
+            android:title="@string/instance_yearly"/>
+    </group>
+</menu>

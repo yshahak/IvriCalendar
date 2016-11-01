@@ -26,7 +26,7 @@ import static android.provider.CalendarContract.Instances.CONTENT_BY_DAY_URI;
 
 public class Contract {
 
-    public static String KEY_HEBREW_CALENDAR_CLIENT_API_ID = "keyHebrewId";
+    public static String KEY_HEBREW_CALENDAR_CLIENT_API_ID = "keyHebrewIdClientAPI";
     public static String KEY_HEBREW_ID = "keyHebrewId";
 
     public static String HEBREW_CALENDAR_SUMMERY_TITLE = "לוח עברי על הבר";
