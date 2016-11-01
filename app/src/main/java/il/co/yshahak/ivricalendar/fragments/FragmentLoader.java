@@ -27,8 +27,8 @@ import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapter;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
-import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 
@@ -112,7 +112,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
 //                CalendarContract.Calendars.ACCOUNT_NAME +  " = ? ";
         String[] WHERE_CALENDARS_ARGS = {"1"};//, "yshahak@gmail.com"};
         return new CursorLoader(getActivity(),  // Context
-                Contract.asSyncAdapter(jewishCalendar), // URI
+                GoogleManager.asSyncAdapter(jewishCalendar), // URI
                 INSTANCE_PROJECTION,                // Projection
                 WHERE_CALENDARS_SELECTED,                           // Selection
                 WHERE_CALENDARS_ARGS,                           // Selection args

@@ -24,7 +24,19 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.CreteIvriEventActivity" android:exported="true"/>
+        <activity android:name=".activities.CreteIvriEventActivity" android:exported="true">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.EDIT" />-->
+                <!--<action android:name="android.intent.action.INSERT" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<data android:mimeType="com.android.calendar/events" />-->
+
+                <!--<data android:mimeType="time/epoch" />-->
+                <!--<data android:host="com.android.calendar"/>-->
+                <!--<data android:scheme="content"/>-->
+                <!--<data android:mimeType="com.android.calendar/events" />-->
+            <!--</intent-filter>-->
+        </activity>
         <activity android:name=".activities.GoogleSignInActivity" android:exported="true"/>
 
     </application>

@@ -48,6 +48,7 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
+
         return 1000;
     }
 

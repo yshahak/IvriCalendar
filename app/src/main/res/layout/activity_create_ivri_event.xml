@@ -56,6 +56,10 @@
                     android:id="@+id/header_edit_text_event_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
+                    android:imeActionLabel="Done"
                     android:hint="הזן כותרת"
                     android:src="@android:drawable/ic_menu_close_clear_cancel"
                     android:textColorHint="@android:color/white"/>

@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -21,15 +24,15 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnTextChanged;
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
 
 /**
  * Created by B.E.L on 31/10/2016.
  */
 
-public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
+public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, KeyboardVisibilityEventListener {
 
     @BindView(R.id.header_btn_save) TextView headerBtnSave;
     @BindView(R.id.header_btn_x) ImageView headerBtnX;
@@ -42,6 +45,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
 
     private PICKER_STATE pickerState;
     private SimpleDateFormat sdf;
+    private Calendar calendarStartTime, calendarEndTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,16 +55,20 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        KeyboardVisibilityEvent.setEventListener(this, this);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MINUTE, 0);
-        eventStartTime.setText(sdf.format(calendar.getTime()));
-        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 1);
-        eventEndTime.setText(sdf.format(calendar.getTime()));
+        calendarStartTime = Calendar.getInstance();
+        calendarStartTime.set(Calendar.MINUTE, 0);
+        eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
+        calendarEndTime = Calendar.getInstance();
+        calendarEndTime.set(Calendar.MINUTE, 0);
+        calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
+        eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
     }
 
     @OnClick({R.id.event_start_day, R.id.event_end_day})void openDayDialog(){
@@ -73,9 +81,6 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         pickerState = (text.equals(eventStartTime)) ? PICKER_STATE.STATE_START_TIME : PICKER_STATE.STATE_END_TIME;
     }
 
-    @OnTextChanged(R.id.header_edit_text_event_title) void eventTitleChanged(CharSequence text){
-        headerBtnSave.setText(text.length() > 0 ? "בוצע" : "שמור");
-    }
 
     @OnClick(R.id.header_btn_save) void click(){
         boolean save = headerBtnSave.getText().equals("שמור");
@@ -86,7 +91,6 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
             keyboard.hideSoftInputFromWindow(headerTitleEditText.getWindowToken(), 0);
             headerBtnSave.setText("שמור");
 
-//            headerTitleEditText.setCursorVisible(false);
         }
     }
 
@@ -97,53 +101,49 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+
         switch (pickerState){
             case STATE_START_TIME:
-                eventStartTime.setText(sdf.format(calendar.getTime()));
-                calendar.set(Calendar.HOUR_OF_DAY, ++hourOfDay);
-                eventEndTime.setText(sdf.format(calendar.getTime()));
+                calendarStartTime.set(Calendar.MINUTE, minute);
+                calendarStartTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
+                calendarEndTime.set(Calendar.MINUTE, minute);
+                calendarEndTime.set(Calendar.HOUR_OF_DAY, ++hourOfDay);
+                eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
                 break;
             case STATE_END_TIME:
-                eventEndTime.setText(sdf.format(calendar.getTime()));
+                calendarEndTime.set(Calendar.MINUTE, minute);
+                calendarEndTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
         }
         pickerState = null;
     }
+
+
     private void saveEvent() {
-        long calID = 3;
-        long startMillis = 0;
-        long endMillis = 0;
-        Calendar beginTime = Calendar.getInstance();
-        beginTime.set(2012, 9, 14, 7, 30);
-        startMillis = beginTime.getTimeInMillis();
-        Calendar endTime = Calendar.getInstance();
-        endTime.set(2012, 9, 14, 8, 45);
-        endMillis = endTime.getTimeInMillis();
-
-//        ContentResolver cr = getContentResolver();
-//        ContentValues values = new ContentValues();
-//        values.put(Events.DTSTART, startMillis);
-//        values.put(Events.DTEND, endMillis);
-//        values.put(Events.TITLE, "Jazzercise");
-//        values.put(Events.DESCRIPTION, "Group workout");
-//        values.put(Events.CALENDAR_ID, calID);
-//        values.put(Events.EVENT_TIMEZONE, "America/Los_Angeles");
-//        Uri uri = cr.insert(Events.CONTENT_URI, values);
-//
-//        long eventID = Long.parseLong(uri.getLastPathSegment());
-
+        String title = headerTitleEditText.getText().toString();
+        int startHour = calendarStartTime.get(Calendar.HOUR_OF_DAY);
+        int startMinute = calendarStartTime.get(Calendar.MINUTE);
+        int endHour = calendarEndTime.get(Calendar.HOUR_OF_DAY);
+        int endMinute = calendarEndTime.get(Calendar.MINUTE);
+        GoogleManager.addHebrewEventToGoogleServer(this, title, startHour, startMinute, endHour, endMinute);
+        finish();
     }
-
-
 
     @Override
     public void onBackPressed() {
+        headerBtnSave.setText("שמור");
         if (pickerState != null){
             pickerState = null;
         }
         super.onBackPressed();
+    }
+
+    //KeyBoard visibilty listener
+    @Override
+    public void onVisibilityChanged(boolean isOpen) {
+        headerBtnSave.setText(isOpen? "בוצע" : "שמור");
+        headerTitleEditText.setCursorVisible(isOpen);
     }
 
     private enum PICKER_STATE {
