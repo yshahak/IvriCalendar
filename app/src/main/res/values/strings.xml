@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">Ivri Calendar</string>
+    <string name="app_name" translatable="false">Ivri Calendar</string>
+    <string name="server_client_id">1051278215233-pn6vgs2q41qor8qf41gnvrtdpie73ti3.apps.googleusercontent.com</string>
+
     <string name="instance_single">אינו חוזר</string>
     <string name="instance_daily">מדי יום</string>
     <string name="instance_weekly">מדי שבוע</string>

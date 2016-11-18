@@ -9,10 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +79,6 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
-        Toolbar myToolbar = (Toolbar) root.findViewById(R.id.my_toolbar);
         days = (RecyclerView) root.findViewById(R.id.recycler_view_days);
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
@@ -95,8 +92,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
 
-        myToolbar.setTitle(month.getMonthName() + " , " + month.getYearName());
-        ((AppCompatActivity)getActivity()).setSupportActionBar(myToolbar);
+        getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
         getLoaderManager().initLoader(0, null, this);
 
         return root;

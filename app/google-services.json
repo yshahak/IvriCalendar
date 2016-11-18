@@ -15,6 +15,46 @@
       },
       "oauth_client": [
         {
+          "client_id": "1051278215233-hp9mvtlqcuf0f9noji3l3hj85omi4eat.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "il.co.yshahak.ivricalendar",
+            "certificate_hash": "7035A1826DD9CE830B755EBA1410107B39EB8CDD"
+          }
+        },
+        {
+          "client_id": "1051278215233-ktq1kjedkck92s70ubdc5b777ic831p2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "il.co.yshahak.ivricalendar",
+            "certificate_hash": "DE076B7AE63C37798DB2BDA9865604748BEC4C83"
+          }
+        },
+        {
+          "client_id": "1051278215233-7ououdiscsqno87083mt1jc8v87k14mq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "il.co.yshahak.ivricalendar",
+            "certificate_hash": "7A80D5A76C49A45ED9D9FF6E4ABB494998485955"
+          }
+        },
+        {
+          "client_id": "1051278215233-8ogf0i4m5l0urf14pqt5totqpggacfae.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "il.co.yshahak.ivricalendar",
+            "certificate_hash": "13F9187DCFE5A487F19DF54ED074B1B14C3F24CC"
+          }
+        },
+        {
+          "client_id": "1051278215233-tdsesc30c72ksstup2me6j5nsar89e83.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "il.co.yshahak.ivricalendar",
+            "certificate_hash": "69CBC5382E4FC7A2DB40E2178FE4EC89A949BDAF"
+          }
+        },
+        {
           "client_id": "1051278215233-2e1e0gk2tcg7jc8admd72ke578jrh3dm.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +69,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051278215233-2e1e0gk2tcg7jc8admd72ke578jrh3dm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

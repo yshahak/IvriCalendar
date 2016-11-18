@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RadioGroup formatGroupChoiser;
     private SharedPreferences prefs;
     public static JewishCalendar currentJewishCalendar;
+    private Toolbar myToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         currentJewishCalendar = new JewishCalendar();
         setContentView(R.layout.activity_main);
+        myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
 
@@ -59,7 +63,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
     }
 
+
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (permissions.length == 0 || grantResults.length == 0){
+            return;
+        }
         if (requestCode == Contract.REQUEST_READ_CALENDAR && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             GoogleManager.getCalendars(this);
         }
@@ -145,5 +153,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 animation.removeAllListeners();
             }
         }).start();
+    }
+
+    public Toolbar getMyToolbar() {
+        return myToolbar;
     }
 }
