@@ -3,6 +3,7 @@ package il.co.yshahak.ivricalendar.adapters;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,8 @@ import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+
+import static il.co.yshahak.ivricalendar.activities.MainActivity.currentJewishDays;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -79,6 +82,9 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             holder.itemView.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
         } else {
             holder.itemView.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
+        }
+        if (currentJewishDays.getMonth().equals(month.getMonthName()) && currentJewishDays.getLabel().equals(day.getLabel())){
+            holder.label.setBackgroundColor(Color.BLUE);
         }
     }
 

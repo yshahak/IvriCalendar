@@ -20,7 +20,10 @@ import android.util.Log;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.R;
@@ -30,11 +33,13 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.Calendar_PROJE
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.HEBREW_CALENDAR_SUMMERY_TITLE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_ID;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ACCOUNTNAME_INDEX;
+import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_COLOR_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_DISPLAY_NAME_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_Events_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_OWNER_ACCOUNT_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE;
+import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_VISIBLE_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.REQUEST_READ_CALENDAR;
 import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
 import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
@@ -45,6 +50,8 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 public class GoogleManager {
 
+    public static HashMap<String, List<CalendarAccount>> accountListNames = new HashMap<>();
+
     public static void getCalendars(Activity activity) {
 
         // Submit the query and get a Cursor object back.
@@ -54,24 +61,45 @@ public class GoogleManager {
             Cursor cur;
             ContentResolver cr = activity.getContentResolver();
             Uri uri = CalendarContract.Calendars.CONTENT_URI;
-            String selection = "((" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?))";
-            //        String[] selectionArgs = new String[]{"yshahak@gmail.com", "com.google", "yshahak@gmail.com"};
+            String selection = "(" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ? " + ")";
             String[] selectionArgs = new String[]{"com.google"};
+
             cur = cr.query(uri, Calendar_PROJECTION, selection, selectionArgs, null);
             if (cur != null) {
+                accountListNames.clear();
                 while (cur.moveToNext()) {
-                    long calID = 0;
+                    int calID , color;
                     String displayName = null;
                     String accountName = null;
                     String ownerName = null;
+                    boolean visible;
 
                     // Get the field values
-                    calID = cur.getLong(PROJECTION_ID_INDEX);
+                    calID = cur.getInt(PROJECTION_ID_INDEX);
                     displayName = cur.getString(PROJECTION_DISPLAY_NAME_INDEX);
                     accountName = cur.getString(PROJECTION_ACCOUNTNAME_INDEX);
+
                     ownerName = cur.getString(PROJECTION_OWNER_ACCOUNT_INDEX);
+                    color = cur.getInt(PROJECTION_COLOR_INDEX);
+                    visible = cur.getInt(PROJECTION_VISIBLE_INDEX) == 1;
+                    CalendarAccount calendarAccount = new CalendarAccount();
+                    calendarAccount.setAccountId(calID);
+                    calendarAccount.setCalendarName(accountName);
+                    calendarAccount.setCalendarDisplayName(displayName);
+                    calendarAccount.setCalendarOwnerName(ownerName);
+                    calendarAccount.setCalendarColor(color);
+                    calendarAccount.setCalendarIsVisible(visible);
+                    if (accountListNames.get(accountName) == null){
+                        List<CalendarAccount> accountList = new ArrayList<>();
+                        accountList.add(calendarAccount);
+                        accountListNames.put(accountName, accountList);
+                    } else {
+                        accountListNames.get(accountName).add(calendarAccount);
+                    }
+                    Log.d("TAG", "calID: " + calID + " , displayName: " + displayName + ", accountName: " + accountName
+                            + " , ownerName: " + ownerName);
+
                     if (displayName.equals(HEBREW_CALENDAR_SUMMERY_TITLE)){
-                        Log.d("TAG", "calID: " + calID + " , displayName: " + displayName + ", accountName: " + accountName + " , ownerName: " + ownerName);
                         PreferenceManager.getDefaultSharedPreferences(activity).edit()
                                 .putLong(KEY_HEBREW_ID, calID).apply();
                     }
@@ -83,6 +111,25 @@ public class GoogleManager {
         } else {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_CALENDAR}, REQUEST_READ_CALENDAR);
         }
+    }
+
+    public static int getCalendarNumber(){
+        int[] sizes = getCalendarNumbers();
+        int count = 0;
+        for (Integer i : sizes){
+            count += i;
+        }
+        return count;
+    }
+
+    public static int[] getCalendarNumbers(){
+        int[] sizes = new int[accountListNames.size()];
+        int i = 0;
+        for (String name : accountListNames.keySet()){
+            sizes[i] =  accountListNames.get(name).size();
+            i++;
+        }
+        return sizes;
     }
 
     @SuppressWarnings("MissingPermission")

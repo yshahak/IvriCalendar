@@ -37,7 +37,9 @@ public class Contract {
             Calendars._ID,                           // 0
             Calendars.ACCOUNT_NAME,                  // 1
             Calendars.CALENDAR_DISPLAY_NAME,         // 2
-            Calendars.OWNER_ACCOUNT                  // 3
+            Calendars.OWNER_ACCOUNT,                 // 3
+            Calendars.CALENDAR_COLOR,                // 4
+            Calendars.VISIBLE                        // 5
     };
 
     // The indices for the projection array above.
@@ -45,6 +47,8 @@ public class Contract {
     public static final int PROJECTION_ACCOUNTNAME_INDEX = 1;
     public static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
     public static final int PROJECTION_OWNER_ACCOUNT_INDEX = 3;
+    public static final int PROJECTION_COLOR_INDEX = 4;
+    public static final int PROJECTION_VISIBLE_INDEX = 5;
 
     public void addHebrewCalendarToGoogleServer(Context context){
         long calID = 2;

@@ -41,7 +41,7 @@ public class Month {
         for (int i = 0; i < days.length; i++) {
             jewishCalendar.setJewishDayOfMonth(i + 1);
             String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
-            days[i] = new Day(label, getBeginAndEnd(jewishCalendar), jewishCalendar.getJewishDayOfMonth());
+            days[i] = new Day(this.monthName, label, getBeginAndEnd(jewishCalendar), jewishCalendar.getJewishDayOfMonth());
         }
         this.isCurrentMonth = isCurrentMonth;
     }

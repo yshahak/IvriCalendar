@@ -11,20 +11,28 @@ import il.co.yshahak.ivricalendar.calendar.google.Event;
 public class Day {
 
     private ArrayList<Event> googleEvents = new ArrayList<>();
+    private String month;
     private final String label;
     private long startDayInMillis, endDayInMillis;
     private int dayInMonth;
 
 
-    public Day(String label, long[] beginAndEnd, int dayInMonth) {
+    public Day(String month, String label, long[] beginAndEnd, int dayInMonth) {
+        this.month = month;
         this.label = label;
-        this.startDayInMillis = beginAndEnd[0];
-        this.endDayInMillis = beginAndEnd[1];
+        if (beginAndEnd != null) {
+            this.startDayInMillis = beginAndEnd[0];
+            this.endDayInMillis = beginAndEnd[1];
+        }
         this.dayInMonth = dayInMonth;
     }
 
     public ArrayList<Event> getGoogleEvents() {
         return googleEvents;
+    }
+
+    public String getMonth() {
+        return month;
     }
 
     public String getLabel() {
