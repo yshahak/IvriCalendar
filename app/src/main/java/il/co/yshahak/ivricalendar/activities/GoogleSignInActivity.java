@@ -31,9 +31,12 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -148,18 +151,30 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
                         transport, jsonFactory, mCredential)
 //                        .setApplicationName("applicationName")
                         .build();
-                com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-                calendar.setSummary(HEBREW_CALENDAR_SUMMERY_TITLE);
-
-                // Insert the new calendar
-                com.google.api.services.calendar.model.Calendar createdCalendar;
 
                 try {
-                    createdCalendar = mService.calendars().insert(calendar).execute();
-                    String id = createdCalendar.getId();
-                    prefs.edit().putString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, id).apply();
-                    Intent intent = new Intent(GoogleSignInActivity.this, MainActivity.class);
-                    startActivity(intent);
+                    //don't want to insert our calendar if already exists, so we will loop through the user calendar list
+                    HashMap<String, CalendarListEntry> calendarsTitles = new HashMap<>();
+                    String pageToken = null;
+                    do {
+                        CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
+                        List<CalendarListEntry> items = calendarList.getItems();
+
+                        for (CalendarListEntry calendarListEntry : items) {
+                            calendarsTitles.put(calendarListEntry.getSummary(), calendarListEntry);
+                        }
+                        pageToken = calendarList.getNextPageToken();
+                    } while (pageToken != null);
+                    if (calendarsTitles.keySet().contains(HEBREW_CALENDAR_SUMMERY_TITLE)){
+                        prefs.edit().putString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, calendarsTitles.get(HEBREW_CALENDAR_SUMMERY_TITLE).getId()).apply();
+                    } else {
+                        com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+                        calendar.setSummary(HEBREW_CALENDAR_SUMMERY_TITLE);
+                        // Iterate through entries in calendar list
+                        String id = mService.calendars().insert(calendar).execute().getId();
+                        prefs.edit().putString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, id).apply();
+                    }
+                    startActivity(new Intent(GoogleSignInActivity.this, MainActivity.class));
                     finish();
                 } catch (IOException e) {
                     e.printStackTrace();

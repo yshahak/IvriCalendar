@@ -6,7 +6,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
@@ -19,30 +18,27 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
-import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
+import java.lang.ref.WeakReference;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
-import il.co.yshahak.ivricalendar.calendar.google.CalendarAccount;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
+import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CALENDAR_CLIENT_API_ID;
-import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
+    public static boolean needToRefreshCalendarVisibility;
     private ViewPager viewPager;
     private DrawerLayout drawerLayout;
     private LinearLayout calendarsList;
@@ -53,22 +49,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static boolean recreateFlag;
     private RadioGroup formatGroupChoiser;
     private SharedPreferences prefs;
-    public static Day currentJewishDays;
     private boolean mSlideState; //indicate the current state of the drawer
+    private int selectedPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        JewishCalendar jewishCalendar =  new JewishCalendar();
-        String monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
-        String label = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth());
-        currentJewishDays = new Day(monthName, label, null, jewishCalendar.getJewishDayOfMonth());
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
+        viewPager.addOnPageChangeListener(this);
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
         calendarsList = (LinearLayout)findViewById(R.id.calender_list);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -101,6 +94,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (prefs.getString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, null) == null){
             startActivity(new Intent(this, GoogleSignInActivity.class));
         }
+        setPagerAdapter();
+        setDrawerMenu();
+//        Log.d("TAG", "onResume");
+    }
+
+    private void setPagerAdapter(){
         PagerAdapter pagerAdapter = viewPager.getAdapter();
         if (pagerAdapter != null) {
             CalendarPagerAdapter.dropPages = true;
@@ -110,9 +109,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
             viewPager.setCurrentItem(500);
         }
-        setDrawerMenu();
-
-//        Log.d("TAG", "onResume");
     }
 
     @Override
@@ -188,6 +184,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 mSlideState = false;//is Closed
+                if (needToRefreshCalendarVisibility){
+                    setPagerAdapter();
+                    needToRefreshCalendarVisibility = false;
+                }
             }
 
             @Override
@@ -196,32 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mSlideState = true;//is Opened
             }
         });
-        calendarsList.removeAllViews();
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        for (String calendarAccountNmae : GoogleManager.accountListNames.keySet()){
-            TextView header = (TextView) layoutInflater.inflate(R.layout.calendar_accont_header, calendarsList, false);
-            header.setText(calendarAccountNmae);
-            calendarsList.addView(header);
-            for (CalendarAccount calendarAccount : GoogleManager.accountListNames.get(calendarAccountNmae)){
-                AppCompatCheckBox checkBox = (AppCompatCheckBox) layoutInflater.inflate(R.layout.calendar_visibility_row, calendarsList, false);
-                calendarsList.addView(checkBox);
-                checkBox.setText(calendarAccount.getCalendarDisplayName());
-                ColorStateList colorStateList = new ColorStateList(
-                        new int[][]{
-                                new int[]{-android.R.attr.state_enabled}, //disabled
-                                new int[]{android.R.attr.state_enabled} //enabled
-                        },
-                        new int[] {
-                                calendarAccount.getCalendarColor() //disabled
-                                ,calendarAccount.getCalendarColor() //enabled
-
-                        }
-                );
-                checkBox.setSupportButtonTintList(colorStateList);
-                checkBox.setChecked(calendarAccount.isCalendarIsVisible());
-
-            }
-        }
+        DrawerHelper.setDrawerMenu(calendarsList, this);
 
     }
 
@@ -236,5 +211,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             drawerLayout.openDrawer(GravityCompat.START);
         }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        this.selectedPage = position;
+        WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
+        if (weakReference != null) {
+            FragmentLoader fragmentLoader = weakReference.get();
+            if (fragmentLoader != null) {
+                setTitle(fragmentLoader.getMonth().getMonthName() + " , " + fragmentLoader.getMonth().getYearName());
+            }
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    public int getSelectedPage() {
+        return selectedPage;
     }
 }

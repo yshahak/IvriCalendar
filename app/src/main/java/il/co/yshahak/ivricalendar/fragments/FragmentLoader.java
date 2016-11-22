@@ -23,6 +23,7 @@ import java.util.List;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapter;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
@@ -57,8 +58,8 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     private int position;
     HashMap<String, List<Event>> eventMap = new HashMap<>();
 
-    public static Fragment newInstance(int position) {
-        Fragment fragment = new FragmentLoader();
+    public static FragmentLoader newInstance(int position) {
+        FragmentLoader fragment = new FragmentLoader();
         Bundle bundle = new Bundle();
         bundle.putInt(KEY_POSITION, position);
         fragment.setArguments(bundle);
@@ -91,8 +92,10 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-
-        getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
+        MainActivity mainActivity = (MainActivity)getActivity();
+        if (mainActivity.getSelectedPage() == position) {
+            getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
+        }
         getLoaderManager().initLoader(0, null, this);
 
         return root;
@@ -101,12 +104,8 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // We only have one loader, so we can ignore the value of i.
-        // (It'll be '0', as set in onCreate().)
-//        Log.d("TAG", "onCreateLoader: " + position);
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
-//                CalendarContract.Calendars.ACCOUNT_NAME +  " = ? ";
-        String[] WHERE_CALENDARS_ARGS = {"1"};//, "yshahak@gmail.com"};
+        String[] WHERE_CALENDARS_ARGS = {"1"};//
         return new CursorLoader(getActivity(),  // Context
                 GoogleManager.asSyncAdapter(jewishCalendar), // URI
                 INSTANCE_PROJECTION,                // Projection
@@ -127,6 +126,10 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
 
     private void setRecyclerView(){
         recyclerView.setAdapter(new CalendarRecyclerAdapter(month));
+    }
+
+    public Month getMonth() {
+        return month;
     }
 
     class ProcessDates extends AsyncTask<Cursor, Void, Void>{

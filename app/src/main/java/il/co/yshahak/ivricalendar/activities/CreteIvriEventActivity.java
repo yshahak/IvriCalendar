@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -31,6 +32,8 @@ import butterknife.OnClick;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
+
+import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
 
 /**
  * Created by B.E.L on 31/10/2016.
@@ -68,6 +71,13 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @Override
     protected void onResume() {
         super.onResume();
+        JewishCalendar jewishCalendar = new JewishCalendar();
+        String date = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()) + " " +
+                hebrewDateFormatter.formatMonth(jewishCalendar)   ;
+        hebrewDateFormatter.setLongWeekFormat(true);
+        String day = hebrewDateFormatter.formatDayOfWeek(jewishCalendar) + " , " + date;
+        eventStartDay.setText(day);
+        eventEndDay.setText(day);
         calendarStartTime = Calendar.getInstance();
         calendarStartTime.set(Calendar.MINUTE, 0);
         eventStartTime.setText(sdf.format(calendarStartTime.getTime()));

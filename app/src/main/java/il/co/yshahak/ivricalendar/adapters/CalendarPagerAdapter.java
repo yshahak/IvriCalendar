@@ -3,6 +3,9 @@ package il.co.yshahak.ivricalendar.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.SparseArray;
+
+import java.lang.ref.WeakReference;
 
 import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 
@@ -11,8 +14,8 @@ import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
  */
 public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
-    public static DIRECTION direction = DIRECTION.NULL;
     public static boolean dropPages;
+    public static SparseArray<WeakReference<FragmentLoader>> fragmentLoaderSparseArray = new SparseArray<>();
 
     public CalendarPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
@@ -21,7 +24,9 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
 //        Log.d("TAG", "getItem, position: "  + position);
-        return FragmentLoader.newInstance(position);
+        FragmentLoader fragmentLoader = FragmentLoader.newInstance(position);
+        fragmentLoaderSparseArray.put(position, new WeakReference<>(fragmentLoader));
+        return fragmentLoader;
     }
 
     @Override
@@ -38,29 +43,10 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
 
 
-//    @Override
-//    public long getItemId(int position) {
-//        if (direction != DIRECTION.NULL){
-//            return (direction == DIRECTION.LEFT) ? --position : ++position;
-//        }
-//        return super.getItemId(position);
-//    }
-
     @Override
     public int getCount() {
-
         return 1000;
     }
 
-    public static enum CALENDAR_MODE{
-        MONTH,
-        WEEK,
-        DAY
-    }
 
-    public static enum DIRECTION{
-        LEFT,
-        RIGHT,
-        NULL
-    }
 }

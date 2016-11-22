@@ -28,17 +28,14 @@ import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.R;
 
-import static android.provider.CalendarContract.Instances.CONTENT_BY_DAY_URI;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.Calendar_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.HEBREW_CALENDAR_SUMMERY_TITLE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_ID;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ACCOUNTNAME_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_COLOR_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_DISPLAY_NAME_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_Events_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_OWNER_ACCOUNT_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_VISIBLE_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.REQUEST_READ_CALENDAR;
 import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
@@ -113,27 +110,9 @@ public class GoogleManager {
         }
     }
 
-    public static int getCalendarNumber(){
-        int[] sizes = getCalendarNumbers();
-        int count = 0;
-        for (Integer i : sizes){
-            count += i;
-        }
-        return count;
-    }
-
-    public static int[] getCalendarNumbers(){
-        int[] sizes = new int[accountListNames.size()];
-        int i = 0;
-        for (String name : accountListNames.keySet()){
-            sizes[i] =  accountListNames.get(name).size();
-            i++;
-        }
-        return sizes;
-    }
 
     @SuppressWarnings("MissingPermission")
-    public static void syncCalendars(Context context){
+    private static void syncCalendars(Context context){
         Account[] accounts = AccountManager.get(context).getAccounts();
         String authority = CalendarContract.Calendars.CONTENT_URI.getAuthority();
         for (Account account : accounts) {
@@ -143,44 +122,6 @@ public class GoogleManager {
                 ContentResolver.requestSync(account, authority, extras);
             }
         }
-    }
-
-    public static void getEvent(Activity activity, Long calId){
-        // Specify the date range you want to search for recurring
-// event instances
-        // Construct the query with the desired date range.
-        Uri.Builder builder = CONTENT_BY_DAY_URI.buildUpon();
-
-        Cursor cur ;
-        ContentResolver cr = activity.getContentResolver();
-        Calendar beginTime = Calendar.getInstance();
-        long endMillis = beginTime.getTimeInMillis();
-        Calendar endTime = Calendar.getInstance();
-        endTime.add(Calendar.MONTH, -7);
-        long startMillis = endTime.getTimeInMillis();
-
-        String selection = CalendarContract.Events.CALENDAR_ID + " = ?";
-        String[] selectionArgs = new String[] {calId.toString()};
-        ContentUris.appendId(builder, startMillis);
-        ContentUris.appendId(builder, endMillis);
-// Submit the query
-//        cur = instancesQuery(cr, null, (int)startMillis, (int)endMillis, null, null, null);
-        cur =  cr.query(builder.build(),
-                null,
-                null,
-                null,
-                null);
-        if (cur == null) {
-            return;
-        }
-        while (cur.moveToNext()) {
-            long eventID;
-            eventID = cur.getLong(PROJECTION_Events_ID_INDEX);
-            String title = cur.getString(PROJECTION_TITLE);
-            Log.i("TAG", "title:  " + title);
-//            getInstances(activity, eventID);
-        }
-        cur.close();
     }
 
     public static Uri asSyncAdapter(JewishCalendar jewishCalendar) {
@@ -205,6 +146,17 @@ public class GoogleManager {
         ContentUris.appendId(builder, begin);
         ContentUris.appendId(builder, end);
         return builder.build();
+    }
+
+    public static void updateCalendarVisibility(ContentResolver contentResolver,  CalendarAccount calendarAccount, boolean visibility) {
+        Uri.Builder builder = CalendarContract.Calendars.CONTENT_URI.buildUpon()
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER,"true")
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, calendarAccount.getCalendarName())
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
+        ContentUris.appendId(builder, calendarAccount.getAccountId());
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CalendarContract.Calendars.VISIBLE, visibility);
+        contentResolver.update(builder.build(), contentValues, null, null);
     }
 
     @SuppressWarnings("MissingPermission")
