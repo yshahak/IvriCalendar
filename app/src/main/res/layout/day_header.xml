@@ -8,9 +8,19 @@
     android:orientation="vertical"
     tools:background="@android:color/holo_blue_dark">
 
-    <include
+
+    <TextView
         android:id="@+id/cell_label"
-        layout="@layout/text_view_event"
-        android:paddingBottom="0dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingTop="3dp"
+        android:paddingBottom="0dp"
+        android:maxLines="2"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        tools:showIn="@layout/day_cell"/>
 
 </tools:LinearLayout>

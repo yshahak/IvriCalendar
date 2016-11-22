@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
 /**
  * Created by yshahak on 10/10/2016.
@@ -14,7 +15,15 @@ import il.co.yshahak.ivricalendar.R;
 public class DaysHeaderAdapter extends RecyclerView.Adapter<DaysHeaderAdapter.ViewHolder> {
     private final static int DAYS_IN_WEEK = 7;
     private final static String[] dayHeaders= {"ראשון" , "שני"  , "שלישי", "רביעי", "חמישי", "שישי", "שבת"};
+    private Week week;
 
+    public DaysHeaderAdapter(Week week) {
+        this.week = week;
+    }
+
+    public DaysHeaderAdapter() {
+
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -23,11 +32,21 @@ public class DaysHeaderAdapter extends RecyclerView.Adapter<DaysHeaderAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.label.setText(dayHeaders[position]);
+        if (week != null) {
+            if (position == 0){
+                return;
+            }
+            holder.label.setText(dayHeaders[position - 1] + "\n" + week.getDays()[position -1].getLabel());
+        } else {
+            holder.label.setText(dayHeaders[position]);
+        }
     }
 
     @Override
     public int getItemCount() {
+        if (week != null) {
+            return DAYS_IN_WEEK + 1;
+        }
         return DAYS_IN_WEEK;
     }
 

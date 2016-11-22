@@ -124,6 +124,35 @@ public class GoogleManager {
         }
     }
 
+//    public static Uri asSyncAdapter(Week week) {
+//        Time time = new Time();
+//        int firstDay = 0, lastDay;
+//        for (int i = 0 ; i < week.getDays().length ;i ++){
+//            if (week.getDays()[i] != null){
+//                break;
+//            }
+//        }
+//        time.set(week.getDays()[count].getJewishCalendar().getTime().getTime());
+//        time.allDay = true;
+//        time.hour = 0;
+//        time.minute = 0;
+//        time.second = 0;
+//        long begin = Time.getJulianDay(time.toMillis(true), 0);
+//        if (jewishCalendar.getDaysInJewishMonth() == 29){
+//            time.monthDay += 29;
+//        } else {
+//            time.monthDay += 30;
+//        }
+//        long end = Time.getJulianDay(time.toMillis(true), 0);
+//
+//        Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
+//                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+//                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
+//        ContentUris.appendId(builder, begin);
+//        ContentUris.appendId(builder, end);
+//        return builder.build();
+//    }
+
     public static Uri asSyncAdapter(JewishCalendar jewishCalendar) {
         jewishCalendar.setJewishDayOfMonth(1);
         Time time = new Time();

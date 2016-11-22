@@ -18,18 +18,21 @@ import android.view.ViewGroup;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
-import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapter;
+import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
+import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterWeek;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
@@ -48,9 +51,10 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 public class FragmentLoader extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-
+    public static DISPLAY displayState = DISPLAY.WEEK;
     private RecyclerView recyclerView, days;
     private Month month;
+    private Week week;
 
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
@@ -73,7 +77,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         int offset = position - CURRENT_PAGE;
         jewishCalendar = shiftMonth(new JewishCalendar(), offset);
         month = new Month(jewishCalendar, offset == 0);
-
+        week = new Week(new JewishCalendar(), offset);
     }
 
     @Nullable
@@ -84,20 +88,27 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
 
-        days.setLayoutManager(new GridLayoutManager(getActivity(), 7));
+        days.setLayoutManager(new GridLayoutManager(getActivity(), displayState == DISPLAY.WEEK ? 8 : 7));
         days.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         days.setHasFixedSize(true);
-        days.setAdapter(new DaysHeaderAdapter());
 
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
+
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), displayState == DISPLAY.WEEK ? 8 : 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
         MainActivity mainActivity = (MainActivity)getActivity();
         if (mainActivity.getSelectedPage() == position) {
             getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
         }
-        getLoaderManager().initLoader(0, null, this);
-
+        if (displayState == DISPLAY.WEEK) {
+            days.setAdapter(new DaysHeaderAdapter(week));
+            recyclerView.setAdapter(new CalendarRecyclerAdapterWeek(week));
+            int hour = new Date().getHours();
+            recyclerView.getLayoutManager().scrollToPosition(hour * 8);
+        } else {
+            getLoaderManager().initLoader(0, null, this);
+            days.setAdapter(new DaysHeaderAdapter());
+        }
         return root;
     }
 
@@ -125,7 +136,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void setRecyclerView(){
-        recyclerView.setAdapter(new CalendarRecyclerAdapter(month));
+        recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month));
     }
 
     public Month getMonth() {
@@ -175,5 +186,11 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         protected void onPostExecute(Void aVoid) {
             setRecyclerView();
         }
+    }
+
+    public enum DISPLAY{
+        MONTH,
+        WEEK,
+        DAY
     }
 }

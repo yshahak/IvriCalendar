@@ -5,7 +5,6 @@ import android.util.Log;
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -38,10 +37,10 @@ public class Month {
         this.headOffsetMonth = setHeadOffset(jewishCalendar);
         this.trailOffsetMonth = setTrailOffset(jewishCalendar);
         days = isFullMonth ? new Day[30] : new Day[29];
+
         for (int i = 0; i < days.length; i++) {
             jewishCalendar.setJewishDayOfMonth(i + 1);
-            String label = hebrewDateFormatter.formatHebrewNumber(i + 1);
-            days[i] = new Day(this.monthName, label, getBeginAndEnd(jewishCalendar), jewishCalendar.getJewishDayOfMonth());
+            days[i] = new Day((JewishCalendar) jewishCalendar.clone());
         }
         this.isCurrentMonth = isCurrentMonth;
     }
@@ -133,34 +132,4 @@ public class Month {
         return isCurrentMonth;
     }
 
-    /*private long[] getBeginAndEnd(JewishCalendar jewishCalendar){
-        long[] longs = new long[2];
-        Time time = new Time();
-        time.set(jewishCalendar.getTime().getTime());
-        time.allDay = true;
-        time.hour = 0;
-        time.minute = 0;
-        time.second = 0;
-        longs[0] = Time.getJulianDay(time.toMillis(true), 0);
-        time.monthDay +=1;
-        longs[1] = Time.getJulianDay(time.toMillis(true), 0);
-        return longs;
-    }*/
-
-    private long[] getBeginAndEnd(JewishCalendar jewishCalendar) {
-        long[] longs = new long[2];
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(jewishCalendar.getTime());
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        longs[0] = calendar.getTimeInMillis();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-        longs[1] = calendar.getTimeInMillis();
-        return longs;
-    }
 }

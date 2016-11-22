@@ -3,6 +3,7 @@ package il.co.yshahak.ivricalendar.adapters;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
@@ -16,34 +17,19 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
 /**
  * Created by yshahak on 07/10/2016.
  */
-public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecyclerAdapter.ViewHolder> {
+public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRecyclerAdapterWeek.ViewHolder> {
     private static final int REQUEST_CODE_EDIT_EVENT = 100;
 
-    private final static int VIEW_TYPE_DAY_CELL = 1;
-    private final static int VIEW_TYPE_HEAD = 2;
-    private static final int VIEW_TYPE_TAIL = 3;
-    private Month month;
+    private Week week;
 
 
-    public CalendarRecyclerAdapter(Month monthes) {
-        this.month = monthes;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-
-        if (position  <  month.getHeadOffsetMonth()){
-            return VIEW_TYPE_HEAD;
-        }
-        if (position <  month.getHeadOffsetMonth() + month.getMonthNumberOfDays()) {
-            return VIEW_TYPE_DAY_CELL;
-        }
-        return VIEW_TYPE_TAIL;
+    public CalendarRecyclerAdapterWeek(Week week) {
+        this.week = week;
     }
 
     @Override
@@ -53,19 +39,25 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        switch (holder.getItemViewType()){
-            case VIEW_TYPE_DAY_CELL:
-                Day day = month.getDays()[position - month.getHeadOffsetMonth()];
-                setDay(holder, day);
-                break;
-
+        int index = (position / 8) ;
+        if (position % 8 == 0){
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+            holder.label.setText("" + index + "");
+        } else {
+            int hour = position / 8;
+            int day = position % 8;
+            if (day == 3){
+                holder.itemView.setBackgroundColor(Color.GRAY);
+            } else {
+                holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+            }
+            holder.label.setText("");
         }
-
     }
 
     private void setDay(ViewHolder holder, Day day){
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
-        holder.label.setText(day.getLabel());
+        holder.label.setText(day.getLabel() + "    " + day.getJewishCalendar().getTime().getDate());
         for (Event event : day.getGoogleEvents()){
             TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, holder.cellContainer, false);
             textView.setText(event.getEventTitle());
@@ -75,14 +67,11 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             textView.setOnClickListener(holder);
             textView.setOnLongClickListener(holder);
         }
-        if (month.isCurrentMonth() && month.getJewishCalendar().getJewishDayOfMonth() == day.getDayInMonth()){
-            holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
-        }
     }
 
     @Override
     public int getItemCount() {
-        return  month.getHeadOffsetMonth() + month.getMonthNumberOfDays() + month.getTrailOffsetMonth() ;
+        return  8 * 24 ;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
