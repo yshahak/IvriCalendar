@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -175,11 +176,13 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layoutDirection="rtl"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_margin="8dp"
                 android:src="@android:drawable/ic_menu_revert"/>
 
@@ -190,9 +193,66 @@
                 android:layout_gravity="center_vertical"
                 android:padding="8dp"
                 android:text="אינו חוזר"
+                android:layout_marginLeft="8dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+
+
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layoutDirection="rtl"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/event_count_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:maxLines="1"
+                tools:visibility="visible"
+                android:visibility="gone"
+                android:padding="2dp"
+                android:text="חזרות:"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+
+            <me.angrybyte.numberpicker.view.ActualNumberPicker
+                android:id="@+id/countPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                tools:visibility="visible"
+                android:visibility="gone"
+                app:bar_color="#ddd"
+                app:bar_width="1dp"
+                app:bars_count="200"
+                app:controls_color="@android:color/black"
+                app:draw_over_controls="false"
+                app:draw_over_text="false"
+                app:fast_controls_color="@android:color/darker_gray"
+                app:highlight_color="#FFFF3040"
+                app:max_value="1000"
+                app:min_value="1"
+                app:selection_color="#A0FF3040"
+                app:show_bars="true"
+                app:show_controls="true"
+                app:show_fast_controls="true"
+                app:show_highlight="true"
+                app:show_text="true"
+                app:text_color="@android:color/black"
+                app:text_size="18sp"
+                app:value="50" />
+
+
+
+
+        </LinearLayout>
 
 
 

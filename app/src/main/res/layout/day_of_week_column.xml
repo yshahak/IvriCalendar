@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<il.co.yshahak.ivricalendar.uihelpers.CustomLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="1920dp"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    tools:showIn="@layout/week_layout">
+
+
+</il.co.yshahak.ivricalendar.uihelpers.CustomLinearLayout>

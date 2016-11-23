@@ -17,6 +17,7 @@ import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -48,14 +49,14 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell_for_month, parent, false));
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
-                Day day = month.getDays()[position - month.getHeadOffsetMonth()];
+                Day day = month.getDays().get(position - month.getHeadOffsetMonth());
                 setDay(holder, day);
                 break;
 
@@ -75,7 +76,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
             textView.setOnClickListener(holder);
             textView.setOnLongClickListener(holder);
         }
-        if (month.isCurrentMonth() && month.getJewishCalendar().getJewishDayOfMonth() == day.getDayInMonth()){
+        if (day.equals(FragmentLoader.currentDay)){
             holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
         }
     }
@@ -92,19 +93,27 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
         ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             cellContainer = (LinearLayout)itemView.findViewById(R.id.cell_root);
             label = (TextView) itemView.findViewById(R.id.cell_label);
         }
 
         @Override
         public void onClick(View view) {
-            Event event = (Event) view.getTag();
-            if (event != null) {
-                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
-                Intent intent = new Intent(Intent.ACTION_VIEW)
-                        .setData(uri);
-                itemView.getContext().startActivity(intent);
-                MainActivity.recreateFlag = true;
+            if (view.equals(itemView)){
+                if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
+                    FragmentLoader.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
+                    notifyDataSetChanged();
+                }
+            } else {
+                Event event = (Event) view.getTag();
+                if (event != null) {
+                    Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
+                    Intent intent = new Intent(Intent.ACTION_VIEW)
+                            .setData(uri);
+                    itemView.getContext().startActivity(intent);
+                    MainActivity.recreateFlag = true;
+                }
             }
         }
 

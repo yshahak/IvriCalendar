@@ -21,6 +21,7 @@ public class Day {
     private long startDayInMillis, endDayInMillis;
     private int dayInMonth;
     private JewishCalendar jewishCalendar;
+    private Calendar calendarForWeekDisplay;
 
     public Day(JewishCalendar jewishCalendar) {
         this.jewishCalendar = jewishCalendar;
@@ -30,6 +31,11 @@ public class Day {
         this.startDayInMillis = beginAndEnd[0];
         this.endDayInMillis = beginAndEnd[1];
         this.dayInMonth = jewishCalendar.getJewishDayOfMonth();
+        calendarForWeekDisplay = Calendar.getInstance();
+        this.calendarForWeekDisplay.setTime(jewishCalendar.getTime());
+        calendarForWeekDisplay.set(Calendar.MINUTE, 0);
+        calendarForWeekDisplay.set(Calendar.SECOND, 0);
+        calendarForWeekDisplay.set(Calendar.MILLISECOND, 0);
     }
 
     public JewishCalendar getJewishCalendar() {
@@ -58,6 +64,10 @@ public class Day {
 
     public long getEndDayInMillis() {
         return endDayInMillis;
+    }
+
+    public Calendar getCalendarForWeekDisplay() {
+        return calendarForWeekDisplay;
     }
 
     private long[] getBeginAndEnd(JewishCalendar jewishCalendar) {

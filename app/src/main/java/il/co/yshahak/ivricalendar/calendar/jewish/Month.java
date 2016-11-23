@@ -5,7 +5,12 @@ import android.util.Log;
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -19,16 +24,21 @@ public class Month {
         hebrewDateFormatter.setHebrewFormat(true);
     }
     private JewishCalendar jewishCalendar;
-    private Day[] days;
+    private List<Day> days = new ArrayList<>();
     private String yearName;
     private String monthName;
     private int monthNumberOfDays;
     private int headOffsetMonth;
     private int trailOffsetMonth;
     private boolean isFullMonth;
-    private boolean isCurrentMonth;
 
     public Month(JewishCalendar jewishCalendar, boolean isCurrentMonth) {
+        Calendar calendar = null;
+        int dayOfMonth = 0;
+        if (isCurrentMonth){
+            calendar = Calendar.getInstance();
+            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        }
         this.jewishCalendar = (JewishCalendar) jewishCalendar.clone();
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
@@ -36,13 +46,18 @@ public class Month {
         this.isFullMonth = (monthNumberOfDays == 30);
         this.headOffsetMonth = setHeadOffset(jewishCalendar);
         this.trailOffsetMonth = setTrailOffset(jewishCalendar);
-        days = isFullMonth ? new Day[30] : new Day[29];
+        int days = isFullMonth ? 30 : 29;
 
-        for (int i = 0; i < days.length; i++) {
+        for (int i = 0; i < days; i++) {
             jewishCalendar.setJewishDayOfMonth(i + 1);
-            days[i] = new Day((JewishCalendar) jewishCalendar.clone());
+            this.days.add(new Day((JewishCalendar) jewishCalendar.clone()));
+            if (isCurrentMonth){
+                calendar.setTime(jewishCalendar.getTime());
+                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
+                    FragmentLoader.currentDay = this.days.get(i);
+                }
+            }
         }
-        this.isCurrentMonth = isCurrentMonth;
     }
 
 
@@ -120,16 +135,12 @@ public class Month {
         return trailOffsetMonth;
     }
 
-    public Day[] getDays() {
+    public List<Day> getDays() {
         return days;
     }
 
     public JewishCalendar getJewishCalendar() {
         return jewishCalendar;
-    }
-
-    public boolean isCurrentMonth() {
-        return isCurrentMonth;
     }
 
 }

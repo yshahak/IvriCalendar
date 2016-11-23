@@ -19,6 +19,7 @@
         android:layoutDirection="rtl"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"/>
+    <!--<include layout="@layout/week_layout"/>-->
 
 
 </LinearLayout>

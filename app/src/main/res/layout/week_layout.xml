@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layoutDirection="rtl"
+        android:orientation="horizontal">
+
+        <include layout="@layout/day_of_week_column_hours"/>
+
+        <include
+            android:id="@+id/week_day_1"
+            layout="@layout/day_of_week_column"/>
+
+        <include
+            android:id="@+id/week_day_2"
+            layout="@layout/day_of_week_column"/>
+
+        <include
+            android:id="@+id/week_day_3"
+            layout="@layout/day_of_week_column"/>
+
+        <include
+            android:id="@+id/week_day_4"
+            layout="@layout/day_of_week_column"/>
+
+        <include
+            android:id="@+id/week_day_5"
+            layout="@layout/day_of_week_column"/>
+
+        <include
+            android:id="@+id/week_day_6"
+            layout="@layout/day_of_week_column"/>
+
+        <include
+            android:id="@+id/week_day_7"
+            layout="@layout/day_of_week_column"/>
+
+
+    </LinearLayout>
+
+</ScrollView>

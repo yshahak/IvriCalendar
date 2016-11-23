@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<il.co.yshahak.ivricalendar.uihelpers.CustomLinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cell_root"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+    android:weightSum="4"
     android:orientation="vertical"
     tools:background="@android:color/holo_blue_dark">
 
@@ -19,6 +20,6 @@
         android:maxLines="1"
         android:textSize="10sp"
         android:textStyle="bold"
-        tools:showIn="@layout/day_cell"/>
+        tools:showIn="@layout/day_cell_for_month"/>
 
-</LinearLayout>
+</il.co.yshahak.ivricalendar.uihelpers.CustomLinearLayout>

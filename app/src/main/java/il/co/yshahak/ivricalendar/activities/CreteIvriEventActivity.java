@@ -32,6 +32,7 @@ import butterknife.OnClick;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
+import me.angrybyte.numberpicker.view.ActualNumberPicker;
 
 import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
 
@@ -50,6 +51,8 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @BindView(R.id.event_start_time) TextView eventStartTime;
     @BindView(R.id.event_end_time) TextView eventEndTime;
     @BindView(R.id.event_instances) TextView textViewRepeat;
+    @BindView(R.id.event_count_title)TextView eventCountTitle;
+    @BindView(R.id.countPicker) ActualNumberPicker eventCountPicker;
 
     private PICKER_STATE pickerState;
     private SimpleDateFormat sdf;
@@ -142,6 +145,28 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     public boolean onMenuItemClick(MenuItem item) {
         textViewRepeat.setText(item.getTitle());
         textViewRepeat.setTag(item.getItemId());
+        if (item.getItemId() != R.id.repeat_single){
+            eventCountPicker.setVisibility(View.VISIBLE);
+            eventCountTitle.setVisibility(View.VISIBLE);
+        }
+        switch (item.getItemId()){
+            case R.id.repeat_single:
+                eventCountPicker.setVisibility(View.GONE);
+                eventCountTitle.setVisibility(View.GONE);
+                break;
+            case R.id.repeat_daily:
+                eventCountPicker.setValue(365);
+                break;
+            case R.id.repeat_weekly:
+                eventCountPicker.setValue(36);
+                break;
+            case R.id.repeat_monthly:
+                eventCountPicker.setValue(12);
+                break;
+            case R.id.repeat_yearly:
+                eventCountPicker.setValue(10);
+                break;
+        }
         return false;
     }
 
@@ -172,9 +197,8 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
 
     private void saveEvent() {
         String title = headerTitleEditText.getText().toString();
-
         int repeatId = (int) textViewRepeat.getTag();
-        GoogleManager.addHebrewEventToGoogleServer(this, title, repeatId, calendarStartTime, calendarEndTime);
+        GoogleManager.addHebrewEventToGoogleServer(this, title, repeatId, calendarStartTime, calendarEndTime, String.valueOf(eventCountPicker.getValue()));
         finish();
     }
 

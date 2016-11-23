@@ -1,6 +1,7 @@
 package il.co.yshahak.ivricalendar.fragments;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -51,7 +52,8 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 public class FragmentLoader extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    public static DISPLAY displayState = DISPLAY.WEEK;
+    public static DISPLAY displayState = DISPLAY.MONTH;
+    public static Day currentDay;
     private RecyclerView recyclerView, days;
     private Month month;
     private Week week;
@@ -100,13 +102,11 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         if (mainActivity.getSelectedPage() == position) {
             getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
         }
+        getLoaderManager().initLoader(0, null, this);
         if (displayState == DISPLAY.WEEK) {
             days.setAdapter(new DaysHeaderAdapter(week));
-            recyclerView.setAdapter(new CalendarRecyclerAdapterWeek(week));
-            int hour = new Date().getHours();
-            recyclerView.getLayoutManager().scrollToPosition(hour * 8);
         } else {
-            getLoaderManager().initLoader(0, null, this);
+
             days.setAdapter(new DaysHeaderAdapter());
         }
         return root;
@@ -117,8 +117,14 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
+        Uri uri;
+        if (displayState == DISPLAY.WEEK) {
+           uri = GoogleManager.asSyncAdapter(week);
+        } else {
+            uri = GoogleManager.asSyncAdapter(jewishCalendar);
+        }
         return new CursorLoader(getActivity(),  // Context
-                GoogleManager.asSyncAdapter(jewishCalendar), // URI
+                uri, // URI
                 INSTANCE_PROJECTION,                // Projection
                 WHERE_CALENDARS_SELECTED,                           // Selection
                 WHERE_CALENDARS_ARGS,                           // Selection args
@@ -136,7 +142,22 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void setRecyclerView(){
-        recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month));
+//        if (displayState == DISPLAY.WEEK) {
+//            CustomLinearLayout day3 = (CustomLinearLayout) getView().findViewById(R.id.week_day_3);
+//            day3.setDay(week.getDays()[2]);
+//        }
+        if (displayState == DISPLAY.WEEK) {
+            recyclerView.setAdapter(new CalendarRecyclerAdapterWeek(week));
+            int hour = new Date().getHours();
+            recyclerView.getLayoutManager().scrollToPosition(hour * 8);
+        } else {
+            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month));
+        }
+
+    }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
     public Month getMonth() {
@@ -166,12 +187,22 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
                 }
                 Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
 
-                for (Day day : month.getDays()){
-                    if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                        day.getGoogleEvents().add(event);
-                        break;
+                if (displayState == DISPLAY.WEEK) {
+                    for (Day day : week.getDays()){
+                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
+                            day.getGoogleEvents().add(event);
+                            break;
+                        }
+                    }
+                } else {
+                    for (Day day : month.getDays()){
+                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
+                            day.getGoogleEvents().add(event);
+                            break;
+                        }
                     }
                 }
+
                 List<Event> list = eventMap.get(calendarName);
                 if (list == null) {
                     list = new ArrayList<>();

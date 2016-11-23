@@ -7,11 +7,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Calendar;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
@@ -26,6 +29,7 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
     private static final int REQUEST_CODE_EDIT_EVENT = 100;
 
     private Week week;
+    private final static long Hour = 1000 * 60 * 60;
 
 
     public CalendarRecyclerAdapterWeek(Week week) {
@@ -34,7 +38,7 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell_for_week, parent, false));
     }
 
     @Override
@@ -46,7 +50,8 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
         } else {
             int hour = position / 8;
             int day = position % 8;
-            if (day == 3){
+            setDay(holder, week.getDays()[day - 1], hour);
+            if (day == 4){
                 holder.itemView.setBackgroundColor(Color.GRAY);
             } else {
                 holder.itemView.setBackgroundColor(Color.TRANSPARENT);
@@ -55,17 +60,29 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
         }
     }
 
-    private void setDay(ViewHolder holder, Day day){
+    private void setDay(ViewHolder holder, Day day, int hour){
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
-        holder.label.setText(day.getLabel() + "    " + day.getJewishCalendar().getTime().getDate());
+        Calendar cal = day.getCalendarForWeekDisplay();
+        cal.set(Calendar.HOUR, hour);
+        long time = cal.getTimeInMillis();
         for (Event event : day.getGoogleEvents()){
-            TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, holder.cellContainer, false);
-            textView.setText(event.getEventTitle());
-            textView.setBackgroundColor(event.getDisplayColor());
-            holder.cellContainer.addView(textView);
-            textView.setTag(event);
-            textView.setOnClickListener(holder);
-            textView.setOnLongClickListener(holder);
+            if (event.getBegin() >= time && event.getBegin()  < (time + Hour)) {
+                int emptyWeight =(int)((event.getBegin() - time) / 1000 / 60 / 15);
+                if (emptyWeight > 0){
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.label.getLayoutParams();
+                    params.weight = emptyWeight;
+                    holder.label.setLayoutParams(params);
+                }
+                Log.d("TAG", "hour: " + hour);
+                Log.d("TAG", "event: " + event.getEventTitle() + " , dif:" + (event.getBegin() - time) / 1000 / 60 / 15);
+                TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, holder.cellContainer, false);
+                textView.setText(event.getEventTitle());
+                textView.setBackgroundColor(event.getDisplayColor());
+                holder.cellContainer.addView(textView);
+                textView.setTag(event);
+                textView.setOnClickListener(holder);
+                textView.setOnLongClickListener(holder);
+            }
         }
     }
 

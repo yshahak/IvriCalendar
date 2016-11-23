@@ -123,6 +123,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(intent);
                     break;
                 case R.id.event_ivri:
+                    WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
+                    if (weakReference != null) {
+                        FragmentLoader fragmentLoader = weakReference.get();
+                        if (fragmentLoader != null) {
+                            if (fragmentLoader.getMonth().getDays().contains(FragmentLoader.currentDay)){
+
+                            }
+                        }
+                    }
                     Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
                     startActivity(intentIvri);
                     break;
@@ -226,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             FragmentLoader fragmentLoader = weakReference.get();
             if (fragmentLoader != null) {
                 setTitle(fragmentLoader.getMonth().getMonthName() + " , " + fragmentLoader.getMonth().getYearName());
+                fragmentLoader.getRecyclerView().getAdapter().notifyDataSetChanged();
             }
         }
     }
