@@ -123,16 +123,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(intent);
                     break;
                 case R.id.event_ivri:
+                    Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
                     WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
                     if (weakReference != null) {
                         FragmentLoader fragmentLoader = weakReference.get();
                         if (fragmentLoader != null) {
                             if (fragmentLoader.getMonth().getDays().contains(FragmentLoader.currentDay)){
-
+                                intentIvri.putExtra(CreteIvriEventActivity.EXTRA_USE_CURRENT_DAY, true);
                             }
                         }
                     }
-                    Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
                     startActivity(intentIvri);
                     break;
             }
@@ -147,7 +147,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (mSlideState) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else {
             super.onBackPressed();
         }
     }

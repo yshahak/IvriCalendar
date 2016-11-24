@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<il.co.yshahak.ivricalendar.uihelpers.CustomLinearLayout
+<il.co.yshahak.ivricalendar.views.CustomLinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -204,4 +204,4 @@
         android:text="23:00"/>
 
 
-</il.co.yshahak.ivricalendar.uihelpers.CustomLinearLayout>
+</il.co.yshahak.ivricalendar.views.CustomLinearLayout>

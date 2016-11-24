@@ -31,7 +31,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
+import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
+import il.co.yshahak.ivricalendar.views.HebrewPickerDialog;
 import me.angrybyte.numberpicker.view.ActualNumberPicker;
 
 import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatter;
@@ -42,6 +44,7 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatt
 
 public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, KeyboardVisibilityEventListener, PopupMenu.OnMenuItemClickListener {
 
+    public static final String EXTRA_USE_CURRENT_DAY = "EXTRA_USE_CURRENT_DAY" ;
     @BindView(R.id.header_btn_save) TextView headerBtnSave;
     @BindView(R.id.header_btn_x) ImageView headerBtnX;
     @BindView(R.id.header_edit_text_event_title) EditText headerTitleEditText;
@@ -74,7 +77,13 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @Override
     protected void onResume() {
         super.onResume();
-        JewishCalendar jewishCalendar = new JewishCalendar();
+        boolean useCurrentDay = getIntent().getBooleanExtra(EXTRA_USE_CURRENT_DAY, false);
+        JewishCalendar jewishCalendar;
+        if (useCurrentDay && FragmentLoader.currentDay != null){
+            jewishCalendar = FragmentLoader.currentDay.getJewishCalendar();
+        } else {
+            jewishCalendar = new JewishCalendar();
+        }
         String date = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()) + " " +
                 hebrewDateFormatter.formatMonth(jewishCalendar)   ;
         hebrewDateFormatter.setLongWeekFormat(true);
@@ -91,7 +100,9 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     }
 
     @OnClick({R.id.event_start_day, R.id.event_end_day})void openDayDialog(){
-
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new HebrewPickerDialog();
+        dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
     }
 
     @OnClick({R.id.event_start_time, R.id.event_end_time}) void openTimeDialog(TextView text){

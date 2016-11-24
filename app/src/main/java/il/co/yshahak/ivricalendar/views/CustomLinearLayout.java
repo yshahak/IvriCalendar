@@ -1,4 +1,4 @@
-package il.co.yshahak.ivricalendar.uihelpers;
+package il.co.yshahak.ivricalendar.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
