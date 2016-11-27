@@ -42,7 +42,8 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatt
  * Created by B.E.L on 31/10/2016.
  */
 
-public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, KeyboardVisibilityEventListener, PopupMenu.OnMenuItemClickListener {
+public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener
+        , KeyboardVisibilityEventListener, PopupMenu.OnMenuItemClickListener{
 
     public static final String EXTRA_USE_CURRENT_DAY = "EXTRA_USE_CURRENT_DAY" ;
     @BindView(R.id.header_btn_save) TextView headerBtnSave;
@@ -77,6 +78,17 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @Override
     protected void onResume() {
         super.onResume();
+        setDates();
+        calendarStartTime = Calendar.getInstance();
+        calendarStartTime.set(Calendar.MINUTE, 0);
+        eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
+        calendarEndTime = Calendar.getInstance();
+        calendarEndTime.set(Calendar.MINUTE, 0);
+        calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
+        eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
+    }
+
+    private void setDates() {
         boolean useCurrentDay = getIntent().getBooleanExtra(EXTRA_USE_CURRENT_DAY, false);
         JewishCalendar jewishCalendar;
         if (useCurrentDay && FragmentLoader.currentDay != null){
@@ -90,19 +102,15 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         String day = hebrewDateFormatter.formatDayOfWeek(jewishCalendar) + " , " + date;
         eventStartDay.setText(day);
         eventEndDay.setText(day);
-        calendarStartTime = Calendar.getInstance();
-        calendarStartTime.set(Calendar.MINUTE, 0);
-        eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
-        calendarEndTime = Calendar.getInstance();
-        calendarEndTime.set(Calendar.MINUTE, 0);
-        calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
-        eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
     }
 
     @OnClick({R.id.event_start_day, R.id.event_end_day})void openDayDialog(){
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new HebrewPickerDialog();
+        HebrewPickerDialog.onDatePickerDismiss = onDatePickerDismiss;
+
         dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
+
     }
 
     @OnClick({R.id.event_start_time, R.id.event_end_time}) void openTimeDialog(TextView text){
@@ -229,12 +237,25 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         headerTitleEditText.setCursorVisible(isOpen);
     }
 
+    OnDatePickerDismiss onDatePickerDismiss = new OnDatePickerDismiss() {
+        @Override
+        public void onBtnOkPressed() {
+            setDates();
+        }
+    };
+
+
+
 
     private enum PICKER_STATE {
         STATE_START_TIME,
         STATE_END_TIME,
         STATE_START_DATE,
         STATE_END_DATE
+    }
+
+    public interface OnDatePickerDismiss{
+        void onBtnOkPressed();
     }
 
 }

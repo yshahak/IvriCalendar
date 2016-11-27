@@ -17,12 +17,12 @@ import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.views.HebrewPickerDialog;
 
 /**
  * Created by yshahak on 07/10/2016.
  */
-public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarRecyclerAdapterMonth.ViewHolder> {
+public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<CalendarRecyclerAdapterPicker.ViewHolder> {
     private static final int REQUEST_CODE_EDIT_EVENT = 100;
 
     private final static int VIEW_TYPE_DAY_CELL = 1;
@@ -31,7 +31,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private Month month;
 
 
-    public CalendarRecyclerAdapterMonth(Month monthes) {
+    public CalendarRecyclerAdapterPicker(Month monthes) {
         this.month = monthes;
     }
 
@@ -49,7 +49,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell_for_month, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.day_cell_for_picker, parent, false));
     }
 
     @Override
@@ -61,7 +61,6 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
                 break;
             default:
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
-
         }
 
     }
@@ -78,9 +77,9 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
             textView.setOnClickListener(holder);
             textView.setOnLongClickListener(holder);
         }
-        if (day.equals(FragmentLoader.currentDay)){
+        if (day.equals(HebrewPickerDialog.currentDay)){
             holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
-        }else {
+        } else {
             holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
         }
     }
@@ -106,7 +105,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         public void onClick(View view) {
             if (view.equals(itemView)){
                 if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
-                    FragmentLoader.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
+                    HebrewPickerDialog.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
                     notifyDataSetChanged();
                 }
             } else {
