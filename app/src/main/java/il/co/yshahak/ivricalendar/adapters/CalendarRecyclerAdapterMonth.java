@@ -61,6 +61,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
                 break;
             default:
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
+                holder.cellContainer.removeAllViews();
 
         }
 

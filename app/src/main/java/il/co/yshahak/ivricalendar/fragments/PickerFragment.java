@@ -26,11 +26,12 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
  */
 
 public class PickerFragment extends Fragment {
-
-    private Month month;
-
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
+    private static final String KEY_MONTH = "keyMonth";
+    private Month month;
+
+
 
     public static PickerFragment newInstance(int position) {
         PickerFragment fragment = new PickerFragment();
@@ -40,14 +41,25 @@ public class PickerFragment extends Fragment {
         return fragment;
     }
 
+    public static PickerFragment newInstance(int position, Month month) {
+        PickerFragment fragment = new PickerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(KEY_POSITION, position);
+        bundle.putParcelable(KEY_MONTH, month);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int position = getArguments().getInt(KEY_POSITION);
-        int offset = position - CURRENT_PAGE;
-
-        JewishCalendar jewishCalendar = shiftMonth(new JewishCalendar(), offset);
-        month = new Month(jewishCalendar, offset == 0);
+        month = getArguments().getParcelable(KEY_MONTH);
+        if (month == null) {
+            int position = getArguments().getInt(KEY_POSITION);
+            int offset = position - CURRENT_PAGE;
+            JewishCalendar jewishCalendar = shiftMonth(new JewishCalendar(), offset);
+            month = new Month(jewishCalendar, offset == 0);
+        }
     }
 
     @Nullable

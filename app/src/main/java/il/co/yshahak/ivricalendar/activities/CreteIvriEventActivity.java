@@ -56,6 +56,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @BindView(R.id.event_end_time) TextView eventEndTime;
     @BindView(R.id.event_instances) TextView textViewRepeat;
     @BindView(R.id.event_count_title)TextView eventCountTitle;
+//    @BindView(R.id.progress_bar)ProgressBar progressBar;
     @BindView(R.id.countPicker) ActualNumberPicker eventCountPicker;
 
     private PICKER_STATE pickerState;
@@ -79,13 +80,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     protected void onResume() {
         super.onResume();
         setDates();
-        calendarStartTime = Calendar.getInstance();
-        calendarStartTime.set(Calendar.MINUTE, 0);
-        eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
-        calendarEndTime = Calendar.getInstance();
-        calendarEndTime.set(Calendar.MINUTE, 0);
-        calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
-        eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
+
     }
 
     private void setDates() {
@@ -102,10 +97,20 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         String day = hebrewDateFormatter.formatDayOfWeek(jewishCalendar) + " , " + date;
         eventStartDay.setText(day);
         eventEndDay.setText(day);
+        calendarStartTime = Calendar.getInstance();
+        calendarStartTime.setTime(jewishCalendar.getTime());
+        calendarStartTime.set(Calendar.MINUTE, 0);
+        eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
+        calendarEndTime = Calendar.getInstance();
+        calendarEndTime.setTime(jewishCalendar.getTime());
+        calendarEndTime.set(Calendar.MINUTE, 0);
+        calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
+        eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
     }
 
     @OnClick({R.id.event_start_day, R.id.event_end_day})void openDayDialog(){
         // Create an instance of the dialog fragment and show it
+//        progressBar.setVisibility(View.VISIBLE);
         DialogFragment dialog = new HebrewPickerDialog();
         HebrewPickerDialog.onDatePickerDismiss = onDatePickerDismiss;
 
@@ -237,10 +242,15 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         headerTitleEditText.setCursorVisible(isOpen);
     }
 
-    OnDatePickerDismiss onDatePickerDismiss = new OnDatePickerDismiss() {
+    OnDatePickerDialog onDatePickerDismiss = new OnDatePickerDialog() {
         @Override
         public void onBtnOkPressed() {
             setDates();
+        }
+
+        @Override
+        public void onAttached() {
+//            progressBar.setVisibility(View.GONE);
         }
     };
 
@@ -254,8 +264,9 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         STATE_END_DATE
     }
 
-    public interface OnDatePickerDismiss{
+    public interface OnDatePickerDialog {
         void onBtnOkPressed();
+        void onAttached();
     }
 
 }

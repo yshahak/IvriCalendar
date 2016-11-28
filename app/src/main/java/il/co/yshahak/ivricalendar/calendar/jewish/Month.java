@@ -1,5 +1,7 @@
 package il.co.yshahak.ivricalendar.calendar.jewish;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
@@ -16,14 +18,14 @@ import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
  * Created by yshahak on 07/10/2016.
  */
 
-public class Month {
+public class Month implements Parcelable {
 
     public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
 
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
-    private JewishCalendar jewishCalendar;
+//    private JewishCalendar jewishCalendar;
     private List<Day> days = new ArrayList<>();
     private String yearName;
     private String monthName;
@@ -39,7 +41,7 @@ public class Month {
             calendar = Calendar.getInstance();
             dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         }
-        this.jewishCalendar = (JewishCalendar) jewishCalendar.clone();
+//        this.jewishCalendar = (JewishCalendar) jewishCalendar.clone();
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
@@ -139,8 +141,48 @@ public class Month {
         return days;
     }
 
-    public JewishCalendar getJewishCalendar() {
-        return jewishCalendar;
+//    public JewishCalendar getJewishCalendar() {
+//        return jewishCalendar;
+//    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+//        dest.writeParcelable(this.jewishCalendar, flags);
+        dest.writeList(this.days);
+        dest.writeString(this.yearName);
+        dest.writeString(this.monthName);
+        dest.writeInt(this.monthNumberOfDays);
+        dest.writeInt(this.headOffsetMonth);
+        dest.writeInt(this.trailOffsetMonth);
+        dest.writeByte(this.isFullMonth ? (byte) 1 : (byte) 0);
+    }
+
+    protected Month(Parcel in) {
+//        this.jewishCalendar = in.readParcelable(JewishCalendar.class.getClassLoader());
+        this.days = new ArrayList<>();
+        in.readList(this.days, Day.class.getClassLoader());
+        this.yearName = in.readString();
+        this.monthName = in.readString();
+        this.monthNumberOfDays = in.readInt();
+        this.headOffsetMonth = in.readInt();
+        this.trailOffsetMonth = in.readInt();
+        this.isFullMonth = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator<Month> CREATOR = new Parcelable.Creator<Month>() {
+        @Override
+        public Month createFromParcel(Parcel source) {
+            return new Month(source);
+        }
+
+        @Override
+        public Month[] newArray(int size) {
+            return new Month[size];
+        }
+    };
 }

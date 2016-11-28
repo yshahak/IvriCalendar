@@ -33,12 +33,6 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
     public int getItemPosition(Object object) {
 //        Log.d("TAG", "getItemPosition: "  + object.toString());
         return dropPages ? POSITION_NONE : super.getItemPosition(object) ;
-
-//        if (direction != DIRECTION.NULL){
-//            int currentPosition = ((FragmentMonth)object).getPosition();
-//            return (direction == DIRECTION.LEFT) ? --currentPosition : ++currentPosition;
-//        }
-//        return super.getItemPosition(object);
     }
 
 
