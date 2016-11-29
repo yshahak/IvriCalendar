@@ -39,6 +39,10 @@
         </activity>
         <activity android:name=".activities.GoogleSignInActivity" android:exported="true"/>
 
+        <provider
+            android:name=".calendar.jewish.JewishCalendarContentProvider"
+            android:authorities="IvriCalendarProvider"
+            android:exported="false" />
     </application>
 
 </manifest>

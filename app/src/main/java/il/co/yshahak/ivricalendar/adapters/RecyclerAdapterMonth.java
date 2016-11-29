@@ -3,6 +3,7 @@ package il.co.yshahak.ivricalendar.adapters;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
@@ -16,32 +17,41 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+
+import static il.co.yshahak.ivricalendar.calendar.jewish.JewishCalendarContract.DateEntry.COLUMN_INDEX_DATE_DAY_IN_WEEK;
+import static il.co.yshahak.ivricalendar.calendar.jewish.JewishCalendarContract.DateEntry.COLUMN_INDEX_DAY_LABEL;
 
 /**
  * Created by yshahak on 07/10/2016.
  */
-public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarRecyclerAdapterMonth.ViewHolder> {
+public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMonth.ViewHolder> {
     private static final int REQUEST_CODE_EDIT_EVENT = 100;
 
     private final static int VIEW_TYPE_DAY_CELL = 1;
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
-    private Month month;
+    private Cursor monthCursor;
+    private int head, tail;
 
 
-    public CalendarRecyclerAdapterMonth(Month monthes) {
-        this.month = monthes;
+    public RecyclerAdapterMonth(Cursor cursor) {
+        this.monthCursor = cursor;
+        monthCursor.moveToFirst();
+        int firstDayInMonth = monthCursor.getInt(COLUMN_INDEX_DATE_DAY_IN_WEEK);
+        head = firstDayInMonth - 1;
+        monthCursor.moveToLast();
+        int lastDayInMonth = monthCursor.getInt(COLUMN_INDEX_DATE_DAY_IN_WEEK);
+        tail = 7 - lastDayInMonth;
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        if (position  <  month.getHeadOffsetMonth()){
+        if (position  <  head){
             return VIEW_TYPE_HEAD;
         }
-        if (position <  month.getHeadOffsetMonth() + month.getMonthNumberOfDays()) {
+        if (position <  head + monthCursor.getCount()) {
             return VIEW_TYPE_DAY_CELL;
         }
         return VIEW_TYPE_TAIL;
@@ -57,8 +67,8 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         holder.cellContainer.removeAllViews();
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
-                Day day = month.getDays().get(position - month.getHeadOffsetMonth());
-                setDay(holder, day);
+                monthCursor.moveToPosition(position - head);
+                holder.label.setText(monthCursor.getString(COLUMN_INDEX_DAY_LABEL));
                 break;
             default:
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
@@ -67,8 +77,8 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     }
 
     private void setDay(ViewHolder holder, Day day){
-        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
         holder.label.setText(day.getLabel() + "    " + day.getJewishCalendar().getTime().getDate());
+        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
         for (Event event : day.getGoogleEvents()){
             TextView textView = (TextView) inflater.inflate(R.layout.text_view_event_for_month, holder.cellContainer, false);
             textView.setText(event.getEventTitle());
@@ -87,7 +97,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     @Override
     public int getItemCount() {
-        return  month.getHeadOffsetMonth() + month.getMonthNumberOfDays() + month.getTrailOffsetMonth() ;
+        return  monthCursor.getCount() + head + tail ;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -106,7 +116,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         public void onClick(View view) {
             if (view.equals(itemView)){
                 if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
-                    FragmentLoader.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
+//                    FragmentLoader.currentDay = monthCursor.getDays().get(getAdapterPosition() - monthCursor.getHeadOffsetMonth());
                     notifyDataSetChanged();
                 }
             } else {
@@ -133,5 +143,9 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
             }
             return true;
         }
+    }
+
+    public Cursor getMonthCursor() {
+        return monthCursor;
     }
 }

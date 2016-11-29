@@ -39,5 +39,7 @@ dependencies {
     compile 'pub.devrel:easypermissions:0.1.5'
     compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:1.0.1'
     compile 'me.angrybyte.picker:picker:1.2.0'
+    compile 'com.facebook.stetho:stetho:1.4.1'
+
 }
 apply plugin: 'com.google.gms.google-services'

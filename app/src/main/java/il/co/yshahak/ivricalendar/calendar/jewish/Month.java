@@ -2,7 +2,6 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
@@ -110,9 +109,9 @@ public class Month implements Parcelable {
         }
 
         jewishCalendar.setJewishMonth(desire);
-        Log.d("TAG",  hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear()) + " , "
-                + hebrewDateFormatter.formatMonth(jewishCalendar) + " , "
-                + hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()));
+//        Log.d("TAG",  hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear()) + " , "
+//                + hebrewDateFormatter.formatMonth(jewishCalendar) + " , "
+//                + hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()));
         return jewishCalendar;
     }
 
