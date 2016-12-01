@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,8 +68,12 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
         holder.cellContainer.removeAllViews();
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
-                monthCursor.moveToPosition(position - head);
-                holder.label.setText(monthCursor.getString(COLUMN_INDEX_DAY_LABEL));
+                if (monthCursor.isClosed()){
+                    Log.d("TAG", "cursor is close!!!");
+                } else {
+                    monthCursor.moveToPosition(position - head);
+                    holder.label.setText(monthCursor.getString(COLUMN_INDEX_DAY_LABEL));
+                }
                 break;
             default:
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));

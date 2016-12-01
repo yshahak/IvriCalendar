@@ -16,17 +16,27 @@ import android.support.annotation.NonNull;
 @SuppressWarnings("ConstantConditions")
 public class JewishCalendarContentProvider extends ContentProvider {
 
-    static final int DATES = 1;
+    static final int DATES = 100; //whole dates records
+    static final int DATES_WITH_ID = 101; //single date record
+    static final int EVENTS = 200;
 
     static final UriMatcher uriMatcher;
     final static String authority = JewishCalendarContract.CONTENT_AUTHORITY;
 
-    static{
-        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(authority, JewishCalendarContract.PATH_DATES, DATES);
+    static {
+        uriMatcher = buildUriMatcher();
     }
-    private JewishCalendarDbHelper dbHelper;
 
+    public static UriMatcher buildUriMatcher() {
+        UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(authority, JewishCalendarContract.PATH_DATES, DATES);
+        uriMatcher.addURI(authority, JewishCalendarContract.PATH_DATES + "/#", DATES_WITH_ID);
+        uriMatcher.addURI(authority, JewishCalendarContract.PATH_EVENTS, EVENTS);
+        return uriMatcher;
+    }
+
+
+    private JewishCalendarDbHelper dbHelper;
 
 
     @Override
@@ -41,16 +51,22 @@ public class JewishCalendarContentProvider extends ContentProvider {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int match = uriMatcher.match(uri);
         Uri returnUri;
-
+        long rowID;
         switch (match) {
-            case DATES: {
-                long rowID = db.insert(JewishCalendarContract.DateEntry.TABLE_NAME, null, values);
-                if (rowID > 0){
+            case DATES:
+                rowID = db.insert(JewishCalendarContract.DateEntry.TABLE_NAME, null, values);
+                if (rowID > 0) {
                     returnUri = JewishCalendarContract.DateEntry.buildDateUri(rowID);
-                }else
+                } else
                     throw new SQLException("Failed to insert row into " + uri);
                 break;
-            }
+            case EVENTS:
+                rowID = db.insert(JewishCalendarContract.EventsEntry.TABLE_NAME, null, values);
+                if (rowID > 0) {
+                    returnUri = JewishCalendarContract.EventsEntry.buildEventsUri(rowID);
+                } else
+                    throw new SQLException("Failed to insert row into " + uri);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -62,7 +78,7 @@ public class JewishCalendarContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
         switch (uriMatcher.match(uri)) {
-            case DATES: {
+            case DATES:
                 retCursor = dbHelper.getReadableDatabase().query(
                         JewishCalendarContract.DateEntry.TABLE_NAME,
                         projection,
@@ -72,8 +88,18 @@ public class JewishCalendarContentProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+            break;
+            case EVENTS:
+                retCursor = dbHelper.getReadableDatabase().query(
+                        JewishCalendarContract.EventsEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
-            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -88,7 +114,7 @@ public class JewishCalendarContentProvider extends ContentProvider {
         int count;
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int match = uriMatcher.match(uri);
-        switch (match){
+        switch (match) {
             case DATES:
                 count = db.delete(JewishCalendarContract.DateEntry.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -105,13 +131,13 @@ public class JewishCalendarContentProvider extends ContentProvider {
         int count;
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int match = uriMatcher.match(uri);
-        switch (match){
+        switch (match) {
             case DATES:
                 count = db.update(JewishCalendarContract.DateEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
             default:
-                throw new IllegalArgumentException("Unknown URI " + uri );
+                throw new IllegalArgumentException("Unknown URI " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
@@ -119,7 +145,7 @@ public class JewishCalendarContentProvider extends ContentProvider {
 
     @Override
     public String getType(@NonNull Uri uri) {
-        switch (uriMatcher.match(uri)){
+        switch (uriMatcher.match(uri)) {
             case DATES:
                 return JewishCalendarContract.DateEntry.CONTENT_TYPE;
             default:

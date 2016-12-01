@@ -2,7 +2,6 @@ package il.co.yshahak.ivricalendar.fragments;
 
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,20 +21,12 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.adapters.RecyclerAdapterMonth;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewishCalendarContract;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewishDbManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_COLOR_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_DISPLAY_NAME_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_DISPLAY_COLOR_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_END_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.jewish.JewishCalendarContract.DateEntry.COLUMN_INDEX_MONTH_LABEL;
 import static il.co.yshahak.ivricalendar.calendar.jewish.JewishCalendarContract.DateEntry.COLUMN_INDEX_YEAR_LABEL;
 import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
@@ -127,6 +118,7 @@ public class FragmentMonthLoader extends Fragment implements LoaderManager.Loade
                 setRecyclerView(cursor);
             } else {
                 JewishDbManager.addMonth(getActivity(), jewishCalendar);
+                getLoaderManager().restartLoader(0, null, this);
             }
         }
     }
@@ -158,57 +150,6 @@ public class FragmentMonthLoader extends Fragment implements LoaderManager.Loade
         return recyclerView;
     }
 
-//    public Month getMonth() {
-//        return month;
-//    }
-
-    class ProcessDates extends AsyncTask<Cursor, Void, Void>{
-
-        @Override
-        protected Void doInBackground(Cursor... cursors) {
-            int eventId;
-            String title, calendarName;
-            Long  start, end;
-            int displayColor, calendarColor;
-            Cursor cursor = cursors[0];
-            while (cursor.moveToNext()) {
-                eventId = cursor.getInt(PROJECTION_ID_INDEX);
-                title = cursor.getString(PROJECTION_TITLE_INDEX);
-                start = cursor.getLong((PROJECTION_BEGIN_INDEX));
-                end = cursor.getLong((PROJECTION_END_INDEX));
-                calendarName = cursor.getString(PROJECTION_CALENDAR_DISPLAY_NAME_INDEX);
-                displayColor = cursor.getInt(PROJECTION_DISPLAY_COLOR_INDEX);
-                calendarColor = cursor.getInt(PROJECTION_CALENDAR_COLOR_INDEX);
-                boolean allDayEvent = (end - start) == 1000*60*60*24;
-                if (allDayEvent){
-                    end = start;
-                }
-                Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
-
-                if (displayState == DISPLAY.WEEK) {
-                    for (Day day : week.getDays()){
-                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                            day.getGoogleEvents().add(event);
-                            break;
-                        }
-                    }
-                } else {
-//                    for (Day day : month.getDays()){
-//                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-//                            day.getGoogleEvents().add(event);
-//                            break;
-//                        }
-//                    }
-                }
-            }
-             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-//            setRecyclerView();
-        }
-    }
 
     public enum DISPLAY{
         MONTH,

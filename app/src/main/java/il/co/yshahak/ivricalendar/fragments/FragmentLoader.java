@@ -173,20 +173,10 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
                     end = start;
                 }
                 Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
-
-                if (displayState == DISPLAY.WEEK) {
-                    for (Day day : week.getDays()){
-                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                            day.getGoogleEvents().add(event);
-                            break;
-                        }
-                    }
-                } else {
-                    for (Day day : month.getDays()){
-                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                            day.getGoogleEvents().add(event);
-                            break;
-                        }
+                for (Day day : month.getDays()){
+                    if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
+                        day.getGoogleEvents().add(event);
+                        break;
                     }
                 }
             }
