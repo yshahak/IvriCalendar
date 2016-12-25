@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onBackPressed() {
         if (floatBtnPressedState) {
-           fadeOutEventCreationLayout();
+            fadeOutEventCreationLayout();
         }
         else if (mSlideState) {
             drawerLayout.closeDrawer(GravityCompat.START);

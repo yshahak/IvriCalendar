@@ -54,6 +54,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.cellContainer.removeAllViews();
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
                 Day day = month.getDays().get(position - month.getHeadOffsetMonth());
@@ -61,17 +62,15 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
                 break;
             default:
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
-                holder.cellContainer.removeAllViews();
 
         }
-
     }
 
     private void setDay(ViewHolder holder, Day day){
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
         holder.label.setText(day.getLabel() + "    " + day.getJewishCalendar().getTime().getDate());
         for (Event event : day.getGoogleEvents()){
-            TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, holder.cellContainer, false);
+            TextView textView = (TextView) inflater.inflate(R.layout.text_view_event_for_month, holder.cellContainer, false);
             textView.setText(event.getEventTitle());
             textView.setBackgroundColor(event.getDisplayColor());
             holder.cellContainer.addView(textView);
@@ -99,7 +98,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            cellContainer = (LinearLayout)itemView.findViewById(R.id.cell_root);
+            cellContainer = (LinearLayout)itemView.findViewById(R.id.event_container);
             label = (TextView) itemView.findViewById(R.id.cell_label);
         }
 

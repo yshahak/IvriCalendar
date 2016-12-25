@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
@@ -80,8 +79,6 @@ public class PickerFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(month));
         days.setAdapter(new DaysHeaderAdapter());
-        TextView title = (TextView) root.findViewById(R.id.title);
-        title.setText(month.getMonthName() + " , " + month.getYearName());
         return root;
     }
 }

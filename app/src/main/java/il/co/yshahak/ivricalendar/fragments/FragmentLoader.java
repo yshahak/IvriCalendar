@@ -119,7 +119,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         String[] WHERE_CALENDARS_ARGS = {"1"};//
         Uri uri;
         if (displayState == DISPLAY.WEEK) {
-           uri = GoogleManager.asSyncAdapter(week);
+            uri = GoogleManager.asSyncAdapter(week);
         } else {
             uri = GoogleManager.asSyncAdapter(jewishCalendar);
         }
@@ -133,7 +133,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-       new ProcessDates().execute(cursor);
+        new ProcessDates().execute(cursor);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
                 }
                 list.add(event);
             }
-             return null;
+            return null;
         }
 
         @Override

@@ -85,36 +85,8 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
                 .build();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-//        mAuth = FirebaseAuth.getInstance();
-//        mAuthListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                FirebaseUser user = firebaseAuth.getCurrentUser();
-//                if (user != null) {
-//                    // User is signed in
-//                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-//                } else {
-//                    // User is signed out
-//                    Log.d(TAG, "onAuthStateChanged:signed_out");
-//                }
-//            }
-//        };
-
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-//        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-//        if (mAuthListener != null) {
-//            mAuth.removeAuthStateListener(mAuthListener);
-//        }
-    }
 
     /**
      * Attempt to call the API, after verifying that all the preconditions are
@@ -325,29 +297,6 @@ public class GoogleSignInActivity extends AppCompatActivity implements GoogleApi
         // Do nothing.
     }
 
-
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
-//        final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-//        mAuth.signInWithCredential(credential)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-//                        if (task.isSuccessful()) {
-//                            mCredential = GoogleAccountCredential.usingOAuth2(
-//                                    getApplicationContext(), Arrays.asList(SCOPES))
-//                                    .setBackOff(new ExponentialBackOff());
-//                            mCredential.setSelectedAccountName(task.getResult().getUser().getEmail());
-//
-//                            //After we are firebase signIn, let's also sign in with Google Calendar API (:
-//                            getResultsFromApi();
-//                        }
-//                    }
-//                });
-    }
 
 
     /**

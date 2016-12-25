@@ -6,17 +6,6 @@
     android:id="@+id/root"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="8dp"
-        android:textColor="@android:color/black"
-        android:textStyle="bold"
-        android:textSize="20sp"/>
-
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_days"
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -78,7 +78,6 @@ public class HebrewPickerDialog extends DialogFragment {
                 e.printStackTrace();
                 return PickerFragment.newInstance(position);
             }
-//            return PickerFragment.newInstance(position);
         }
 
         @Override

@@ -56,7 +56,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     @BindView(R.id.event_end_time) TextView eventEndTime;
     @BindView(R.id.event_instances) TextView textViewRepeat;
     @BindView(R.id.event_count_title)TextView eventCountTitle;
-//    @BindView(R.id.progress_bar)ProgressBar progressBar;
+    //    @BindView(R.id.progress_bar)ProgressBar progressBar;
     @BindView(R.id.countPicker) ActualNumberPicker eventCountPicker;
 
     private PICKER_STATE pickerState;
@@ -109,8 +109,6 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     }
 
     @OnClick({R.id.event_start_day, R.id.event_end_day})void openDayDialog(){
-        // Create an instance of the dialog fragment and show it
-//        progressBar.setVisibility(View.VISIBLE);
         DialogFragment dialog = new HebrewPickerDialog();
         HebrewPickerDialog.onDatePickerDismiss = onDatePickerDismiss;
 
