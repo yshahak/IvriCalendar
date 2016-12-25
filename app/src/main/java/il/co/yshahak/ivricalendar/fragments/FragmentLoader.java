@@ -18,16 +18,10 @@ import android.view.ViewGroup;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
-import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterWeek;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
@@ -62,7 +56,6 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     private static final String KEY_POSITION = "keyPosition";
     private JewishCalendar jewishCalendar;
     private int position;
-    HashMap<String, List<Event>> eventMap = new HashMap<>();
 
     public static FragmentLoader newInstance(int position) {
         FragmentLoader fragment = new FragmentLoader();
@@ -106,9 +99,9 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         if (displayState == DISPLAY.WEEK) {
             days.setAdapter(new DaysHeaderAdapter(week));
         } else {
-
             days.setAdapter(new DaysHeaderAdapter());
         }
+        setRecyclerView();
         return root;
     }
 
@@ -142,18 +135,12 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void setRecyclerView(){
-//        if (displayState == DISPLAY.WEEK) {
-//            CustomLinearLayout day3 = (CustomLinearLayout) getView().findViewById(R.id.week_day_3);
-//            day3.setDay(week.getDays()[2]);
-//        }
-        if (displayState == DISPLAY.WEEK) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterWeek(week));
-            int hour = new Date().getHours();
-            recyclerView.getLayoutManager().scrollToPosition(hour * 8);
-        } else {
+        RecyclerView.Adapter adapter = recyclerView.getAdapter();
+        if (adapter == null) {
             recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month));
+        } else {
+            adapter.notifyDataSetChanged();
         }
-
     }
 
     public RecyclerView getRecyclerView() {
@@ -186,29 +173,12 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
                     end = start;
                 }
                 Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
-
-                if (displayState == DISPLAY.WEEK) {
-                    for (Day day : week.getDays()){
-                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                            day.getGoogleEvents().add(event);
-                            break;
-                        }
-                    }
-                } else {
-                    for (Day day : month.getDays()){
-                        if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                            day.getGoogleEvents().add(event);
-                            break;
-                        }
+                for (Day day : month.getDays()){
+                    if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
+                        day.getGoogleEvents().add(event);
+                        break;
                     }
                 }
-
-                List<Event> list = eventMap.get(calendarName);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    eventMap.put(calendarName, list);
-                }
-                list.add(event);
             }
             return null;
         }

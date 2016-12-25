@@ -7,7 +7,7 @@ import android.util.SparseArray;
 
 import java.lang.ref.WeakReference;
 
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonthLoader;
 
 /**
  * Created by yshahak on 06/10/2016.
@@ -15,7 +15,7 @@ import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
     public static boolean dropPages;
-    public static SparseArray<WeakReference<FragmentLoader>> fragmentLoaderSparseArray = new SparseArray<>();
+    public static SparseArray<WeakReference<FragmentMonthLoader>> fragmentLoaderSparseArray = new SparseArray<>();
 
     public CalendarPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
@@ -24,7 +24,7 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
 //        Log.d("TAG", "getItem, position: "  + position);
-        FragmentLoader fragmentLoader = FragmentLoader.newInstance(position);
+        FragmentMonthLoader fragmentLoader = FragmentMonthLoader.newInstance(position);
         fragmentLoaderSparseArray.put(position, new WeakReference<>(fragmentLoader));
         return fragmentLoader;
     }

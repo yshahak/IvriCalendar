@@ -25,13 +25,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
-import java.lang.ref.WeakReference;
+import com.facebook.stetho.Stetho;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CALENDAR_CLIENT_API_ID;
@@ -55,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Stetho.initializeWithDefaults(this);
+//        getContentResolver().delete(JewishCalendarContract.DateEntry.CONTENT_URI, null, null);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -124,15 +125,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case R.id.event_ivri:
                     Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
-                    WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
-                    if (weakReference != null) {
-                        FragmentLoader fragmentLoader = weakReference.get();
-                        if (fragmentLoader != null) {
-                            if (fragmentLoader.getMonth().getDays().contains(FragmentLoader.currentDay)){
-                                intentIvri.putExtra(CreteIvriEventActivity.EXTRA_USE_CURRENT_DAY, true);
-                            }
-                        }
-                    }
+//                    WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
+//                    if (weakReference != null) {
+//                        FragmentLoader fragmentLoader = weakReference.get();
+//                        if (fragmentLoader != null) {
+//                            if (fragmentLoader.getMonth().getDays().contains(FragmentLoader.currentDay)){
+//                                intentIvri.putExtra(CreteIvriEventActivity.EXTRA_USE_CURRENT_DAY, true);
+//                            }
+//                        }
+//                    }
                     startActivity(intentIvri);
                     break;
             }
@@ -231,14 +232,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPageSelected(int position) {
         this.selectedPage = position;
-        WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
-        if (weakReference != null) {
-            FragmentLoader fragmentLoader = weakReference.get();
-            if (fragmentLoader != null) {
-                setTitle(fragmentLoader.getMonth().getMonthName() + " , " + fragmentLoader.getMonth().getYearName());
-                fragmentLoader.getRecyclerView().getAdapter().notifyDataSetChanged();
-            }
-        }
+//        WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
+//        if (weakReference != null) {
+//            FragmentLoader fragmentLoader = weakReference.get();
+//            if (fragmentLoader != null) {
+//                setTitle(fragmentLoader.getMonth().getMonthName() + " , " + fragmentLoader.getMonth().getYearName());
+//                RecyclerView.Adapter adapter = fragmentLoader.getRecyclerView().getAdapter();
+//                if (adapter != null) {
+//                    adapter.notifyDataSetChanged();
+//                }
+//            }
+//        }
     }
 
     @Override
