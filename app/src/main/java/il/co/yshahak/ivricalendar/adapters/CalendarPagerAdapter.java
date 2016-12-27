@@ -7,15 +7,15 @@ import android.util.SparseArray;
 
 import java.lang.ref.WeakReference;
 
-import il.co.yshahak.ivricalendar.fragments.FragmentMonthLoader;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
  * Created by yshahak on 06/10/2016.
  */
 public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
-
+    public static DISPLAY displayState = DISPLAY.MONTH;
     public static boolean dropPages;
-    public static SparseArray<WeakReference<FragmentMonthLoader>> fragmentLoaderSparseArray = new SparseArray<>();
+    public static SparseArray<WeakReference<FragmentMonth>> fragmentLoaderSparseArray = new SparseArray<>();
 
     public CalendarPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
@@ -24,9 +24,14 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
 //        Log.d("TAG", "getItem, position: "  + position);
-        FragmentMonthLoader fragmentLoader = FragmentMonthLoader.newInstance(position);
-        fragmentLoaderSparseArray.put(position, new WeakReference<>(fragmentLoader));
-        return fragmentLoader;
+        if (displayState == DISPLAY.MONTH) {
+            FragmentMonth fragmentLoader = FragmentMonth.newInstance(position);
+            fragmentLoaderSparseArray.put(position, new WeakReference<>(fragmentLoader));
+            return fragmentLoader;
+        } else {
+
+        }
+        return null;
     }
 
     @Override
@@ -42,5 +47,10 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
         return 1000;
     }
 
+    public enum DISPLAY{
+        MONTH,
+        WEEK,
+        DAY
+    }
 
 }

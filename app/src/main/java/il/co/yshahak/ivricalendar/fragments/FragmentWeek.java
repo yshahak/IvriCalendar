@@ -44,9 +44,9 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
  * Created by yshahak on 10/10/2016.
  */
 
-public class FragmentLoader extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener{
 
-    public static DISPLAY displayState = DISPLAY.MONTH;
     public static Day currentDay;
     private RecyclerView recyclerView, days;
     private Month month;
@@ -57,8 +57,8 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     private JewishCalendar jewishCalendar;
     private int position;
 
-    public static FragmentLoader newInstance(int position) {
-        FragmentLoader fragment = new FragmentLoader();
+    public static FragmentWeek newInstance(int position) {
+        FragmentWeek fragment = new FragmentWeek();
         Bundle bundle = new Bundle();
         bundle.putInt(KEY_POSITION, position);
         fragment.setArguments(bundle);
@@ -82,13 +82,11 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         days = (RecyclerView) root.findViewById(R.id.recycler_view_days);
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
-
-        days.setLayoutManager(new GridLayoutManager(getActivity(), displayState == DISPLAY.WEEK ? 8 : 7));
+        days.setLayoutManager(new GridLayoutManager(getActivity(), 8 ));
         days.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         days.setHasFixedSize(true);
 
-
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), displayState == DISPLAY.WEEK ? 8 : 7));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),  8));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
         MainActivity mainActivity = (MainActivity)getActivity();
@@ -96,11 +94,8 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
             getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
         }
         getLoaderManager().initLoader(0, null, this);
-        if (displayState == DISPLAY.WEEK) {
-            days.setAdapter(new DaysHeaderAdapter(week));
-        } else {
-            days.setAdapter(new DaysHeaderAdapter());
-        }
+        days.setAdapter(new DaysHeaderAdapter(week));
+
         setRecyclerView();
         return root;
     }
@@ -110,12 +105,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-        Uri uri;
-        if (displayState == DISPLAY.WEEK) {
-            uri = GoogleManager.asSyncAdapter(week);
-        } else {
-            uri = GoogleManager.asSyncAdapter(jewishCalendar);
-        }
+        Uri uri = GoogleManager.asSyncAdapter(week);
         return new CursorLoader(getActivity(),  // Context
                 uri, // URI
                 INSTANCE_PROJECTION,                // Projection
@@ -137,7 +127,7 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
     private void setRecyclerView(){
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month));
+            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month, this));
         } else {
             adapter.notifyDataSetChanged();
         }
@@ -149,6 +139,11 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
 
     public Month getMonth() {
         return month;
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 
     class ProcessDates extends AsyncTask<Cursor, Void, Void>{
@@ -189,9 +184,4 @@ public class FragmentLoader extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
-    public enum DISPLAY{
-        MONTH,
-        WEEK,
-        DAY
-    }
 }

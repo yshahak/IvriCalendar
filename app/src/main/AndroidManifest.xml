@@ -15,7 +15,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,26 +22,26 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.CreteIvriEventActivity"
+            android:exported="true">
 
-        <activity android:name=".activities.CreteIvriEventActivity" android:exported="true">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.EDIT" />-->
-                <!--<action android:name="android.intent.action.INSERT" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<data android:mimeType="com.android.calendar/events" />-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.EDIT" /> -->
+            <!-- <action android:name="android.intent.action.INSERT" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- <data android:mimeType="com.android.calendar/events" /> -->
 
-                <!--<data android:mimeType="time/epoch" />-->
-                <!--<data android:host="com.android.calendar"/>-->
-                <!--<data android:scheme="content"/>-->
-                <!--<data android:mimeType="com.android.calendar/events" />-->
-            <!--</intent-filter>-->
+
+            <!-- <data android:mimeType="time/epoch" /> -->
+            <!-- <data android:host="com.android.calendar"/> -->
+            <!-- <data android:scheme="content"/> -->
+            <!-- <data android:mimeType="com.android.calendar/events" /> -->
+            <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".activities.GoogleSignInActivity" android:exported="true"/>
-
-        <provider
-            android:name=".calendar.jewish.JewishCalendarContentProvider"
-            android:authorities="IvriCalendarProvider"
-            android:exported="false" />
+        <activity
+            android:name=".activities.GoogleSignInActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>

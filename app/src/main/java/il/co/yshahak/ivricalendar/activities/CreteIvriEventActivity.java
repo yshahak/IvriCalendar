@@ -31,7 +31,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
 import il.co.yshahak.ivricalendar.views.HebrewPickerDialog;
 import me.angrybyte.numberpicker.view.ActualNumberPicker;
@@ -86,8 +86,8 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     private void setDates() {
         boolean useCurrentDay = getIntent().getBooleanExtra(EXTRA_USE_CURRENT_DAY, false);
         JewishCalendar jewishCalendar;
-        if (useCurrentDay && FragmentLoader.currentDay != null){
-            jewishCalendar = FragmentLoader.currentDay.getJewishCalendar();
+        if (useCurrentDay && FragmentMonth.currentDay != null){
+            jewishCalendar = FragmentMonth.currentDay.getJewishCalendar();
         } else {
             jewishCalendar = new JewishCalendar();
         }

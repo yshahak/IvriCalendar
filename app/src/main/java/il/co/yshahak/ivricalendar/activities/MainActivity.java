@@ -25,8 +25,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
-import com.facebook.stetho.Stetho;
-
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
@@ -54,8 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Stetho.initializeWithDefaults(this);
-//        getContentResolver().delete(JewishCalendarContract.DateEntry.CONTENT_URI, null, null);
+//        Stetho.initializeWithDefaults(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -114,31 +111,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v.equals(fab)) {
-            fadeInEventCreationLayout();
-        } else if (v.equals(eventBtnCreate)) {
-            switch (formatGroupChoiser.getCheckedRadioButtonId()){
-                case R.id.event_loazi:
-                    Intent intent = new Intent(Intent.ACTION_INSERT)
-                            .setData(CalendarContract.Events.CONTENT_URI);
-                    startActivity(intent);
-                    break;
-                case R.id.event_ivri:
-                    Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
-//                    WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
+        switch (v.getId()){
+            case R.id.fab:
+                fadeInEventCreationLayout();
+                break;
+            case R.id.event_create_btn:
+                switch (formatGroupChoiser.getCheckedRadioButtonId()){
+                    case R.id.event_loazi:
+                        Intent intent = new Intent(Intent.ACTION_INSERT)
+                                .setData(CalendarContract.Events.CONTENT_URI);
+                        startActivity(intent);
+                        break;
+                    case R.id.event_ivri:
+                        Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
+//                    WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
 //                    if (weakReference != null) {
-//                        FragmentLoader fragmentLoader = weakReference.get();
+//                        FragmentMonth fragmentLoader = weakReference.get();
 //                        if (fragmentLoader != null) {
-//                            if (fragmentLoader.getMonth().getDays().contains(FragmentLoader.currentDay)){
+//                            if (fragmentLoader.getMonth().getDays().contains(FragmentMonth.currentDay)){
 //                                intentIvri.putExtra(CreteIvriEventActivity.EXTRA_USE_CURRENT_DAY, true);
 //                            }
 //                        }
 //                    }
-                    startActivity(intentIvri);
-                    break;
-            }
-            fadeOutEventCreationLayout();
+                        startActivity(intentIvri);
+                        break;
+                }
+                fadeOutEventCreationLayout();
+                break;
+            case R.id.cell_root:
+                CalendarPagerAdapter.dropPages = true;
+                CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
+                viewPager.getAdapter().notifyDataSetChanged();
+                CalendarPagerAdapter.dropPages = false;
+                break;
         }
+
     }
 
     @Override
@@ -232,9 +239,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPageSelected(int position) {
         this.selectedPage = position;
-//        WeakReference<FragmentLoader> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
+//        WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
 //        if (weakReference != null) {
-//            FragmentLoader fragmentLoader = weakReference.get();
+//            FragmentMonth fragmentLoader = weakReference.get();
 //            if (fragmentLoader != null) {
 //                setTitle(fragmentLoader.getMonth().getMonthName() + " , " + fragmentLoader.getMonth().getYearName());
 //                RecyclerView.Adapter adapter = fragmentLoader.getRecyclerView().getAdapter();

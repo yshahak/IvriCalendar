@@ -16,7 +16,7 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.CreteIvriEventActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.fragments.PickerFragment;
 
 /**
@@ -32,14 +32,14 @@ public class HebrewPickerDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        HebrewPickerDialog.currentDay = FragmentLoader.currentDay;
+        HebrewPickerDialog.currentDay = FragmentMonth.currentDay;
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month_picker, container, false);
         final ViewPager viewPager = (ViewPager) root.findViewById(R.id.view_pager);
         View btnOk = root.findViewById(R.id.btn_ok);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentLoader.currentDay = currentDay;
+                FragmentMonth.currentDay = currentDay;
                 onDatePickerDismiss.onBtnOkPressed();
                 dismiss();
             }
@@ -72,7 +72,7 @@ public class HebrewPickerDialog extends DialogFragment {
         @Override
         public Fragment getItem(int position) {
             try {
-                FragmentLoader fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
+                FragmentMonth fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
                 return PickerFragment.newInstance(position, fragment.getMonth());
             } catch (Exception e) {
                 e.printStackTrace();

@@ -11,13 +11,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
  * Created by yshahak on 07/10/2016.
  */
 
-public class Month implements Parcelable {
+public class Month extends JewishCalendar implements Parcelable {
 
     public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
 
@@ -33,34 +33,70 @@ public class Month implements Parcelable {
     private int trailOffsetMonth;
     private boolean isFullMonth;
 
-    public Month(JewishCalendar jewishCalendar, boolean isCurrentMonth) {
+    public Month(){
+
+    }
+
+    public Month(int offset) {
+        Month month = new Month();
+        int currentMonth = month.getJewishMonth();
+        int currentYear = month.getJewishYear();
+
+        int desire = currentMonth + offset;
+        if (currentMonth < 7 && desire >= 7) {
+            month.setJewishYear(++currentYear);
+        } else if (currentMonth > 6 && desire <= 6) {
+            month.setJewishYear(--currentYear);
+        }
+        if (desire < 1) {
+            boolean leap = month.isJewishLeapYear();
+            desire += leap ? 13 : 12;
+            if (desire <= 6 && leap){
+                leap =  false;
+            }
+            month.setJewishMonth(leap ? 13 : 12);
+            new Month(desire - (leap ? 13 : 12));
+        } else if (desire > (month.isJewishLeapYear() ? 13 : 12)) {
+            boolean leap = month.isJewishLeapYear();
+            if (desire > 6 && leap){
+                leap =  false;
+                desire--;
+            }
+            desire -= leap ? 12 : 13;
+            month.setJewishMonth(1);
+            new Month(desire);
+        }
+        month.setJewishMonth(desire);
+        init(offset == 0);
+    }
+
+
+    private void init(boolean isCurrentMonth) {
         Calendar calendar = null;
         int dayOfMonth = 0;
         if (isCurrentMonth){
             calendar = Calendar.getInstance();
             dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         }
-//        this.jewishCalendar = (JewishCalendar) jewishCalendar.clone();
-        this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
-        this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
-        this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
+        this.yearName = hebrewDateFormatter.formatHebrewNumber(getJewishYear());
+        this.monthName = hebrewDateFormatter.formatMonth(this);
+        this.monthNumberOfDays = getDaysInJewishMonth();
         this.isFullMonth = (monthNumberOfDays == 30);
-        this.headOffsetMonth = setHeadOffset(jewishCalendar);
-        this.trailOffsetMonth = setTrailOffset(jewishCalendar);
+        this.headOffsetMonth = setHeadOffset(this);
+        this.trailOffsetMonth = setTrailOffset(this);
         int days = isFullMonth ? 30 : 29;
 
         for (int i = 0; i < days; i++) {
-            jewishCalendar.setJewishDayOfMonth(i + 1);
-            this.days.add(new Day((JewishCalendar) jewishCalendar.clone()));
+            setJewishDayOfMonth(i + 1);
+            this.days.add(new Day((JewishCalendar) clone()));
             if (isCurrentMonth){
-                calendar.setTime(jewishCalendar.getTime());
+                calendar.setTime(getTime());
                 if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
-                    FragmentLoader.currentDay = this.days.get(i);
+                    FragmentMonth.currentDay = this.days.get(i);
                 }
             }
         }
     }
-
 
     private int setHeadOffset(JewishCalendar jewishCalendar) {
         int dayInMonth = jewishCalendar.getJewishDayOfMonth() % 7;
@@ -109,9 +145,6 @@ public class Month implements Parcelable {
         }
 
         jewishCalendar.setJewishMonth(desire);
-//        Log.d("TAG",  hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear()) + " , "
-//                + hebrewDateFormatter.formatMonth(jewishCalendar) + " , "
-//                + hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()));
         return jewishCalendar;
     }
 

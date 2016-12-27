@@ -7,4 +7,5 @@
     <string name="instance_weekly">מדי שבוע</string>
     <string name="instance_monthly">מדי חודש</string>
     <string name="instance_yearly">מדי שנה</string>
+    <string name="title_activity_day">DayActivity</string>
 </resources>

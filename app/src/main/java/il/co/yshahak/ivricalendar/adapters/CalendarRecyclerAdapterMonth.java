@@ -17,7 +17,7 @@ import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
-import il.co.yshahak.ivricalendar.fragments.FragmentLoader;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -28,11 +28,13 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private final static int VIEW_TYPE_DAY_CELL = 1;
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
+    private final View.OnClickListener clickListener;
     private Month month;
 
 
-    public CalendarRecyclerAdapterMonth(Month monthes) {
+    public CalendarRecyclerAdapterMonth(Month monthes, View.OnClickListener listener) {
         this.month = monthes;
+        this.clickListener = listener;
     }
 
     @Override
@@ -78,7 +80,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
             textView.setOnClickListener(holder);
             textView.setOnLongClickListener(holder);
         }
-        if (day.equals(FragmentLoader.currentDay)){
+        if (day.equals(FragmentMonth.currentDay)){
             holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
         }else {
             holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
@@ -106,8 +108,9 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         public void onClick(View view) {
             if (view.equals(itemView)){
                 if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
-                    FragmentLoader.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
-                    notifyDataSetChanged();
+                    FragmentMonth.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
+                    clickListener.onClick(view);
+//                    notifyDataSetChanged();
                 }
             } else {
                 Event event = (Event) view.getTag();

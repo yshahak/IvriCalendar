@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.Calendar_PROJECTION;
@@ -148,6 +149,26 @@ public class GoogleManager {
         time.second = 0;
         long begin = Time.getJulianDay(time.toMillis(true), 0);
         time.monthDay += (lastDay - firstDay);
+
+        long end = Time.getJulianDay(time.toMillis(true), 0);
+
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
+        ContentUris.appendId(builder, begin);
+        ContentUris.appendId(builder, end);
+        return builder.build();
+    }
+
+    public static Uri asSyncAdapter(Day day) {
+        Time time = new Time();
+
+        time.set(day.getJewishCalendar().getTime().getTime());
+        time.allDay = true;
+        time.hour = 0;
+        time.minute = 0;
+        time.second = 0;
+        long begin = Time.getJulianDay(time.toMillis(true), 0);
 
         long end = Time.getJulianDay(time.toMillis(true), 0);
 
