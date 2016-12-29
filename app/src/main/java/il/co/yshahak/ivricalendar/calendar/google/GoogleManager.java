@@ -20,14 +20,17 @@ import android.util.Log;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.Calendar_PROJECTION;
@@ -180,7 +183,8 @@ public class GoogleManager {
         return builder.build();
     }
 
-    public static Uri asSyncAdapter(JewishCalendar jewishCalendar) {
+    public static Uri asSyncAdapter(JewCalendar jewishCalendar) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
         jewishCalendar.setJewishDayOfMonth(1);
         Time time = new Time();
         time.set(jewishCalendar.getTime().getTime());
@@ -189,6 +193,8 @@ public class GoogleManager {
         time.minute = 0;
         time.second = 0;
         long begin = Time.getJulianDay(time.toMillis(true), 0);
+        Log.d("TAG", simpleDateFormat.format(begin));
+
         if (jewishCalendar.getDaysInJewishMonth() == 29){
             time.monthDay += 29;
         } else {

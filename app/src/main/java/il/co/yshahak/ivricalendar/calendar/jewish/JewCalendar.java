@@ -41,7 +41,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
                 setJewishMonth(next);
             }
         } else if (offset < 0){
-            for (int i = offset; i > 0; i--) {
+            for (int i = offset * (-1); i > 0; i--) {
                 int previous = getJewishMonth() - 1;
                 if (previous == 0) {
                     setJewishYear(getJewishYear() - 1);

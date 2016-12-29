@@ -12,6 +12,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,11 @@ import android.view.ViewGroup;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
@@ -162,6 +165,9 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
             int displayColor, calendarColor;
             Cursor cursor = cursors[0];
             JewishCalendar calendar;
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
+
             while (cursor.moveToNext()) {
                 eventId = cursor.getInt(PROJECTION_ID_INDEX);
                 title = cursor.getString(PROJECTION_TITLE_INDEX);
@@ -181,6 +187,9 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
                     list = new ArrayList<>();
                     events.put(calendar.getJewishDayOfMonth(), list);
                 }
+                Log.d("TAG", event.getEventTitle() + " , " + simpleDateFormat.format(end)+ " - "
+                        + simpleDateFormat.format(start));
+
                 list.add(event);
 //                for (Day day : days){
 //                }
