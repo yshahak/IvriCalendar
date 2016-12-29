@@ -79,9 +79,12 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         int offset = position - CURRENT_PAGE;
 //        shiftMonth(new JewishCalendar(), offset);
 //        month = new Month(jewishCalendar, offset == 0);
+        Log.d("TAG", "start");
         jewishCalendar = new JewCalendar(offset);
+        Log.d("TAG", "jewishCalendar");
         this.days = jewishCalendar.getDays(offset);
-
+        Log.d("TAG", "days");
+//        getLoaderManager().initLoader(0, null, this);
     }
 
     @Nullable
@@ -102,8 +105,6 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         if (mainActivity.getSelectedPage() == position) {
             getActivity().setTitle(jewishCalendar.getMonthName() + " , " + jewishCalendar.getYearName());
         }
-        getLoaderManager().initLoader(0, null, this);
-
         daysRecycler.setAdapter(new DaysHeaderAdapter());
         setRecyclerView();
         return root;
@@ -125,7 +126,9 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        new ProcessDates().execute(cursor);
+        Log.d("TAG", "startProcess: " + jewishCalendar.getMonthName());
+
+//        new ProcessDates().execute(cursor);
     }
 
     @Override

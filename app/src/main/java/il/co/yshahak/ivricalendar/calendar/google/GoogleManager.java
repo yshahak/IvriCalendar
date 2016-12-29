@@ -185,7 +185,7 @@ public class GoogleManager {
 
     public static Uri asSyncAdapter(JewCalendar jewishCalendar) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
-        jewishCalendar.setJewishDayOfMonth(1);
+        jewishCalendar.setJewishDayOfMonth(2);
         Time time = new Time();
         time.set(jewishCalendar.getTime().getTime());
         time.allDay = true;
@@ -193,14 +193,14 @@ public class GoogleManager {
         time.minute = 0;
         time.second = 0;
         long begin = Time.getJulianDay(time.toMillis(true), 0);
-        Log.d("TAG", simpleDateFormat.format(begin));
-
+        Log.d("TAG", "start: " + simpleDateFormat.format(time.toMillis(true)));
         if (jewishCalendar.getDaysInJewishMonth() == 29){
             time.monthDay += 29;
         } else {
             time.monthDay += 30;
         }
         long end = Time.getJulianDay(time.toMillis(true), 0);
+        Log.d("TAG", "end: " + simpleDateFormat.format(time.toMillis(true)));
 
         Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")

@@ -82,7 +82,7 @@ public class Contract {
             Instances.BEGIN,          // 1
             Instances.END,            // 2
             Instances.TITLE ,         // 3
-            Instances.DISPLAY_COLOR,   // 4
+            Instances.DISPLAY_COLOR,  // 4
             Calendars.CALENDAR_DISPLAY_NAME,     //5
             Calendars.CALENDAR_COLOR,   //6
             Calendars.OWNER_ACCOUNT };   //7
