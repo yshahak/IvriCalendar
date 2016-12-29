@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -25,10 +26,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import java.lang.ref.WeakReference;
+
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CALENDAR_CLIENT_API_ID;
@@ -239,17 +243,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPageSelected(int position) {
         this.selectedPage = position;
-//        WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
-//        if (weakReference != null) {
-//            FragmentMonth fragmentLoader = weakReference.get();
-//            if (fragmentLoader != null) {
-//                setTitle(fragmentLoader.getMonth().getMonthName() + " , " + fragmentLoader.getMonth().getYearName());
-//                RecyclerView.Adapter adapter = fragmentLoader.getRecyclerView().getAdapter();
-//                if (adapter != null) {
-//                    adapter.notifyDataSetChanged();
-//                }
-//            }
-//        }
+        WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
+        if (weakReference != null) {
+            FragmentMonth fragmentLoader = weakReference.get();
+            if (fragmentLoader != null) {
+                setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
+                RecyclerView.Adapter adapter = fragmentLoader.getRecyclerView().getAdapter();
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
     }
 
     @Override

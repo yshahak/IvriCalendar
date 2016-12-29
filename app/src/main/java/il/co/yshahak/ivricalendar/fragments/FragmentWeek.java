@@ -21,11 +21,11 @@ import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
-import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
@@ -38,7 +38,6 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_DIS
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_END_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 /**
  * Created by yshahak on 10/10/2016.
@@ -54,7 +53,7 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
 
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
-    private JewishCalendar jewishCalendar;
+    private JewCalendar jewishCalendar;
     private int position;
 
     public static FragmentWeek newInstance(int position) {
@@ -70,7 +69,7 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
         super.onCreate(savedInstanceState);
         this.position = getArguments().getInt(KEY_POSITION);
         int offset = position - CURRENT_PAGE;
-        jewishCalendar = shiftMonth(new JewishCalendar(), offset);
+        jewishCalendar = new JewCalendar(offset);
         month = new Month(jewishCalendar, offset == 0);
         week = new Week(new JewishCalendar(), offset);
     }
@@ -125,12 +124,12 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void setRecyclerView(){
-        RecyclerView.Adapter adapter = recyclerView.getAdapter();
-        if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month, this));
-        } else {
-            adapter.notifyDataSetChanged();
-        }
+//        RecyclerView.Adapter adapter = recyclerView.getAdapter();
+//        if (adapter == null) {
+//            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month, this));
+//        } else {
+//            adapter.notifyDataSetChanged();
+//        }
     }
 
     public RecyclerView getRecyclerView() {

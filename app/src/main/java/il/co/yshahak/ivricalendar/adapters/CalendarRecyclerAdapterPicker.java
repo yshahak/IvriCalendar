@@ -6,9 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.views.HebrewPickerDialog;
 
 /**
@@ -19,20 +21,22 @@ public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<Calendar
     private final static int VIEW_TYPE_DAY_CELL = 1;
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
-    private Month month;
+//    private Month month;
+    private JewCalendar jewCalendar;
+    private List<Day> days;
 
-
-    public CalendarRecyclerAdapterPicker(Month monthes) {
-        this.month = monthes;
+    public CalendarRecyclerAdapterPicker(JewCalendar jewCalendar, List<Day> days) {
+        this.jewCalendar = jewCalendar;
+        this.days = days;
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        if (position  <  month.getHeadOffsetMonth()){
+        if (position  <  jewCalendar.getHeadOffset()){
             return VIEW_TYPE_HEAD;
         }
-        if (position <  month.getHeadOffsetMonth() + month.getMonthNumberOfDays()) {
+        if (position <  jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth()) {
             return VIEW_TYPE_DAY_CELL;
         }
         return VIEW_TYPE_TAIL;
@@ -47,7 +51,7 @@ public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<Calendar
     public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
-                Day day = month.getDays().get(position - month.getHeadOffsetMonth());
+                Day day = days.get(position - jewCalendar.getHeadOffset());
                 setDay(holder, day);
                 break;
             default:
@@ -67,7 +71,7 @@ public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<Calendar
 
     @Override
     public int getItemCount() {
-        return  month.getHeadOffsetMonth() + month.getMonthNumberOfDays() + month.getTrailOffsetMonth() ;
+        return  jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset() ;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -83,7 +87,7 @@ public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<Calendar
         @Override
         public void onClick(View view) {
             if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
-                HebrewPickerDialog.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
+                HebrewPickerDialog.currentDay = days.get(getAdapterPosition() - jewCalendar.getHeadOffset());
                 notifyDataSetChanged();
             }
         }

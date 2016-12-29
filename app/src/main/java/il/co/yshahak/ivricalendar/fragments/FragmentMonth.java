@@ -12,11 +12,16 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
@@ -26,7 +31,7 @@ import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
@@ -37,7 +42,6 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_DIS
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_END_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 /**
  * Created by yshahak on 10/10/2016.
@@ -46,12 +50,15 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     public static Day currentDay;
-    private RecyclerView recyclerView, days;
-    private Month month;
+    public static int currentDayOfMonth;
+    private RecyclerView recyclerView, daysRecycler;
+//    private Month month;
+    private List<Day> days = new ArrayList<>();
+    private SparseArray<List<Event>> events = new SparseArray<>();
+    private JewCalendar jewishCalendar;
 
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
-    private JewishCalendar jewishCalendar;
     private int position;
 
     public static FragmentMonth newInstance(int position) {
@@ -67,31 +74,34 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         super.onCreate(savedInstanceState);
         this.position = getArguments().getInt(KEY_POSITION);
         int offset = position - CURRENT_PAGE;
-        jewishCalendar = shiftMonth(new JewishCalendar(), offset);
+//        shiftMonth(new JewishCalendar(), offset);
 //        month = new Month(jewishCalendar, offset == 0);
+        jewishCalendar = new JewCalendar(offset);
+        this.days = jewishCalendar.getDays(offset);
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
-        days = (RecyclerView) root.findViewById(R.id.recycler_view_days);
+        daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
-        days.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-        days.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
-        days.setHasFixedSize(true);
+        daysRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 7));
+        daysRecycler.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        daysRecycler.setHasFixedSize(true);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
         MainActivity mainActivity = (MainActivity)getActivity();
         if (mainActivity.getSelectedPage() == position) {
-            getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
+            getActivity().setTitle(jewishCalendar.getMonthName() + " , " + jewishCalendar.getYearName());
         }
         getLoaderManager().initLoader(0, null, this);
 
-        days.setAdapter(new DaysHeaderAdapter());
+        daysRecycler.setAdapter(new DaysHeaderAdapter());
         setRecyclerView();
         return root;
     }
@@ -123,7 +133,7 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
     private void setRecyclerView(){
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(month, (View.OnClickListener) getActivity()));
+            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(jewishCalendar, events, (View.OnClickListener) getActivity()));
         } else {
             adapter.notifyDataSetChanged();
         }
@@ -133,10 +143,14 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         return recyclerView;
     }
 
-    public Month getMonth() {
-        return month;
-    }
+//    public Month getMonth() {
+//        return month;
+//    }
 
+
+    public JewCalendar getJewishCalendar() {
+        return jewishCalendar;
+    }
 
     class ProcessDates extends AsyncTask<Cursor, Void, Void>{
 
@@ -147,6 +161,7 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
             Long  start, end;
             int displayColor, calendarColor;
             Cursor cursor = cursors[0];
+            JewishCalendar calendar;
             while (cursor.moveToNext()) {
                 eventId = cursor.getInt(PROJECTION_ID_INDEX);
                 title = cursor.getString(PROJECTION_TITLE_INDEX);
@@ -159,13 +174,16 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
                 if (allDayEvent){
                     end = start;
                 }
-                Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
-                for (Day day : month.getDays()){
-                    if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                        day.getGoogleEvents().add(event);
-                        break;
-                    }
+                calendar = new JewishCalendar(new Date(start));
+                Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName, calendar.getJewishDayOfMonth());
+                List<Event> list = events.get(calendar.getJewishDayOfMonth());
+                if (list == null) {
+                    list = new ArrayList<>();
+                    events.put(calendar.getJewishDayOfMonth(), list);
                 }
+                list.add(event);
+//                for (Day day : days){
+//                }
             }
             return null;
         }

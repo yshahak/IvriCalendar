@@ -73,7 +73,7 @@ public class HebrewPickerDialog extends DialogFragment {
         public Fragment getItem(int position) {
             try {
                 FragmentMonth fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
-                return PickerFragment.newInstance(position, fragment.getMonth());
+                return PickerFragment.newInstance(position, fragment.getJewishCalendar());
             } catch (Exception e) {
                 e.printStackTrace();
                 return PickerFragment.newInstance(position);

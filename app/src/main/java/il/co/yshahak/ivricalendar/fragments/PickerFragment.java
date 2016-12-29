@@ -9,16 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
+import java.util.List;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterPicker;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.Day;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
-import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 /**
  * Created by B.E.L on 27/11/2016.
@@ -27,9 +27,10 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 public class PickerFragment extends Fragment {
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
-    private static final String KEY_MONTH = "keyMonth";
-    private Month month;
-
+    private static final String KEY_JEW_CALENDAR = "keyJewCalendar";
+//    private Month month;
+    private List<Day> days;
+    private JewCalendar jewishCalendar;
 
 
     public static PickerFragment newInstance(int position) {
@@ -40,11 +41,11 @@ public class PickerFragment extends Fragment {
         return fragment;
     }
 
-    public static PickerFragment newInstance(int position, Month month) {
+    public static PickerFragment newInstance(int position, JewCalendar jewCalendar) {
         PickerFragment fragment = new PickerFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(KEY_POSITION, position);
-        bundle.putParcelable(KEY_MONTH, month);
+        bundle.putParcelable(KEY_JEW_CALENDAR, jewCalendar);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -52,13 +53,14 @@ public class PickerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        month = getArguments().getParcelable(KEY_MONTH);
-        if (month == null) {
-            int position = getArguments().getInt(KEY_POSITION);
-            int offset = position - CURRENT_PAGE;
-            JewishCalendar jewishCalendar = shiftMonth(new JewishCalendar(), offset);
-            month = new Month(jewishCalendar, offset == 0);
+        jewishCalendar = getArguments().getParcelable(KEY_JEW_CALENDAR);
+        int position = getArguments().getInt(KEY_POSITION);
+        int offset = position - CURRENT_PAGE;
+
+        if (jewishCalendar == null) {
+            jewishCalendar = new JewCalendar(offset);
         }
+        this.days = jewishCalendar.getDays(offset);
     }
 
     @Nullable
@@ -77,7 +79,7 @@ public class PickerFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(month));
+        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(jewishCalendar, this.days));
         days.setAdapter(new DaysHeaderAdapter());
         return root;
     }

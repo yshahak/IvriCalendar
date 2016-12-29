@@ -6,17 +6,20 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.calendar.jewish.Month;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
@@ -29,21 +32,24 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
     private final View.OnClickListener clickListener;
-    private Month month;
+//    private Month month;
+    private SparseArray<List<Event>> eventSparseArray;
+    private JewCalendar jewCalendar;
 
 
-    public CalendarRecyclerAdapterMonth(Month monthes, View.OnClickListener listener) {
-        this.month = monthes;
+    public CalendarRecyclerAdapterMonth(JewCalendar jewCalendar, SparseArray<List<Event>> eventSparseArray, View.OnClickListener listener) {
+        this.jewCalendar = jewCalendar;
+        this.eventSparseArray = eventSparseArray;
         this.clickListener = listener;
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        if (position  <  month.getHeadOffsetMonth()){
+        if (position  <  jewCalendar.getHeadOffset()){
             return VIEW_TYPE_HEAD;
         }
-        if (position <  month.getHeadOffsetMonth() + month.getMonthNumberOfDays()) {
+        if (position <  jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth()) {
             return VIEW_TYPE_DAY_CELL;
         }
         return VIEW_TYPE_TAIL;
@@ -59,8 +65,9 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         holder.cellContainer.removeAllViews();
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
-                Day day = month.getDays().get(position - month.getHeadOffsetMonth());
-                setDay(holder, day);
+//                Day day = days.get(position - jewCalendar.getHeadOffset());
+//                setDay(holder, day);
+                setDay(holder, position- jewCalendar.getHeadOffset());
                 break;
             default:
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
@@ -87,9 +94,34 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         }
     }
 
+    private void setDay(ViewHolder holder, int position){
+        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
+        jewCalendar.setJewishDayOfMonth(position + 1);
+        holder.label.setText(jewCalendar.getDayLabel() + "    ");
+        if (position + 1 ==  FragmentMonth.currentDayOfMonth){
+            holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
+        }else {
+            holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
+        }
+        List<Event> events = eventSparseArray.get(position + 1);
+        if (events == null) {
+            return;
+        }
+        for (Event event : events){
+            TextView textView = (TextView) inflater.inflate(R.layout.text_view_event_for_month, holder.cellContainer, false);
+            textView.setText(event.getEventTitle());
+            textView.setBackgroundColor(event.getDisplayColor());
+            holder.cellContainer.addView(textView);
+            textView.setTag(event);
+            textView.setOnClickListener(holder);
+            textView.setOnLongClickListener(holder);
+        }
+
+    }
+
     @Override
     public int getItemCount() {
-        return  month.getHeadOffsetMonth() + month.getMonthNumberOfDays() + month.getTrailOffsetMonth() ;
+        return  jewCalendar.getTrailOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset() ;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -108,7 +140,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         public void onClick(View view) {
             if (view.equals(itemView)){
                 if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
-                    FragmentMonth.currentDay = month.getDays().get(getAdapterPosition() - month.getHeadOffsetMonth());
+//                    FragmentMonth.currentDay = days.get(getAdapterPosition() - jewCalendar.getHeadOffset());
                     clickListener.onClick(view);
 //                    notifyDataSetChanged();
                 }
