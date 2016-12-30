@@ -17,6 +17,7 @@ import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
  * Created by yshahk on 12/28/2016.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class JewCalendar extends JewishCalendar implements Parcelable {
 
     public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
@@ -24,33 +25,99 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
+    private int headOffst, trailOffse;
 
 
     public JewCalendar(int offset){
         shiftMonth(offset);
     }
 
+    public JewCalendar() {
+        setOffsets();
+    }
+
     public void shiftMonth(int offset){
         if (offset > 0) {
             for (int i = 0; i < offset; i++) {
-                int next = getJewishMonth() + 1;
-                if (next == 14 || (next == 13 && !isJewishLeapYear())) {
-                    next = 1;
-                    setJewishYear(getJewishYear() + 1);
-                }
-                setJewishMonth(next);
+                shiftMonthForward();
             }
         } else if (offset < 0){
             for (int i = offset * (-1); i > 0; i--) {
-                int previous = getJewishMonth() - 1;
-                if (previous == 0) {
-                    setJewishYear(getJewishYear() - 1);
-                    previous = isJewishLeapYear() ? 13 : 12;
-                }
-                setJewishMonth(previous);
+                shiftMonthBackword();
             }
         } else {
             FragmentMonth.currentDayOfMonth = getJewishDayOfMonth();
+            setOffsets();
+        }
+    }
+
+    public void shiftDay(int offset){
+        if (offset > 0) {
+            for (int i = 0; i < offset; i++) {
+                shiftDayForward();
+            }
+        } else if (offset < 0){
+            for (int i = offset * (-1); i > 0; i--) {
+                shiftDayBackword();
+            }
+        } else {
+            FragmentMonth.currentDayOfMonth = getJewishDayOfMonth();
+        }
+    }
+
+    private void shiftMonthForward(){
+        int next = getJewishMonth() + 1;
+        if (next == 14 || (next == 13 && !isJewishLeapYear())) {
+            next = 1;
+            setJewishYear(getJewishYear() + 1);
+        }
+        setJewishMonth(next);
+        setOffsets();
+    }
+
+    private void shiftMonthBackword() {
+        int previous = getJewishMonth() - 1;
+        if (previous == 0) {
+            setJewishYear(getJewishYear() - 1);
+            previous = isJewishLeapYear() ? 13 : 12;
+        }
+        setJewishMonth(previous);
+        setOffsets();
+    }
+
+    private void shiftDayForward(){
+        int next = getJewishDayOfMonth() + 1;
+        if (next == 31 || (next == 30 && !isFullMonth())) {
+            next = 1;
+            shiftMonthForward();
+        }
+        setJewishDayOfMonth(next);
+    }
+
+    private void shiftDayBackword() {
+        int previous = getJewishMonth() - 1;
+        if (previous == 0) {
+            shiftMonthForward();
+            previous = isFullMonth() ? 30 : 29;
+        }
+        setJewishDayOfMonth(previous);
+    }
+
+
+    private void setOffsets(){
+        { //calculate head
+            int dayInMonth = getJewishDayOfMonth() % 7;
+            Date date = getTime();
+            date.setTime(date.getTime() - 1000 * 60 * 60 * 24 * (--dayInMonth));
+            JewishCalendar mockCalendar = new JewishCalendar(date);
+            int dayInWeek = mockCalendar.getDayOfWeek();
+            headOffst = --dayInWeek;
+        }
+        {//calculate trail
+            JewishCalendar mock = new JewishCalendar(getTime());
+            mock.setJewishDayOfMonth(isFullMonth() ? 30 : 29);
+            int dayOfWeek = getDayOfWeek();
+            trailOffse =  7 - dayOfWeek;
         }
     }
 
@@ -67,19 +134,11 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public int getHeadOffset() {
-        int dayInMonth = getJewishDayOfMonth() % 7;
-        Date date = getTime();
-        date.setTime(date.getTime() - 1000 * 60 * 60 * 24 * (--dayInMonth));
-        JewishCalendar mockCalendar = new JewishCalendar(date);
-        int dayInWeek = mockCalendar.getDayOfWeek();
-        return --dayInWeek;
+        return headOffst;
     }
 
     public int getTrailOffset() {
-        JewishCalendar mock = new JewishCalendar(getTime());
-        mock.setJewishDayOfMonth(isFullMonth() ? 30 : 29);
-        int dayOfWeek = mock.getDayOfWeek();
-        return 7 - dayOfWeek;
+        return trailOffse;
     }
 
     public String getDayLabel() {

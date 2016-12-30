@@ -242,7 +242,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPageSelected(int position) {
+
+        Log.d("TAG", "onPageSelected: "  + position);
+        if (this.selectedPage != 0){
+            if (position > this.selectedPage){
+                CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.RIGHT;
+//                CalendarManager.shiftRight();
+            } else if (position < this.selectedPage){
+                CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.LEFT;
+//                CalendarManager.shiftLeft();
+            }
+        }
         this.selectedPage = position;
+        CalendarPagerAdapter.selectedPage = position;
         WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
         if (weakReference != null) {
             FragmentMonth fragmentLoader = weakReference.get();

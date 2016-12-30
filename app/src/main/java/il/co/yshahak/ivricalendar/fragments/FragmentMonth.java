@@ -29,6 +29,7 @@ import java.util.Locale;
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
+import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
@@ -51,17 +52,17 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TIT
  */
 
 public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+    private static final String KEY_DIRECTION = "keyDirection";
+    private static final String KEY_POSITION = "keyPosition";
 
     public static Day currentDay;
     public static int currentDayOfMonth;
-    private RecyclerView recyclerView, daysRecycler;
-//    private Month month;
-    private List<Day> days = new ArrayList<>();
+    private RecyclerView recyclerView;
+    //    private Month month;
+//    private List<Day> days = new ArrayList<>();
     private SparseArray<List<Event>> events = new SparseArray<>();
     private JewCalendar jewishCalendar;
 
-    private final static int CURRENT_PAGE = 500;
-    private static final String KEY_POSITION = "keyPosition";
     private int position;
 
     public static FragmentMonth newInstance(int position) {
@@ -72,26 +73,38 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         return fragment;
     }
 
+    public static FragmentMonth newInstance(CalendarPagerAdapter.DIRECTION direction) {
+        FragmentMonth fragment = new FragmentMonth();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(KEY_DIRECTION, direction);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    public static FragmentMonth newInstance() {
+        return new FragmentMonth();
+    }
+
+    public void setJewishCalendar(JewCalendar jewishCalendar){
+        this.jewishCalendar = jewishCalendar;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.position = getArguments().getInt(KEY_POSITION);
-        int offset = position - CURRENT_PAGE;
-//        shiftMonth(new JewishCalendar(), offset);
-//        month = new Month(jewishCalendar, offset == 0);
-        Log.d("TAG", "start");
-        jewishCalendar = new JewCalendar(offset);
-        Log.d("TAG", "jewishCalendar");
-        this.days = jewishCalendar.getDays(offset);
-        Log.d("TAG", "days");
-//        getLoaderManager().initLoader(0, null, this);
+        Log.d("TAG", "onCreate: " + jewishCalendar.getMonthName());
+        if (events.size() == 0) {
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
-        daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
+        RecyclerView daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
         daysRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 7));
@@ -126,9 +139,8 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Log.d("TAG", "startProcess: " + jewishCalendar.getMonthName());
 
-//        new ProcessDates().execute(cursor);
+        new ProcessDates().execute(cursor);
     }
 
     @Override
@@ -148,11 +160,6 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
     public RecyclerView getRecyclerView() {
         return recyclerView;
     }
-
-//    public Month getMonth() {
-//        return month;
-//    }
-
 
     public JewCalendar getJewishCalendar() {
         return jewishCalendar;
