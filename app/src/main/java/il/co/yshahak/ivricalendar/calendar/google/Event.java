@@ -1,5 +1,7 @@
 package il.co.yshahak.ivricalendar.calendar.google;
 
+import java.util.Date;
+
 /**
  * Created by yshahak on 14/10/2016.
  */
@@ -13,6 +15,7 @@ public class Event {
     private int displayColor;
     private String calendarDisplayName;
     private int dayOfMonth;
+    private Date beginDate, endDate;
 
     public Event(int eventId, String eventTitle, boolean allDayEvent, long begin, long end, int displayColor, String calendarDisplayName) {
         this.eventId = eventId;
@@ -33,6 +36,14 @@ public class Event {
         this.displayColor = displayColor;
         this.calendarDisplayName = calendarDisplayName;
         this.dayOfMonth = dayOfMonth;
+    }
+
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public int getEventId() {
@@ -65,5 +76,13 @@ public class Event {
 
     public int getDayOfMonth() {
         return dayOfMonth;
+    }
+
+    public Date getBeginDate() {
+        return beginDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
     }
 }

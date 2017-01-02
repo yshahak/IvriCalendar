@@ -29,7 +29,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
@@ -163,17 +162,21 @@ public class GoogleManager {
         return builder.build();
     }
 
-    public static Uri asSyncAdapter(Day day) {
+    public static Uri asSyncAdapterDay(JewCalendar jewishCalendar) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
         Time time = new Time();
+        time.set(jewishCalendar.getTime().getTime());
+//        time.monthDay = time.monthDay - 1;
 
-        time.set(day.getJewishCalendar().getTime().getTime());
         time.allDay = true;
         time.hour = 0;
         time.minute = 0;
         time.second = 0;
         long begin = Time.getJulianDay(time.toMillis(true), 0);
-
+//        Log.d("TAG", "start: " + simpleDateFormat.format(time.toMillis(true)));
+        time.monthDay = time.monthDay + 1;
         long end = Time.getJulianDay(time.toMillis(true), 0);
+//        Log.d("TAG", "end: " + simpleDateFormat.format(time.toMillis(true)));
 
         Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
@@ -183,7 +186,7 @@ public class GoogleManager {
         return builder.build();
     }
 
-    public static Uri asSyncAdapter(JewCalendar jewishCalendar) {
+    public static Uri asSyncAdapterMonth(JewCalendar jewishCalendar) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
         jewishCalendar.setJewishDayOfMonth(2);
         Time time = new Time();

@@ -18,7 +18,6 @@ import java.util.List;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
@@ -75,24 +74,6 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         }
     }
 
-    private void setDay(ViewHolder holder, Day day){
-        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
-        holder.label.setText(day.getLabel() + "    " + day.getJewishCalendar().getTime().getDate());
-        for (Event event : day.getGoogleEvents()){
-            TextView textView = (TextView) inflater.inflate(R.layout.text_view_event_for_month, holder.cellContainer, false);
-            textView.setText(event.getEventTitle());
-            textView.setBackgroundColor(event.getDisplayColor());
-            holder.cellContainer.addView(textView);
-            textView.setTag(event);
-            textView.setOnClickListener(holder);
-            textView.setOnLongClickListener(holder);
-        }
-        if (day.equals(FragmentMonth.currentDay)){
-            holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
-        }else {
-            holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
-        }
-    }
 
     private void setDay(ViewHolder holder, int position){
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());

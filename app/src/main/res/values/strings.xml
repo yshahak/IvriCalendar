@@ -8,4 +8,7 @@
     <string name="instance_monthly">מדי חודש</string>
     <string name="instance_yearly">מדי שנה</string>
     <string name="title_activity_day">DayActivity</string>
+    <string name="display_month">חודשי</string>
+    <string name="display_day">יומי</string>
+    <string name="display_header">תצוגה:</string>
 </resources>

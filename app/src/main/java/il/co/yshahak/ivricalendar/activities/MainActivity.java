@@ -37,7 +37,7 @@ import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CALENDAR_CLIENT_API_ID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener {
 
     public static boolean needToRefreshCalendarVisibility;
     private ViewPager viewPager;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton fab;
     private Button eventBtnCreate;
     public static boolean recreateFlag;
-    private RadioGroup formatGroupChoiser;
+    private RadioGroup formatGroupChoiser, displayChooser;
     private SharedPreferences prefs;
     private boolean mSlideState; //indicate the current state of the drawer
     private int selectedPage;
@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         eventBtnCreate = (Button) findViewById(R.id.event_create_btn);
         eventBtnCreate.setOnClickListener(this);
         formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
+        displayChooser = (RadioGroup)findViewById(R.id.radio_group_display);
+        displayChooser.setOnCheckedChangeListener(this);
     }
 
 
@@ -275,5 +277,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public int getSelectedPage() {
         return selectedPage;
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        drawerLayout.closeDrawers();
+        switch (checkedId){
+            case R.id.display_month:
+                    CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
+                break;
+            case R.id.display_day:
+                    CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
+                break;
+        }
+        setPagerAdapter();
     }
 }

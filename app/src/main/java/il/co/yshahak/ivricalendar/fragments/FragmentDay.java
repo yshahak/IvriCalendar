@@ -12,18 +12,23 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
+import java.util.ArrayList;
+import java.util.Date;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDay;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
+import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_COLOR_INDEX;
@@ -32,7 +37,6 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_DIS
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_END_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_ID_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TITLE_INDEX;
-import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 
 /**
  * Created by yshahak on 10/10/2016.
@@ -41,14 +45,14 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
 public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         View.OnClickListener{
 
-    public static Day currentDay;
     private RecyclerView recyclerView;
-    private Day day;
 
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
-    private JewishCalendar jewishCalendar;
+    private JewCalendar jewishCalendar;
     private int position;
+    private ArrayList<Event> dayEvents = new ArrayList<>();
+    private SparseIntArray eventToHourMap = new SparseIntArray();
 
     public static FragmentDay newInstance(int position) {
         FragmentDay fragment = new FragmentDay();
@@ -62,8 +66,9 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.position = getArguments().getInt(KEY_POSITION);
-        int offset = position - CURRENT_PAGE;
-        jewishCalendar = shiftMonth(new JewishCalendar(), offset);
+        jewishCalendar = new JewCalendar();
+        jewishCalendar.shiftDay(position - FRONT_PAGE);
+
 
     }
 
@@ -75,6 +80,8 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setHasFixedSize(true);
+        ((TextView)root.findViewById(R.id.day_label)).setText(jewishCalendar.getDayLabel() + "\n"
+                + JewCalendar.hebrewDateFormatter.formatDayOfWeek(jewishCalendar));
         getLoaderManager().initLoader(0, null, this);
 
         setRecyclerView();
@@ -86,7 +93,7 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-        Uri uri = GoogleManager.asSyncAdapter(day);
+        Uri uri = GoogleManager.asSyncAdapterDay(jewishCalendar);
         return new CursorLoader(getActivity(),  // Context
                 uri, // URI
                 INSTANCE_PROJECTION,                // Projection
@@ -108,10 +115,11 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     private void setRecyclerView(){
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterDay(day));
+            recyclerView.setAdapter(new CalendarRecyclerAdapterDay(jewishCalendar, dayEvents, eventToHourMap));
         } else {
             adapter.notifyDataSetChanged();
         }
+        recyclerView.smoothScrollToPosition(jewishCalendar.getTime().getHours());
     }
 
     public RecyclerView getRecyclerView() {
@@ -144,11 +152,17 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
                 if (allDayEvent){
                     end = start;
                 }
+                Log.d("TAG", "begin: " + start + " end: " + end);
                 Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
-                if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                    day.getGoogleEvents().add(event);
-                    break;
+                event.setBeginDate(new Date(start));
+                event.setEndDate(new Date(end));
+                for (int i = event.getBeginDate().getHours() ; i < event.getEndDate().getHours(); i++){
+                    int count = eventToHourMap.get(i);
+                    count++;
+                    eventToHourMap.put(i, count);
                 }
+                dayEvents.add(event);
+
             }
             return null;
         }

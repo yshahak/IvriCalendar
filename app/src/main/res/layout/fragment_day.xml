@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:orientation="vertical">
 
@@ -13,5 +14,16 @@
         android:layoutDirection="rtl"
         android:layout_height="wrap_content"/>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/day_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:textColor="@android:color/holo_blue_bright"
+        android:textStyle="bold"
+        tools:text="12:00"
+        android:background="@drawable/hour_labal_bg"
+        android:padding="8dp"/>
+
+</FrameLayout>
 

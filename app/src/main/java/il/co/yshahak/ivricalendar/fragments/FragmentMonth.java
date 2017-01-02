@@ -29,7 +29,6 @@ import java.util.Locale;
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
-import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
@@ -73,13 +72,6 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         return fragment;
     }
 
-    public static FragmentMonth newInstance(CalendarPagerAdapter.DIRECTION direction) {
-        FragmentMonth fragment = new FragmentMonth();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_DIRECTION, direction);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
 
     public static FragmentMonth newInstance() {
         return new FragmentMonth();
@@ -94,7 +86,7 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.position = getArguments().getInt(KEY_POSITION);
-        Log.d("TAG", "onCreate: " + jewishCalendar.getMonthName());
+//        Log.d("TAG", "onCreate: " + jewishCalendar.getMonthName());
         if (events.size() == 0) {
             getLoaderManager().initLoader(0, null, this);
         }
@@ -128,7 +120,7 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-        Uri uri = GoogleManager.asSyncAdapter(jewishCalendar);
+        Uri uri = GoogleManager.asSyncAdapterMonth(jewishCalendar);
         return new CursorLoader(getActivity(),  // Context
                 uri, // URI
                 INSTANCE_PROJECTION,                // Projection
@@ -201,8 +193,6 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
                         + simpleDateFormat.format(start));
 
                 list.add(event);
-//                for (Day day : days){
-//                }
             }
             return null;
         }

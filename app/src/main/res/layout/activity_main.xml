@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                                        xmlns:tools="http://schemas.android.com/tools"
+                                        android:id="@+id/drawer_layout"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:paddingTop="16dp"
-                android:src="@drawable/menu_btn" />
+                android:src="@drawable/menu_btn"/>
         </android.support.v7.widget.Toolbar>
 
         <FrameLayout
@@ -40,7 +40,7 @@
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="il.co.yshahak.ivricalendar.activities.MainActivity" />
+                tools:context="il.co.yshahak.ivricalendar.activities.MainActivity"/>
 
             <LinearLayout
                 android:id="@+id/add_event_layout"
@@ -57,7 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:text="צור אירוע:" />
+                    android:text="צור אירוע:"/>
 
                 <RadioGroup
                     android:id="@+id/radio_group_format"
@@ -70,14 +70,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="מבוסס תאריך לועזי" />
+                        android:text="מבוסס תאריך לועזי"/>
 
                     <RadioButton
                         android:id="@+id/event_ivri"
                         style="@style/style_radio_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="מבוסס תאריך עברי" />
+                        android:text="מבוסס תאריך עברי"/>
                 </RadioGroup>
 
                 <Button
@@ -85,7 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="צור" />
+                    android:text="צור"/>
 
 
             </LinearLayout>
@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start"
                 android:layout_margin="@dimen/fab_margin"
-                app:srcCompat="@android:drawable/ic_input_add" />
+                app:srcCompat="@android:drawable/ic_input_add"/>
 
         </FrameLayout>
 
@@ -117,15 +117,55 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/calender_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:orientation="vertical"/>
+                android:orientation="vertical">
+
+                <RadioGroup
+                    android:id="@+id/radio_group_display"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/display_header"/>
+
+                    <RadioButton
+                        android:id="@+id/display_month"
+                        style="@style/style_radio_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/display_month"/>
+
+                    <RadioButton
+                        android:id="@+id/display_day"
+                        style="@style/style_radio_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/display_day"/>
+                </RadioGroup>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"/>
+
+                <LinearLayout
+                    android:id="@+id/calender_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
 
         </ScrollView>
-
-
 
 
     </android.support.design.widget.NavigationView>

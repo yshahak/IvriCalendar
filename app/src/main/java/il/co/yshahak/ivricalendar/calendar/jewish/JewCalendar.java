@@ -95,7 +95,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     private void shiftDayBackword() {
-        int previous = getJewishMonth() - 1;
+        int previous = getJewishDayOfMonth() - 1;
         if (previous == 0) {
             shiftMonthForward();
             previous = isFullMonth() ? 30 : 29;
@@ -118,6 +118,12 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             mock.setJewishDayOfMonth(isFullMonth() ? 30 : 29);
             int dayOfWeek = getDayOfWeek();
             trailOffse =  7 - dayOfWeek;
+        }
+    }
+
+    public void setHour(int hour){
+        if (hour >= 0 && hour < 24) {
+            setJewishDate(getJewishYear(), getJewishMonth(), getJewishDayOfMonth(), hour, getTime().getMinutes(), 0);
         }
     }
 
