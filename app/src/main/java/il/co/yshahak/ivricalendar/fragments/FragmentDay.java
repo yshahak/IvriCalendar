@@ -1,6 +1,7 @@
 package il.co.yshahak.ivricalendar.fragments;
 
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,7 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseIntArray;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +22,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDay;
+import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDaily;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
@@ -52,7 +54,8 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     private JewCalendar jewishCalendar;
     private int position;
     private ArrayList<Event> dayEvents = new ArrayList<>();
-    private SparseIntArray eventToHourMap = new SparseIntArray();
+    private SparseArray<List<Event>> eventToHourMap = new SparseArray<>();
+    private ArrayList<Section> sections = new ArrayList<>();
 
     public static FragmentDay newInstance(int position) {
         FragmentDay fragment = new FragmentDay();
@@ -115,7 +118,7 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     private void setRecyclerView(){
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterDay(jewishCalendar, dayEvents, eventToHourMap));
+            recyclerView.setAdapter(new CalendarRecyclerAdapterDaily(sections));
         } else {
             adapter.notifyDataSetChanged();
         }
@@ -157,13 +160,17 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
                 event.setBeginDate(new Date(start));
                 event.setEndDate(new Date(end));
                 for (int i = event.getBeginDate().getHours() ; i < event.getEndDate().getHours(); i++){
-                    int count = eventToHourMap.get(i);
-                    count++;
-                    eventToHourMap.put(i, count);
+                    List<Event> eventList= eventToHourMap.get(i);
+                    if (eventList == null) {
+                        eventList = new ArrayList<>();
+                        eventToHourMap.put(i, eventList);
+                    }
+                    eventList.add(event);
                 }
                 dayEvents.add(event);
 
             }
+            processDay();
             return null;
         }
 
@@ -171,6 +178,41 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
         protected void onPostExecute(Void aVoid) {
             setRecyclerView();
         }
+    }
+
+    private void processDay() {
+        sections.clear();
+        Section section = new Section();
+        boolean activeRange = false;
+        section.range.x = 0;
+        for (int hour = 0; hour < 23; hour++) {
+            List<Event> events = eventToHourMap.get(hour);
+            if (events == null || events.size() == 0) {
+                if (activeRange) {
+                    activeRange = false;
+                    section.range.y = hour - 1;
+                    sections.add(section);
+                    section = new Section();
+                    section.range.x = hour;
+                }
+            } else {
+                if (!activeRange) {
+                    activeRange = true;
+                    section.range.y = hour - 1;
+                    sections.add(section);
+                    section = new Section();
+                    section.range.x = hour;
+                }
+                section.sectionEvents.addAll(events);
+            }
+        }
+        section.range.y = 24;
+        sections.add(section);
+    }
+
+    public class Section {
+        public List<Event> sectionEvents = new ArrayList<>();
+        public Point range = new Point();
     }
 
 }

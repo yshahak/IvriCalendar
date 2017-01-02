@@ -8,7 +8,5 @@
     android:layout_gravity="center"
     android:gravity="center"
     android:textSize="12sp"
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
     android:textStyle="bold"
     tools:showIn="@layout/day_cell_for_month"/>
