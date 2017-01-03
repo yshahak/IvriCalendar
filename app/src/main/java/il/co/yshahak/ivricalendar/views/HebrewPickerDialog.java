@@ -16,6 +16,7 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.CreteIvriEventActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
+import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.fragments.PickerFragment;
 
@@ -72,7 +73,7 @@ public class HebrewPickerDialog extends DialogFragment {
         @Override
         public Fragment getItem(int position) {
             try {
-                FragmentMonth fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
+                BaseCalendarFragment fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
                 return PickerFragment.newInstance(position, fragment.getJewishCalendar());
             } catch (Exception e) {
                 e.printStackTrace();

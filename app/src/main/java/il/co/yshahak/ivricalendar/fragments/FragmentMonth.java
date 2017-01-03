@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -28,15 +27,15 @@ import java.util.Locale;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
+import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
-import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
+import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_COLOR_INDEX;
@@ -50,43 +49,23 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TIT
  * Created by yshahak on 10/10/2016.
  */
 
-public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
-    private static final String KEY_DIRECTION = "keyDirection";
-    private static final String KEY_POSITION = "keyPosition";
+public class FragmentMonth extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     public static Day currentDay;
     public static int currentDayOfMonth;
     private RecyclerView recyclerView;
-    //    private Month month;
-//    private List<Day> days = new ArrayList<>();
     private SparseArray<List<Event>> events = new SparseArray<>();
-    private JewCalendar jewishCalendar;
-
-    private int position;
 
     public static FragmentMonth newInstance(int position) {
         FragmentMonth fragment = new FragmentMonth();
-        Bundle bundle = new Bundle();
-        bundle.putInt(KEY_POSITION, position);
-        fragment.setArguments(bundle);
+        init(fragment, position);
         return fragment;
     }
-
-
-    public static FragmentMonth newInstance() {
-        return new FragmentMonth();
-    }
-
-    public void setJewishCalendar(JewCalendar jewishCalendar){
-        this.jewishCalendar = jewishCalendar;
-    }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.position = getArguments().getInt(KEY_POSITION);
-//        Log.d("TAG", "onCreate: " + jewishCalendar.getMonthName());
+        jewishCalendar.shiftMonth(position - FRONT_PAGE);
         if (events.size() == 0) {
             getLoaderManager().initLoader(0, null, this);
         }
@@ -106,8 +85,7 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-        MainActivity mainActivity = (MainActivity)getActivity();
-        if (mainActivity.getSelectedPage() == position) {
+        if (CalendarPagerAdapter.selectedPage == position) {
             getActivity().setTitle(jewishCalendar.getMonthName() + " , " + jewishCalendar.getYearName());
         }
         daysRecycler.setAdapter(new DaysHeaderAdapter());
@@ -153,9 +131,6 @@ public class FragmentMonth extends Fragment implements LoaderManager.LoaderCallb
         return recyclerView;
     }
 
-    public JewCalendar getJewishCalendar() {
-        return jewishCalendar;
-    }
 
     class ProcessDates extends AsyncTask<Cursor, Void, Void>{
 

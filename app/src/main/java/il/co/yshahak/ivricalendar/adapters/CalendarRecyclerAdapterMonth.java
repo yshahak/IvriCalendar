@@ -116,7 +116,8 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
             if (view.equals(itemView)) {
                 if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
                     int monthDay = (int) itemView.getTag(R.string.tag_month_position);
-                    int shiftTo = jewCalendar.getDaysDifference(monthDay);
+                    jewCalendar.setJewishDayOfMonth(monthDay);
+                    view.setTag(R.string.tag_month_position, JewCalendar.getDaysDifference(jewCalendar, new JewCalendar()));
                     clickListener.onClick(view);
                 }
             } else {

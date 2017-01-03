@@ -18,7 +18,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -32,9 +31,11 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
+import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CALENDAR_CLIENT_API_ID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener {
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RadioGroup formatGroupChoiser, displayChooser;
     private SharedPreferences prefs;
     private boolean mSlideState; //indicate the current state of the drawer
-    private int selectedPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CalendarPagerAdapter.dropPages = false;
         } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
-            viewPager.setCurrentItem(500);
+            viewPager.setCurrentItem(FRONT_PAGE);
         }
         recreateFlag = false;
     }
@@ -149,6 +149,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.cell_root:
                 CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
                 displayChooser.check(R.id.display_day);
+                int monthDay = (int) v.getTag(R.string.tag_month_position);
+                if (monthDay != 0){
+                    viewPager.setCurrentItem(viewPager.getCurrentItem() + monthDay);
+                }
                 backToMonthDisplay = true;
                 break;
         }
@@ -163,6 +167,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             drawerLayout.closeDrawer(GravityCompat.START);
         } else if (backToMonthDisplay) {
             CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
+            WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
+            if (weakReference != null && weakReference.get() != null) {
+                JewCalendar current = weakReference.get().getJewishCalendar();
+                int shift = JewCalendar.getMonthDifference(current, new JewCalendar());
+                viewPager.setCurrentItem(FRONT_PAGE + shift);
+            }
             displayChooser.check(R.id.display_month);
             backToMonthDisplay = false;
         } else {
@@ -250,24 +260,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onPageSelected(int position) {
 
         Log.d("TAG", "onPageSelected: " + position);
-        if (this.selectedPage != 0) {
-            if (position > this.selectedPage) {
+        if (CalendarPagerAdapter.selectedPage != 0) {
+            if (position > CalendarPagerAdapter.selectedPage) {
                 CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.RIGHT;
-            } else if (position < this.selectedPage) {
+            } else if (position < CalendarPagerAdapter.selectedPage) {
                 CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.LEFT;
             }
         }
-        this.selectedPage = position;
         CalendarPagerAdapter.selectedPage = position;
-        WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
+        WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
         if (weakReference != null) {
-            FragmentMonth fragmentLoader = weakReference.get();
+            BaseCalendarFragment fragmentLoader = weakReference.get();
             if (fragmentLoader != null) {
                 setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
-                RecyclerView.Adapter adapter = fragmentLoader.getRecyclerView().getAdapter();
-                if (adapter != null) {
-                    adapter.notifyDataSetChanged();
-                }
             }
         }
     }
@@ -275,10 +280,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPageScrollStateChanged(int state) {
 
-    }
-
-    public int getSelectedPage() {
-        return selectedPage;
     }
 
     @Override

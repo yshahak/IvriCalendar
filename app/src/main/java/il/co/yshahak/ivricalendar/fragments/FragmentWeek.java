@@ -20,7 +20,7 @@ import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
+import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
@@ -88,8 +88,7 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),  8));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-        MainActivity mainActivity = (MainActivity)getActivity();
-        if (mainActivity.getSelectedPage() == position) {
+        if (CalendarPagerAdapter.selectedPage == position) {
             getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
         }
         getLoaderManager().initLoader(0, null, this);

@@ -217,30 +217,49 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         }
     };
 
-    public int getDaysDifference(int monthDay) {
+    public static int getDaysDifference(JewCalendar baseCalendar, JewCalendar compareCalendar) {
         int shift = 0, sign;
-        JewCalendar currentJewCalendar = new JewCalendar();
-        if (getJewishYear() != currentJewCalendar.getJewishYear()){
-            sign = getJewishYear() >  currentJewCalendar.getJewishYear() ? 1 : -1;
-            while (getJewishYear() != currentJewCalendar.getJewishYear()){
-                currentJewCalendar.shiftDay(sign);
+        if (baseCalendar.getJewishYear() != compareCalendar.getJewishYear()){
+            sign = baseCalendar.getJewishYear() >  compareCalendar.getJewishYear() ? 1 : -1;
+            while (baseCalendar.getJewishYear() != compareCalendar.getJewishYear()){
+                compareCalendar.shiftDay(sign);
                 shift += sign;
             }
         }
-        if (getJewishMonth() != currentJewCalendar.getJewishMonth()){
-            sign = getJewishMonth() > currentJewCalendar.getJewishMonth() ? 1 : -1;
-            while (getJewishMonth() != currentJewCalendar.getJewishMonth()){
-                currentJewCalendar.shiftDay(sign);
+        if (baseCalendar.getJewishMonth() != compareCalendar.getJewishMonth()){
+            sign = baseCalendar.getJewishMonth() > compareCalendar.getJewishMonth() ? 1 : -1;
+            while (baseCalendar.getJewishMonth() != compareCalendar.getJewishMonth()){
+                compareCalendar.shiftDay(sign);
                 shift += sign;
             }
 
         }
-        if (monthDay != currentJewCalendar.getJewishDayOfMonth()){
-            sign = monthDay > currentJewCalendar.getJewishDayOfMonth() ? 1: -1;
-            while (monthDay != currentJewCalendar.getJewishDayOfMonth()){
-                currentJewCalendar.shiftDay(sign);
+        if (baseCalendar.getJewishDayOfMonth() != compareCalendar.getJewishDayOfMonth()){
+            sign = baseCalendar.getJewishDayOfMonth() > compareCalendar.getJewishDayOfMonth() ? 1: -1;
+            while (baseCalendar.getJewishDayOfMonth() != compareCalendar.getJewishDayOfMonth()){
+                compareCalendar.shiftDay(sign);
                 shift += sign;
             }
+        }
+        return shift;
+    }
+
+    public static int getMonthDifference(JewCalendar baseCalendar, JewCalendar compareCalendar) {
+        int shift = 0, sign;
+        if (baseCalendar.getJewishYear() != compareCalendar.getJewishYear()){
+            sign = baseCalendar.getJewishYear() >  compareCalendar.getJewishYear() ? 1 : -1;
+            while (baseCalendar.getJewishYear() != compareCalendar.getJewishYear()){
+                compareCalendar.shiftMonth(sign);
+                shift += sign;
+            }
+        }
+        if (baseCalendar.getJewishMonth() != compareCalendar.getJewishMonth()){
+            sign = baseCalendar.getJewishMonth() > compareCalendar.getJewishMonth() ? 1 : -1;
+            while (baseCalendar.getJewishMonth() != compareCalendar.getJewishMonth()){
+                compareCalendar.shiftMonth(sign);
+                shift += sign;
+            }
+
         }
         return shift;
     }

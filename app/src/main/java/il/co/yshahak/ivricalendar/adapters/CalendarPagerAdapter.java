@@ -8,7 +8,7 @@ import android.util.SparseArray;
 
 import java.lang.ref.WeakReference;
 
-import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
 import il.co.yshahak.ivricalendar.fragments.FragmentDay;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
@@ -22,7 +22,7 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
     public static int selectedPage = FRONT_PAGE;
     private final FragmentManager mFragmentManager;
 
-    public static SparseArray<WeakReference<FragmentMonth>> fragmentLoaderSparseArray = new SparseArray<>();
+    public static SparseArray<WeakReference<BaseCalendarFragment>> fragmentLoaderSparseArray = new SparseArray<>();
 
     public static DIRECTION direction = DIRECTION.NULL;
 
@@ -35,8 +35,10 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
     public void notifyDataSetChanged() {
         FragmentTransaction mCurTransaction = mFragmentManager.beginTransaction();
         if (mCurTransaction != null) {
-            for(Fragment fragment : mFragmentManager.getFragments()){
-                mCurTransaction.remove(fragment);
+            for (Fragment fragment : mFragmentManager.getFragments()) {
+                if (fragment != null) {
+                    mCurTransaction.remove(fragment);
+                }
             }
             mCurTransaction.commitNow();
         }
@@ -46,17 +48,14 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
 //        Log.d("TAG", "getItem, position: "  + position);
+        BaseCalendarFragment fragment = null;
         if (displayState == DISPLAY.MONTH) {
-            JewCalendar jewCalendar = new JewCalendar();
-            FragmentMonth fragmentLoader = FragmentMonth.newInstance(position);
-            jewCalendar.shiftMonth(position - FRONT_PAGE);
-            fragmentLoader.setJewishCalendar(jewCalendar);
-            fragmentLoaderSparseArray.put(position, new WeakReference<>(fragmentLoader));
-            return fragmentLoader;
-        } else if (displayState == DISPLAY.DAY){
-            return FragmentDay.newInstance(position);
+            fragment = FragmentMonth.newInstance(position);
+        } else if (displayState == DISPLAY.DAY) {
+            fragment = FragmentDay.newInstance(position);
         }
-        return null;
+        fragmentLoaderSparseArray.put(position, new WeakReference<>(fragment));
+        return fragment;
     }
 
     @Override
@@ -70,10 +69,10 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
         return 1000;
     }
 
-    private POSITION getPosition(int position){
-        if (position > selectedPage){
+    private POSITION getPosition(int position) {
+        if (position > selectedPage) {
             return POSITION.RIGHT;
-        } else if (position < selectedPage){
+        } else if (position < selectedPage) {
             return POSITION.LEFT;
         }
         return POSITION.MIDDLE;

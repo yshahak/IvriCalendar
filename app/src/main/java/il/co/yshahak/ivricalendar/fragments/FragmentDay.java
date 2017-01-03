@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -45,36 +44,28 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TIT
  * Created by yshahak on 10/10/2016.
  */
 
-public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+public class FragmentDay extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor>,
         View.OnClickListener{
 
     private RecyclerView recyclerViewEvents;
 
-    private final static int CURRENT_PAGE = 500;
-    private static final String KEY_POSITION = "keyPosition";
-    private JewCalendar jewishCalendar;
-    private int position;
     private ArrayList<Event> dayEvents = new ArrayList<>();
     private SparseArray<List<Event>> eventToHourMap = new SparseArray<>();
     private ArrayList<Section> sections = new ArrayList<>();
     private boolean enableScrolling = true;
 
+
     public static FragmentDay newInstance(int position) {
         FragmentDay fragment = new FragmentDay();
-        Bundle bundle = new Bundle();
-        bundle.putInt(KEY_POSITION, position);
-        fragment.setArguments(bundle);
+        init(fragment, position);
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.position = getArguments().getInt(KEY_POSITION);
-        jewishCalendar = new JewCalendar();
         jewishCalendar.shiftDay(position - FRONT_PAGE);
-
-
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Nullable
@@ -87,7 +78,6 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
         recyclerViewEvents.setHasFixedSize(true);
         ((TextView)root.findViewById(R.id.day_label)).setText(jewishCalendar.getDayLabel() + "\n"
                 + JewCalendar.hebrewDateFormatter.formatDayOfWeek(jewishCalendar));
-        getLoaderManager().initLoader(0, null, this);
         final RecyclerView recyclerViewHours = (RecyclerView)root.findViewById(R.id.recycler_view_hours);
         recyclerViewHours.setLayoutManager(new LinearLayoutManager(getActivity())
         {
