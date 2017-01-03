@@ -216,4 +216,32 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             return new JewCalendar[size];
         }
     };
+
+    public int getDaysDifference(int monthDay) {
+        int shift = 0, sign;
+        JewCalendar currentJewCalendar = new JewCalendar();
+        if (getJewishYear() != currentJewCalendar.getJewishYear()){
+            sign = getJewishYear() >  currentJewCalendar.getJewishYear() ? 1 : -1;
+            while (getJewishYear() != currentJewCalendar.getJewishYear()){
+                currentJewCalendar.shiftDay(sign);
+                shift += sign;
+            }
+        }
+        if (getJewishMonth() != currentJewCalendar.getJewishMonth()){
+            sign = getJewishMonth() > currentJewCalendar.getJewishMonth() ? 1 : -1;
+            while (getJewishMonth() != currentJewCalendar.getJewishMonth()){
+                currentJewCalendar.shiftDay(sign);
+                shift += sign;
+            }
+
+        }
+        if (monthDay != currentJewCalendar.getJewishDayOfMonth()){
+            sign = monthDay > currentJewCalendar.getJewishDayOfMonth() ? 1: -1;
+            while (monthDay != currentJewCalendar.getJewishDayOfMonth()){
+                currentJewCalendar.shiftDay(sign);
+                shift += sign;
+            }
+        }
+        return shift;
+    }
 }

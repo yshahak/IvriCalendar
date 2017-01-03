@@ -8,6 +8,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -50,6 +51,8 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.shiftMonth;
  */
 
 public class GoogleManager {
+
+    public static final int REQUEST_CODE_EDIT_EVENT = 100;
 
     public static HashMap<String, List<CalendarAccount>> accountListNames = new HashMap<>();
 
@@ -173,10 +176,10 @@ public class GoogleManager {
         time.minute = 0;
         time.second = 0;
         long begin = Time.getJulianDay(time.toMillis(true), 0);
-//        Log.d("TAG", "start: " + simpleDateFormat.format(time.toMillis(true)));
+        Log.d("TAG", "start: " + simpleDateFormat.format(time.toMillis(true)));
         time.monthDay = time.monthDay + 1;
         long end = Time.getJulianDay(time.toMillis(true), 0);
-//        Log.d("TAG", "end: " + simpleDateFormat.format(time.toMillis(true)));
+        Log.d("TAG", "end: " + simpleDateFormat.format(time.toMillis(true)));
 
         Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
@@ -293,6 +296,14 @@ public class GoogleManager {
         values.put(CalendarContract.Events.CALENDAR_ID, calID);
         values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
         return values;
+    }
+
+    public static void openEvent(Context context, Event event){
+        Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
+        Intent intent = new Intent(Intent.ACTION_VIEW)
+                .setData(uri)
+                .putExtra(CalendarContract.Events.TITLE, event.getEventTitle());
+        ((Activity)context).startActivityForResult(intent, REQUEST_CODE_EDIT_EVENT);
     }
 
 }

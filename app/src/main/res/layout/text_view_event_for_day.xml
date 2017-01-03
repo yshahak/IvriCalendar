@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/label_container"
     android:layout_width="0dp"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:layout_gravity="center"
-    android:gravity="center"
-    android:textSize="12sp"
-    android:textStyle="bold"
-    tools:showIn="@layout/day_cell_for_month"/>
+    android:layout_marginLeft="2dp"
+    card_view:cardCornerRadius="4dp"
+    android:layout_marginRight="2dp"
+    android:layout_gravity="top">
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:text="event"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        tools:showIn="@layout/day_cell_for_month"/>
+</android.support.v7.widget.CardView>

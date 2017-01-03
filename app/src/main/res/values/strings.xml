@@ -11,4 +11,5 @@
     <string name="display_month">חודשי</string>
     <string name="display_day">יומי</string>
     <string name="display_header">תצוגה:</string>
+    <string name="tag_month_position">tagMonthPosition</string>
 </resources>

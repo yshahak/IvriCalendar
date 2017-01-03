@@ -1,10 +1,5 @@
 package il.co.yshahak.ivricalendar.adapters;
 
-import android.app.Activity;
-import android.content.ContentUris;
-import android.content.Intent;
-import android.net.Uri;
-import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -16,8 +11,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
@@ -25,7 +20,6 @@ import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
  * Created by yshahak on 07/10/2016.
  */
 public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarRecyclerAdapterMonth.ViewHolder> {
-    private static final int REQUEST_CODE_EDIT_EVENT = 100;
 
     private final static int VIEW_TYPE_DAY_CELL = 1;
     private final static int VIEW_TYPE_HEAD = 2;
@@ -78,6 +72,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private void setDay(ViewHolder holder, int position){
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
         jewCalendar.setJewishDayOfMonth(position + 1);
+        holder.itemView.setTag(R.string.tag_month_position, position + 1);
         holder.label.setText(jewCalendar.getDayLabel() + "    ");
         if (position + 1 ==  FragmentMonth.currentDayOfMonth){
             holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
@@ -95,7 +90,6 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
             holder.cellContainer.addView(textView);
             textView.setTag(event);
             textView.setOnClickListener(holder);
-            textView.setOnLongClickListener(holder);
         }
 
     }
@@ -105,7 +99,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         return  jewCalendar.getTrailOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset() ;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private LinearLayout cellContainer;
         private TextView label;
@@ -113,41 +107,25 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            cellContainer = (LinearLayout)itemView.findViewById(R.id.event_container);
+            cellContainer = (LinearLayout) itemView.findViewById(R.id.event_container);
             label = (TextView) itemView.findViewById(R.id.cell_label);
         }
 
         @Override
         public void onClick(View view) {
-            if (view.equals(itemView)){
+            if (view.equals(itemView)) {
                 if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
-//                    FragmentMonth.currentDay = days.get(getAdapterPosition() - jewCalendar.getHeadOffset());
+                    int monthDay = (int) itemView.getTag(R.string.tag_month_position);
+                    int shiftTo = jewCalendar.getDaysDifference(monthDay);
                     clickListener.onClick(view);
-//                    notifyDataSetChanged();
                 }
             } else {
                 Event event = (Event) view.getTag();
                 if (event != null) {
-                    Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
-                    Intent intent = new Intent(Intent.ACTION_VIEW)
-                            .setData(uri);
-                    itemView.getContext().startActivity(intent);
-                    MainActivity.recreateFlag = true;
+                    GoogleManager.openEvent(itemView.getContext(), event);
                 }
             }
         }
-
-        @Override
-        public boolean onLongClick(View view) {
-            Event event = (Event) view.getTag();
-            if (event != null) {
-                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
-                Intent intent = new Intent(Intent.ACTION_EDIT)
-                        .setData(uri)
-                        .putExtra(CalendarContract.Events.TITLE, event.getEventTitle());
-                ((Activity)itemView.getContext()).startActivityForResult(intent, REQUEST_CODE_EDIT_EVENT);
-            }
-            return true;
-        }
     }
+
 }

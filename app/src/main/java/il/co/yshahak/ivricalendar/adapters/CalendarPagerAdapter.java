@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.util.SparseArray;
 
 import java.lang.ref.WeakReference;
@@ -17,7 +16,7 @@ import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
  * Created by yshahak on 06/10/2016.
  */
 public class CalendarPagerAdapter extends FragmentPagerAdapter {
-    public static DISPLAY displayState = DISPLAY.DAY;
+    public static DISPLAY displayState = DISPLAY.MONTH;
     public static boolean dropPages;
     public final static int FRONT_PAGE = 500;
     public static int selectedPage = FRONT_PAGE;
@@ -46,7 +45,7 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Log.d("TAG", "getItem, position: "  + position);
+//        Log.d("TAG", "getItem, position: "  + position);
         if (displayState == DISPLAY.MONTH) {
             JewCalendar jewCalendar = new JewCalendar();
             FragmentMonth fragmentLoader = FragmentMonth.newInstance(position);

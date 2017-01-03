@@ -13,7 +13,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,10 +25,12 @@ import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDaily;
+import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDayHours;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
@@ -47,7 +48,7 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TIT
 public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         View.OnClickListener{
 
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerViewEvents;
 
     private final static int CURRENT_PAGE = 500;
     private static final String KEY_POSITION = "keyPosition";
@@ -56,6 +57,7 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     private ArrayList<Event> dayEvents = new ArrayList<>();
     private SparseArray<List<Event>> eventToHourMap = new SparseArray<>();
     private ArrayList<Section> sections = new ArrayList<>();
+    private boolean enableScrolling = true;
 
     public static FragmentDay newInstance(int position) {
         FragmentDay fragment = new FragmentDay();
@@ -79,14 +81,37 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_day, container, false);
-        recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
+        recyclerViewEvents = (RecyclerView)root.findViewById(R.id.recycler_view_events);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setHasFixedSize(true);
+        recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewEvents.setHasFixedSize(true);
         ((TextView)root.findViewById(R.id.day_label)).setText(jewishCalendar.getDayLabel() + "\n"
                 + JewCalendar.hebrewDateFormatter.formatDayOfWeek(jewishCalendar));
         getLoaderManager().initLoader(0, null, this);
+        final RecyclerView recyclerViewHours = (RecyclerView)root.findViewById(R.id.recycler_view_hours);
+        recyclerViewHours.setLayoutManager(new LinearLayoutManager(getActivity())
+        {
+            @Override
+            public boolean canScrollVertically() {
+                return enableScrolling;
+            }
+        });
+        recyclerViewHours.setHasFixedSize(true);
+        recyclerViewHours.setAdapter(new CalendarRecyclerAdapterDayHours());
+        recyclerViewEvents.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                recyclerViewHours.scrollBy(dx, dy);
+            }
+        });
+        recyclerViewHours.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                enableScrolling = newState != SCROLL_STATE_DRAGGING;
 
+            }
+        });
         setRecyclerView();
         return root;
     }
@@ -116,17 +141,16 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
     }
 
     private void setRecyclerView(){
-        RecyclerView.Adapter adapter = recyclerView.getAdapter();
+        RecyclerView.Adapter adapter = recyclerViewEvents.getAdapter();
         if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterDaily(sections));
+            recyclerViewEvents.setAdapter(new CalendarRecyclerAdapterDaily(sections));
         } else {
             adapter.notifyDataSetChanged();
         }
-        recyclerView.smoothScrollToPosition(jewishCalendar.getTime().getHours());
     }
 
-    public RecyclerView getRecyclerView() {
-        return recyclerView;
+    public RecyclerView getRecyclerViewEvents() {
+        return recyclerViewEvents;
     }
 
     @Override
@@ -155,11 +179,12 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
                 if (allDayEvent){
                     end = start;
                 }
-                Log.d("TAG", "begin: " + start + " end: " + end);
+//                Log.d("TAG", "begin: " + start + " end: " + end);
                 Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
                 event.setBeginDate(new Date(start));
                 event.setEndDate(new Date(end));
-                for (int i = event.getBeginDate().getHours() ; i < event.getEndDate().getHours(); i++){
+                int endHour = event.getEndDate().getMinutes() > 0 ? event.getEndDate().getHours() + 1 : event.getEndDate().getHours();
+                for (int i = event.getBeginDate().getHours() ; i < endHour; i++){
                     List<Event> eventList= eventToHourMap.get(i);
                     if (eventList == null) {
                         eventList = new ArrayList<>();
@@ -190,23 +215,46 @@ public class FragmentDay extends Fragment implements LoaderManager.LoaderCallbac
             if (events == null || events.size() == 0) {
                 if (activeRange) {
                     activeRange = false;
-                    section.range.y = hour - 1;
+                    Section newSection = new Section();
+                    for (Event event : section.sectionEvents){
+                        int eventTime = (event.getEndDate().getHours() * 60) + event.getEndDate().getMinutes();
+                        if (section.range.y == 0){
+                            section.range.y = eventTime;
+                            newSection.range.x = eventTime;
+                        }
+                        else if (eventTime > section.range.y){
+                            section.range.y = eventTime;
+                            newSection.range.x = eventTime;
+                        }
+                    }
                     sections.add(section);
-                    section = new Section();
-                    section.range.x = hour;
+                    section = newSection;
                 }
             } else {
                 if (!activeRange) {
                     activeRange = true;
-                    section.range.y = hour - 1;
+                    Section newSection = new Section();
+                    for(Event event : events){
+                        int eventTime = (event.getBeginDate().getHours() * 60) + event.getBeginDate().getMinutes();
+                        if (newSection.range.x == 0){
+                            section.range.y = eventTime;
+                            newSection.range.x = eventTime;
+                        }
+                        else if (eventTime > newSection.range.x){
+                            newSection.range.x = eventTime;
+                        }
+                    }
                     sections.add(section);
-                    section = new Section();
-                    section.range.x = hour;
+                    section = newSection;
                 }
-                section.sectionEvents.addAll(events);
+                for (Event event : events) {
+                    if (!section.sectionEvents.contains(event)) {
+                        section.sectionEvents.add(event);
+                    }
+                }
             }
         }
-        section.range.y = 24;
+        section.range.y = 24 * 60;
         sections.add(section);
     }
 

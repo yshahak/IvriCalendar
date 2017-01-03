@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton fab;
     private Button eventBtnCreate;
     public static boolean recreateFlag;
+    public static boolean backToMonthDisplay;
     private RadioGroup formatGroupChoiser, displayChooser;
     private SharedPreferences prefs;
     private boolean mSlideState; //indicate the current state of the drawer
@@ -65,19 +66,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.addOnPageChangeListener(this);
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
-        calendarsList = (LinearLayout)findViewById(R.id.calender_list);
+        calendarsList = (LinearLayout) findViewById(R.id.calender_list);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
         eventBtnCreate = (Button) findViewById(R.id.event_create_btn);
         eventBtnCreate.setOnClickListener(this);
         formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
-        displayChooser = (RadioGroup)findViewById(R.id.radio_group_display);
+        displayChooser = (RadioGroup) findViewById(R.id.radio_group_display);
         displayChooser.setOnCheckedChangeListener(this);
     }
 
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (permissions.length == 0 || grantResults.length == 0){
+        if (permissions.length == 0 || grantResults.length == 0) {
             return;
         }
         if (requestCode == Contract.REQUEST_READ_CALENDAR && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         GoogleManager.getCalendars(this);
-        if (prefs.getString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, null) == null){
+        if (prefs.getString(KEY_HEBREW_CALENDAR_CLIENT_API_ID, null) == null) {
             startActivity(new Intent(this, GoogleSignInActivity.class));
         }
         setPagerAdapter();
@@ -103,26 +104,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        Log.d("TAG", "onResume");
     }
 
-    private void setPagerAdapter(){
+    private void setPagerAdapter() {
         PagerAdapter pagerAdapter = viewPager.getAdapter();
         if (pagerAdapter != null) {
-            CalendarPagerAdapter.dropPages = true;
+            CalendarPagerAdapter.dropPages = recreateFlag;
             pagerAdapter.notifyDataSetChanged();
             CalendarPagerAdapter.dropPages = false;
         } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
             viewPager.setCurrentItem(500);
         }
+        recreateFlag = false;
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.fab:
                 fadeInEventCreationLayout();
                 break;
             case R.id.event_create_btn:
-                switch (formatGroupChoiser.getCheckedRadioButtonId()){
+                switch (formatGroupChoiser.getCheckedRadioButtonId()) {
                     case R.id.event_loazi:
                         Intent intent = new Intent(Intent.ACTION_INSERT)
                                 .setData(CalendarContract.Events.CONTENT_URI);
@@ -145,10 +147,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fadeOutEventCreationLayout();
                 break;
             case R.id.cell_root:
-                CalendarPagerAdapter.dropPages = true;
                 CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
-                viewPager.getAdapter().notifyDataSetChanged();
-                CalendarPagerAdapter.dropPages = false;
+                displayChooser.check(R.id.display_day);
+                backToMonthDisplay = true;
                 break;
         }
 
@@ -158,16 +159,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onBackPressed() {
         if (floatBtnPressedState) {
             fadeOutEventCreationLayout();
-        }
-        else if (mSlideState) {
+        } else if (mSlideState) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else {
+        } else if (backToMonthDisplay) {
+            CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
+            displayChooser.check(R.id.display_month);
+            backToMonthDisplay = false;
+        } else {
             super.onBackPressed();
         }
     }
 
-    private void fadeInEventCreationLayout(){
+
+    private void fadeInEventCreationLayout() {
         floatBtnPressedState = true;
         fab.animate().alpha(0).start();
         viewPager.animate().alpha(0.15f).start();
@@ -176,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createEventFrameLayout.animate().setListener(null).alpha(1).start();
     }
 
-    private void fadeOutEventCreationLayout(){
+    private void fadeOutEventCreationLayout() {
         floatBtnPressedState = false;
         fab.animate().alpha(1).start();
         viewPager.animate().alpha(1).start();
@@ -208,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 mSlideState = false;//is Closed
-                if (needToRefreshCalendarVisibility){
+                if (needToRefreshCalendarVisibility) {
                     setPagerAdapter();
                     needToRefreshCalendarVisibility = false;
                 }
@@ -245,14 +249,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPageSelected(int position) {
 
-        Log.d("TAG", "onPageSelected: "  + position);
-        if (this.selectedPage != 0){
-            if (position > this.selectedPage){
+        Log.d("TAG", "onPageSelected: " + position);
+        if (this.selectedPage != 0) {
+            if (position > this.selectedPage) {
                 CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.RIGHT;
-//                CalendarManager.shiftRight();
-            } else if (position < this.selectedPage){
+            } else if (position < this.selectedPage) {
                 CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.LEFT;
-//                CalendarManager.shiftLeft();
             }
         }
         this.selectedPage = position;
@@ -282,14 +284,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         drawerLayout.closeDrawers();
-        switch (checkedId){
+        switch (checkedId) {
             case R.id.display_month:
-                    CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
+                CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
                 break;
             case R.id.display_day:
-                    CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
+                CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
                 break;
         }
+        recreateFlag = true;
         setPagerAdapter();
     }
 }
