@@ -24,7 +24,6 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
 
     public static SparseArray<WeakReference<BaseCalendarFragment>> fragmentLoaderSparseArray = new SparseArray<>();
 
-    public static DIRECTION direction = DIRECTION.NULL;
 
     public CalendarPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
@@ -48,10 +47,10 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
 //        Log.d("TAG", "getItem, position: "  + position);
-        BaseCalendarFragment fragment = null;
+        BaseCalendarFragment fragment;
         if (displayState == DISPLAY.MONTH) {
             fragment = FragmentMonth.newInstance(position);
-        } else if (displayState == DISPLAY.DAY) {
+        } else {
             fragment = FragmentDay.newInstance(position);
         }
         fragmentLoaderSparseArray.put(position, new WeakReference<>(fragment));
@@ -90,10 +89,5 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
         DAY
     }
 
-    public enum DIRECTION {
-        LEFT,
-        RIGHT,
-        NULL
-    }
 
 }

@@ -15,9 +15,7 @@ import android.view.ViewGroup;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.CreteIvriEventActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
-import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.fragments.PickerFragment;
 
 /**
@@ -26,21 +24,18 @@ import il.co.yshahak.ivricalendar.fragments.PickerFragment;
 
 public class HebrewPickerDialog extends DialogFragment {
     private final static int CURRENT_PAGE = 500;
-    public static Day currentDay;
     public static CreteIvriEventActivity.OnDatePickerDialog onDatePickerDismiss;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        HebrewPickerDialog.currentDay = FragmentMonth.currentDay;
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month_picker, container, false);
         final ViewPager viewPager = (ViewPager) root.findViewById(R.id.view_pager);
         View btnOk = root.findViewById(R.id.btn_ok);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentMonth.currentDay = currentDay;
                 onDatePickerDismiss.onBtnOkPressed();
                 dismiss();
             }

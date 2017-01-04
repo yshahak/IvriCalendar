@@ -11,8 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
-
 /**
  * Created by yshahk on 12/28/2016.
  */
@@ -45,10 +43,8 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             for (int i = offset * (-1); i > 0; i--) {
                 shiftMonthBackword();
             }
-        } else {
-            FragmentMonth.currentDayOfMonth = getJewishDayOfMonth();
-            setOffsets();
         }
+        setOffsets();
     }
 
     public void shiftDay(int offset){
@@ -60,8 +56,6 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             for (int i = offset * (-1); i > 0; i--) {
                 shiftDayBackword();
             }
-        } else {
-            FragmentMonth.currentDayOfMonth = getJewishDayOfMonth();
         }
     }
 
@@ -72,7 +66,6 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             setJewishYear(getJewishYear() + 1);
         }
         setJewishMonth(next);
-        setOffsets();
     }
 
     private void shiftMonthBackword() {
@@ -82,7 +75,6 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             previous = isJewishLeapYear() ? 13 : 12;
         }
         setJewishMonth(previous);
-        setOffsets();
     }
 
     private void shiftDayForward(){
@@ -116,9 +108,10 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         {//calculate trail
             JewishCalendar mock = new JewishCalendar(getTime());
             mock.setJewishDayOfMonth(isFullMonth() ? 30 : 29);
-            int dayOfWeek = getDayOfWeek();
+            int dayOfWeek = mock.getDayOfWeek();
             trailOffse =  7 - dayOfWeek;
         }
+//        Log.d("TAG", getMonthName() +  ", headOffst:" + headOffst + ", trailOffse:" + trailOffse);
     }
 
     public void setHour(int hour){
@@ -173,21 +166,21 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     public List<Day> getDays(int offset){
         List<Day> days = new ArrayList<>();
-        Calendar calendar = null;
-        int dayOfMonth = 0;
-        if (offset == 0){
-            calendar = Calendar.getInstance();
-            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        }
+//        Calendar calendar = null;
+//        int dayOfMonth = 0;
+//        if (offset == 0){
+//            calendar = Calendar.getInstance();
+//            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+//        }
         for (int i = 0; i < getDaysInJewishMonth(); i++) {
             setJewishDayOfMonth(i + 1);
             days.add(new Day((JewishCalendar) clone()));
-            if (offset == 0){
-                calendar.setTime(getTime());
-                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
-                    FragmentMonth.currentDay = days.get(i);
-                }
-            }
+//            if (offset == 0){
+//                calendar.setTime(getTime());
+//                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
+//                    FragmentMonth.currentDay = days.get(i);
+//                }
+//            }
         }
         return days;
     }

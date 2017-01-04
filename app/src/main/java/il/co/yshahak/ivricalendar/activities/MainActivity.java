@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
@@ -33,6 +35,7 @@ import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
+import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
@@ -41,6 +44,8 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CAL
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener {
 
     public static boolean needToRefreshCalendarVisibility;
+    public static JewCalendar currentJewCalendar = new JewCalendar();
+
     private ViewPager viewPager;
     private DrawerLayout drawerLayout;
     private LinearLayout calendarsList;
@@ -52,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static boolean backToMonthDisplay;
     private RadioGroup formatGroupChoiser, displayChooser;
     private SharedPreferences prefs;
-    private boolean mSlideState; //indicate the current state of the drawer
+    private Toolbar myToolbar;
+    private ActionBarDrawerToggle mDrawertToggle;
+    private TextView currentDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +67,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        Stetho.initializeWithDefaults(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         setContentView(R.layout.activity_main);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.addOnPageChangeListener(this);
+//        viewPager.setOffscreenPageLimit(1);
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
         calendarsList = (LinearLayout) findViewById(R.id.calender_list);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -74,6 +82,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
         displayChooser = (RadioGroup) findViewById(R.id.radio_group_display);
         displayChooser.setOnCheckedChangeListener(this);
+        currentDay = (TextView)findViewById(R.id.current_day);
+        currentDay.setOnClickListener(this);
+        setTitle(currentJewCalendar.getMonthName() + " , " + currentJewCalendar.getYearName());
+
+        setDrawerMenu();
+
     }
 
 
@@ -84,6 +98,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == Contract.REQUEST_READ_CALENDAR && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             GoogleManager.getCalendars(this);
         }
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawertToggle.syncState();
     }
 
     @Override
@@ -100,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(new Intent(this, GoogleSignInActivity.class));
         }
         setPagerAdapter();
-        setDrawerMenu();
+        DrawerHelper.setDrawerMenu(calendarsList, this);
+        currentDay.setText(currentJewCalendar.getDayLabel());
 //        Log.d("TAG", "onResume");
     }
 
@@ -126,9 +147,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.event_create_btn:
                 switch (formatGroupChoiser.getCheckedRadioButtonId()) {
                     case R.id.event_loazi:
-                        Intent intent = new Intent(Intent.ACTION_INSERT)
-                                .setData(CalendarContract.Events.CONTENT_URI);
-                        startActivity(intent);
+                        Intent intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
+                        startActivityForResult(intent, 0);
                         break;
                     case R.id.event_ivri:
                         Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
@@ -151,9 +171,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 displayChooser.check(R.id.display_day);
                 int monthDay = (int) v.getTag(R.string.tag_month_position);
                 if (monthDay != 0){
-                    viewPager.setCurrentItem(viewPager.getCurrentItem() + monthDay);
+                    viewPager.setCurrentItem(FRONT_PAGE + monthDay, true);
                 }
                 backToMonthDisplay = true;
+                break;
+            case R.id.current_day:
+                viewPager.setCurrentItem(FRONT_PAGE, true);
                 break;
         }
 
@@ -163,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onBackPressed() {
         if (floatBtnPressedState) {
             fadeOutEventCreationLayout();
-        } else if (mSlideState) {
+        } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else if (backToMonthDisplay) {
             CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
@@ -172,9 +195,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 JewCalendar current = weakReference.get().getJewishCalendar();
                 int shift = JewCalendar.getMonthDifference(current, new JewCalendar());
                 viewPager.setCurrentItem(FRONT_PAGE + shift);
+                setTitle(current.getMonthName() + " , " + current.getYearName());
             }
             displayChooser.check(R.id.display_month);
             backToMonthDisplay = false;
+
         } else {
             super.onBackPressed();
         }
@@ -213,42 +238,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * setting the drawer category menu of the store
      */
     private void setDrawerMenu() {
-        drawerLayout.setDrawerListener(new ActionBarDrawerToggle(this,
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawertToggle = new ActionBarDrawerToggle(this,
                 drawerLayout,
-                null,
+                myToolbar,
                 0,
                 0) {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                mSlideState = false;//is Closed
                 if (needToRefreshCalendarVisibility) {
                     setPagerAdapter();
                     needToRefreshCalendarVisibility = false;
                 }
+                syncState();
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                mSlideState = true;//is Opened
+                syncState();
             }
-        });
-        DrawerHelper.setDrawerMenu(calendarsList, this);
-
-    }
-
-    /**
-     * open or close the drawer menu
-     *
-     * @param view the hamburger icon clicked
-     */
-    public void clickEventSlide(View view) {
-        if (mSlideState) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            drawerLayout.openDrawer(GravityCompat.START);
-        }
+        };
+        drawerLayout.setDrawerListener(mDrawertToggle);
     }
 
     @Override
@@ -260,18 +273,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onPageSelected(int position) {
 
         Log.d("TAG", "onPageSelected: " + position);
-        if (CalendarPagerAdapter.selectedPage != 0) {
-            if (position > CalendarPagerAdapter.selectedPage) {
-                CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.RIGHT;
-            } else if (position < CalendarPagerAdapter.selectedPage) {
-                CalendarPagerAdapter.direction = CalendarPagerAdapter.DIRECTION.LEFT;
-            }
-        }
         CalendarPagerAdapter.selectedPage = position;
         WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
         if (weakReference != null) {
             BaseCalendarFragment fragmentLoader = weakReference.get();
-            if (fragmentLoader != null) {
+            if (fragmentLoader != null && fragmentLoader instanceof FragmentMonth) {
                 setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
             }
         }

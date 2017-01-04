@@ -7,11 +7,8 @@ import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
  * Created by yshahak on 07/10/2016.
@@ -34,12 +31,12 @@ public class Month implements Parcelable {
     private boolean isFullMonth;
 
     public Month(JewCalendar jewishCalendar, boolean isCurrentMonth) {
-        Calendar calendar = null;
-        int dayOfMonth = 0;
-        if (isCurrentMonth){
-            calendar = Calendar.getInstance();
-            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        }
+//        Calendar calendar = null;
+//        int dayOfMonth = 0;
+//        if (isCurrentMonth){
+//            calendar = Calendar.getInstance();
+//            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+//        }
         this.jewCalendar = (JewCalendar) jewishCalendar.clone();
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
@@ -49,16 +46,16 @@ public class Month implements Parcelable {
         this.trailOffsetMonth = setTrailOffset(jewishCalendar);
         int days = isFullMonth ? 30 : 29;
 
-        for (int i = 0; i < days; i++) {
-            jewishCalendar.setJewishDayOfMonth(i + 1);
-            this.days.add(new Day((JewishCalendar) jewishCalendar.clone()));
-            if (isCurrentMonth){
-                calendar.setTime(jewishCalendar.getTime());
-                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
-                    FragmentMonth.currentDay = this.days.get(i);
-                }
-            }
-        }
+//        for (int i = 0; i < days; i++) {
+//            jewishCalendar.setJewishDayOfMonth(i + 1);
+//            this.days.add(new Day((JewishCalendar) jewishCalendar.clone()));
+//            if (isCurrentMonth){
+//                calendar.setTime(jewishCalendar.getTime());
+//                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
+//                    FragmentMonth.currentDay = this.days.get(i);
+//                }
+//            }
+//        }
     }
 
 

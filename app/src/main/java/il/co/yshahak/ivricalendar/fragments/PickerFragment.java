@@ -9,13 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterPicker;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
@@ -29,7 +26,6 @@ public class PickerFragment extends Fragment {
     private static final String KEY_POSITION = "keyPosition";
     private static final String KEY_JEW_CALENDAR = "keyJewCalendar";
 //    private Month month;
-    private List<Day> days;
     private JewCalendar jewishCalendar;
 
 
@@ -60,7 +56,6 @@ public class PickerFragment extends Fragment {
         if (jewishCalendar == null) {
             jewishCalendar = new JewCalendar(offset);
         }
-        this.days = jewishCalendar.getDays(offset);
     }
 
     @Nullable
@@ -79,7 +74,7 @@ public class PickerFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(jewishCalendar, this.days));
+        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(jewishCalendar));
         days.setAdapter(new DaysHeaderAdapter());
         return root;
     }

@@ -27,12 +27,10 @@ import java.util.Locale;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
@@ -51,8 +49,6 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_TIT
 
 public class FragmentMonth extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    public static Day currentDay;
-    public static int currentDayOfMonth;
     private RecyclerView recyclerView;
     private SparseArray<List<Event>> events = new SparseArray<>();
 
@@ -85,9 +81,6 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-        if (CalendarPagerAdapter.selectedPage == position) {
-            getActivity().setTitle(jewishCalendar.getMonthName() + " , " + jewishCalendar.getYearName());
-        }
         daysRecycler.setAdapter(new DaysHeaderAdapter());
         setRecyclerView();
         return root;
