@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
+import il.co.yshahak.ivricalendar.activities.CreteIvriEventActivity;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 /**
@@ -58,13 +58,14 @@ public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<Calendar
     private void setDay(ViewHolder holder, int position) {
         jewCalendar.setJewishDayOfMonth(position + 1);
         holder.label.setText(jewCalendar.getDayLabel());
-        if (jewCalendar.equals(MainActivity.currentJewCalendar)) {
+        if (jewCalendar.equals(CreteIvriEventActivity.currentCalendar)) {
             if (position + 1 == jewCalendar.getJewishDayOfMonth()) {
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.colorPrimary));
             } else {
                 holder.label.setBackgroundColor(holder.itemView.getContext().getResources().getColor(android.R.color.transparent));
             }
         }
+        holder.itemView.setTag(position + 1);
     }
 
 
@@ -86,6 +87,7 @@ public class CalendarRecyclerAdapterPicker extends RecyclerView.Adapter<Calendar
         @Override
         public void onClick(View view) {
             if (getItemViewType() == VIEW_TYPE_DAY_CELL) {
+                CreteIvriEventActivity.currentCalendar.setJewishDayOfMonth((Integer) itemView.getTag());
                 notifyDataSetChanged();
             }
         }

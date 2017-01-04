@@ -64,6 +64,7 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        jewishCalendar = new JewCalendar();
         jewishCalendar.shiftDay(position - FRONT_PAGE);
         getLoaderManager().initLoader(0, null, this);
     }

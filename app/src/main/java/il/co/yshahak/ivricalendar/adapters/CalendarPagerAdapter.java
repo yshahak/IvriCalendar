@@ -32,14 +32,16 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        FragmentTransaction mCurTransaction = mFragmentManager.beginTransaction();
-        if (mCurTransaction != null) {
-            for (Fragment fragment : mFragmentManager.getFragments()) {
-                if (fragment != null) {
-                    mCurTransaction.remove(fragment);
+        if (dropPages) {
+            FragmentTransaction mCurTransaction = mFragmentManager.beginTransaction();
+            if (mCurTransaction != null) {
+                for (Fragment fragment : mFragmentManager.getFragments()) {
+                    if (fragment != null) {
+                        mCurTransaction.remove(fragment);
+                    }
                 }
+                mCurTransaction.commitNow();
             }
-            mCurTransaction.commitNow();
         }
         super.notifyDataSetChanged();
     }

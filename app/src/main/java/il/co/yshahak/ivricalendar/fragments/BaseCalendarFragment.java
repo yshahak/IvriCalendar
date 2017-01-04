@@ -27,7 +27,6 @@ public  class BaseCalendarFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.position = getArguments().getInt(KEY_POSITION);
-        jewishCalendar = new JewCalendar();
     }
 
     public void setJewishCalendar(JewCalendar jewishCalendar){

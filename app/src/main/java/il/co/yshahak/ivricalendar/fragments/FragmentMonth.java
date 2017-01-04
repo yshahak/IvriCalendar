@@ -31,6 +31,7 @@ import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
@@ -61,6 +62,7 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        jewishCalendar = new JewCalendar();
         jewishCalendar.shiftMonth(position - FRONT_PAGE);
         if (events.size() == 0) {
             getLoaderManager().initLoader(0, null, this);

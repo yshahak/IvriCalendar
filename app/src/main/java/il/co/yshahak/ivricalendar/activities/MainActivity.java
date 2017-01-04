@@ -28,6 +28,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
+import java.util.Date;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
@@ -35,7 +36,6 @@ import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
-import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         formatGroupChoiser = (RadioGroup) findViewById(R.id.radio_group_format);
         displayChooser = (RadioGroup) findViewById(R.id.radio_group_display);
         displayChooser.setOnCheckedChangeListener(this);
-        currentDay = (TextView)findViewById(R.id.current_day);
+        currentDay = (TextView) findViewById(R.id.current_day);
         currentDay.setOnClickListener(this);
         setTitle(currentJewCalendar.getMonthName() + " , " + currentJewCalendar.getYearName());
 
@@ -148,20 +148,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switch (formatGroupChoiser.getCheckedRadioButtonId()) {
                     case R.id.event_loazi:
                         Intent intent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
-                        startActivityForResult(intent, 0);
+                        startActivity(intent);
                         break;
                     case R.id.event_ivri:
-                        Intent intentIvri = new Intent(this, CreteIvriEventActivity.class);
-//                    WeakReference<FragmentMonth> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(selectedPage);
-//                    if (weakReference != null) {
-//                        FragmentMonth fragmentLoader = weakReference.get();
-//                        if (fragmentLoader != null) {
-//                            if (fragmentLoader.getMonth().getDays().contains(FragmentMonth.currentDay)){
-//                                intentIvri.putExtra(CreteIvriEventActivity.EXTRA_USE_CURRENT_DAY, true);
-//                            }
-//                        }
-//                    }
-                        startActivity(intentIvri);
+                        WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
+                        if (weakReference != null) {
+                            BaseCalendarFragment fragmentLoader = weakReference.get();
+                            if (fragmentLoader != null) {
+                                Date date = fragmentLoader.getJewishCalendar().getTime();
+                                CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
+                            }
+                        }
+                        startActivity(new Intent(this, CreteIvriEventActivity.class));
                         break;
                 }
                 fadeOutEventCreationLayout();
@@ -170,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.DAY;
                 displayChooser.check(R.id.display_day);
                 int monthDay = (int) v.getTag(R.string.tag_month_position);
-                if (monthDay != 0){
+                if (monthDay != 0) {
                     viewPager.setCurrentItem(FRONT_PAGE + monthDay, true);
                 }
                 backToMonthDisplay = true;
@@ -277,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
         if (weakReference != null) {
             BaseCalendarFragment fragmentLoader = weakReference.get();
-            if (fragmentLoader != null && fragmentLoader instanceof FragmentMonth) {
+            if (fragmentLoader != null) {
                 setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
             }
         }

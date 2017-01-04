@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -31,6 +30,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.fragments.TimePickerFragment;
 import il.co.yshahak.ivricalendar.views.HebrewPickerDialog;
 import me.angrybyte.numberpicker.view.ActualNumberPicker;
@@ -44,7 +44,8 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatt
 public class CreteIvriEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener
         , KeyboardVisibilityEventListener, PopupMenu.OnMenuItemClickListener{
 
-    public static final String EXTRA_USE_CURRENT_DAY = "EXTRA_USE_CURRENT_DAY" ;
+//    public static final String EXTRA_USE_CURRENT_DAY = "EXTRA_USE_CURRENT_DAY" ;
+    public static JewCalendar currentCalendar;
     @BindView(R.id.header_btn_save) TextView headerBtnSave;
     @BindView(R.id.header_btn_x) ImageView headerBtnX;
     @BindView(R.id.header_edit_text_event_title) EditText headerTitleEditText;
@@ -83,25 +84,22 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
     }
 
     private void setDates() {
-        boolean useCurrentDay = getIntent().getBooleanExtra(EXTRA_USE_CURRENT_DAY, false);
-        JewishCalendar jewishCalendar;
-        if (useCurrentDay ){
-            jewishCalendar = MainActivity.currentJewCalendar;
-        } else {
-            jewishCalendar = new JewishCalendar();
+//        boolean useCurrentDay = getIntent().getBooleanExtra(EXTRA_USE_CURRENT_DAY, false);
+        if (currentCalendar == null ){
+            currentCalendar = new JewCalendar();
         }
-        String date = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth()) + " " +
-                hebrewDateFormatter.formatMonth(jewishCalendar)   ;
+        String date = hebrewDateFormatter.formatHebrewNumber(currentCalendar.getJewishDayOfMonth()) + " " +
+                hebrewDateFormatter.formatMonth(currentCalendar)   ;
         hebrewDateFormatter.setLongWeekFormat(true);
-        String day = hebrewDateFormatter.formatDayOfWeek(jewishCalendar) + " , " + date;
+        String day = hebrewDateFormatter.formatDayOfWeek(currentCalendar) + " , " + date;
         eventStartDay.setText(day);
         eventEndDay.setText(day);
         calendarStartTime = Calendar.getInstance();
-        calendarStartTime.setTime(jewishCalendar.getTime());
+        calendarStartTime.setTime(currentCalendar.getTime());
         calendarStartTime.set(Calendar.MINUTE, 0);
         eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
         calendarEndTime = Calendar.getInstance();
-        calendarEndTime.setTime(jewishCalendar.getTime());
+        calendarEndTime.setTime(currentCalendar.getTime());
         calendarEndTime.set(Calendar.MINUTE, 0);
         calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
         eventEndTime.setText(sdf.format(calendarEndTime.getTime()));

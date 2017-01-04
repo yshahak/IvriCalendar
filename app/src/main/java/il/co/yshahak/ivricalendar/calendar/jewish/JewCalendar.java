@@ -26,8 +26,14 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     private int headOffst, trailOffse;
 
 
+
     public JewCalendar(int offset){
         shiftMonth(offset);
+    }
+
+    public JewCalendar(Date date) {
+        super(date);
+        setOffsets();
     }
 
     public JewCalendar() {
