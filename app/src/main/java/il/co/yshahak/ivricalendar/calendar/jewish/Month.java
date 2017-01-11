@@ -21,59 +21,31 @@ public class Month implements Parcelable {
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
-    private JewCalendar jewCalendar;
     private List<Day> days = new ArrayList<>();
     private String yearName;
     private String monthName;
     private int monthNumberOfDays;
-    private int headOffsetMonth;
-    private int trailOffsetMonth;
+    private int headOffst, trailOffse;
+
+//    private int headOffsetMonth;
+//    private int trailOffsetMonth;
     private boolean isFullMonth;
 
-    public Month(JewCalendar jewishCalendar, boolean isCurrentMonth) {
-//        Calendar calendar = null;
-//        int dayOfMonth = 0;
-//        if (isCurrentMonth){
-//            calendar = Calendar.getInstance();
-//            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-//        }
-        this.jewCalendar = (JewCalendar) jewishCalendar.clone();
+    public Month(JewCalendar jewishCalendar, int offset) {
+        int currrentYear = jewishCalendar.getJewishYear();
+        int currentMonth = jewishCalendar.getJewishMonth();
+        int curretnDay = jewishCalendar.getJewishDayOfMonth();
+        shiftMonth(jewishCalendar, offset);
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
         this.isFullMonth = (monthNumberOfDays == 30);
-        this.headOffsetMonth = setHeadOffset(jewishCalendar);
-        this.trailOffsetMonth = setTrailOffset(jewishCalendar);
-        int days = isFullMonth ? 30 : 29;
-
-//        for (int i = 0; i < days; i++) {
-//            jewishCalendar.setJewishDayOfMonth(i + 1);
-//            this.days.add(new Day((JewishCalendar) jewishCalendar.clone()));
-//            if (isCurrentMonth){
-//                calendar.setTime(jewishCalendar.getTime());
-//                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
-//                    FragmentMonth.currentDay = this.days.get(i);
-//                }
-//            }
-//        }
+        setDays(jewishCalendar);
+        setOffsets(jewishCalendar);
+        jewishCalendar.setJewishDate(currrentYear, currentMonth, curretnDay);
     }
 
 
-    private int setHeadOffset(JewishCalendar jewishCalendar) {
-        int dayInMonth = jewishCalendar.getJewishDayOfMonth() % 7;
-        Date date = jewishCalendar.getTime();
-        date.setTime(date.getTime() - 1000 * 60 * 60 * 24 * (--dayInMonth));
-        JewishCalendar mockCalendar = new JewishCalendar(date);
-        int dayInWeek = mockCalendar.getDayOfWeek();
-        return --dayInWeek;
-    }
-
-    private int setTrailOffset(JewishCalendar jewishCalendar) {
-        JewishCalendar mock = new JewishCalendar(jewishCalendar.getTime());
-        mock.setJewishDayOfMonth(isFullMonth ? 30 : 29);
-        int dayOfWeek = mock.getDayOfWeek();
-        return 7 - dayOfWeek;
-    }
 
     public static JewishCalendar shiftMonth(JewishCalendar jewishCalendar, int offst) {
         int currentMonth = jewishCalendar.getJewishMonth();
@@ -112,6 +84,63 @@ public class Month implements Parcelable {
         return jewishCalendar;
     }
 
+    public void shiftMonth(JewCalendar jewishCalendar, int offset){
+        if (offset > 0) {
+            for (int i = 0; i < offset; i++) {
+                shiftMonthForward(jewishCalendar);
+            }
+        } else if (offset < 0){
+            for (int i = offset * (-1); i > 0; i--) {
+                shiftMonthBackword(jewishCalendar);
+            }
+        }
+    }
+
+    private void shiftMonthForward(JewCalendar jewishCalendar){
+        int next = jewishCalendar.getJewishMonth() + 1;
+        if (next == 14 || (next == 13 && !jewishCalendar.isJewishLeapYear())) {
+            next = 1;
+            jewishCalendar.setJewishYear(jewishCalendar.getJewishYear() + 1);
+        }
+        jewishCalendar.setJewishMonth(next);
+    }
+
+    private void shiftMonthBackword(JewCalendar jewishCalendar) {
+        int previous = jewishCalendar.getJewishMonth() - 1;
+        if (previous == 0) {
+            jewishCalendar.setJewishYear(jewishCalendar.getJewishYear() - 1);
+            previous = jewishCalendar.isJewishLeapYear() ? 13 : 12;
+        }
+        jewishCalendar.setJewishMonth(previous);
+    }
+
+    private void setOffsets(JewCalendar jewishCalendar){
+        { //calculate head
+            int dayInMonth = jewishCalendar.getJewishDayOfMonth() % 7;
+            Date date = jewishCalendar.getTime();
+            date.setTime(date.getTime() - 1000 * 60 * 60 * 24 * (--dayInMonth));
+            JewishCalendar mockCalendar = new JewishCalendar(date);
+            int dayInWeek = mockCalendar.getDayOfWeek();
+            headOffst = --dayInWeek;
+        }
+        {//calculate trail
+            JewishCalendar mock = new JewishCalendar(jewishCalendar.getTime());
+            mock.setJewishDayOfMonth(jewishCalendar.isFullMonth() ? 30 : 29);
+            int dayOfWeek = mock.getDayOfWeek();
+            trailOffse =  7 - dayOfWeek;
+        }
+//        Log.d("TAG", getMonthName() +  ", headOffst:" + headOffst + ", trailOffse:" + trailOffse);
+    }
+
+    private void setDays(JewCalendar jewCalendar) {
+        int daysSum = isFullMonth ? 30 : 29;
+        for (int i = 1; i <= daysSum ; i++){
+            jewCalendar.setJewishDayOfMonth(i);
+            Day day = new Day(jewCalendar);
+            days.add(day);
+        }
+    }
+
 
     public String getYearName() {
         return yearName;
@@ -125,13 +154,13 @@ public class Month implements Parcelable {
         return monthNumberOfDays;
     }
 
-    public int getHeadOffsetMonth() {
-        return headOffsetMonth;
-    }
-
-    public int getTrailOffsetMonth() {
-        return trailOffsetMonth;
-    }
+//    public int getHeadOffsetMonth() {
+//        return headOffsetMonth;
+//    }
+//
+//    public int getTrailOffsetMonth() {
+//        return trailOffsetMonth;
+//    }
 
     public List<Day> getDays() {
         return days;
@@ -153,8 +182,8 @@ public class Month implements Parcelable {
         dest.writeString(this.yearName);
         dest.writeString(this.monthName);
         dest.writeInt(this.monthNumberOfDays);
-        dest.writeInt(this.headOffsetMonth);
-        dest.writeInt(this.trailOffsetMonth);
+//        dest.writeInt(this.headOffsetMonth);
+//        dest.writeInt(this.trailOffsetMonth);
         dest.writeByte(this.isFullMonth ? (byte) 1 : (byte) 0);
     }
 
@@ -165,8 +194,8 @@ public class Month implements Parcelable {
         this.yearName = in.readString();
         this.monthName = in.readString();
         this.monthNumberOfDays = in.readInt();
-        this.headOffsetMonth = in.readInt();
-        this.trailOffsetMonth = in.readInt();
+//        this.headOffsetMonth = in.readInt();
+//        this.trailOffsetMonth = in.readInt();
         this.isFullMonth = in.readByte() != 0;
     }
 

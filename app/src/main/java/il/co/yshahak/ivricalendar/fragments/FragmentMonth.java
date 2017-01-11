@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
@@ -52,6 +53,7 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
 
     private RecyclerView recyclerView;
     private SparseArray<List<Event>> events = new SparseArray<>();
+    private ViewGroup root;
 
     public static FragmentMonth newInstance(int position) {
         FragmentMonth fragment = new FragmentMonth();
@@ -62,7 +64,7 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        jewishCalendar = new JewCalendar();
+        jewishCalendar = (JewCalendar) MainActivity.currentJewCalendar.clone();
         jewishCalendar.shiftMonth(position - FRONT_PAGE);
         if (events.size() == 0) {
             getLoaderManager().initLoader(0, null, this);
@@ -72,7 +74,10 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
+        if (root != null) {
+            return root;
+        }
+        root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
         RecyclerView daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
@@ -88,6 +93,11 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
         return root;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("check", "check");
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

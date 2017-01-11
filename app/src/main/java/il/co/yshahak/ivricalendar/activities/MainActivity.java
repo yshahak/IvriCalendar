@@ -43,7 +43,7 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CAL
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener {
 
-    public static boolean needToRefreshCalendarVisibility;
+//    public static boolean needToRefreshCalendarVisibility;
     public static JewCalendar currentJewCalendar = new JewCalendar();
 
     private ViewPager viewPager;
@@ -151,12 +151,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         startActivity(intent);
                         break;
                     case R.id.event_ivri:
-                        WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
-                        if (weakReference != null) {
-                            BaseCalendarFragment fragmentLoader = weakReference.get();
-                            if (fragmentLoader != null) {
-                                Date date = fragmentLoader.getJewishCalendar().getTime();
-                                CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
+                        if (CalendarPagerAdapter.selectedPage == FRONT_PAGE){
+                            Date date = currentJewCalendar.getTime();
+                            CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
+
+                        } else {
+                            WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
+                            if (weakReference != null) {
+                                BaseCalendarFragment fragmentLoader = weakReference.get();
+                                if (fragmentLoader != null) {
+                                    Date date = fragmentLoader.getJewishCalendar().getTime();
+                                    CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
+                                }
                             }
                         }
                         startActivity(new Intent(this, CreteIvriEventActivity.class));
@@ -246,9 +252,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                if (needToRefreshCalendarVisibility) {
+                if (recreateFlag) {
                     setPagerAdapter();
-                    needToRefreshCalendarVisibility = false;
                 }
                 syncState();
             }
@@ -270,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPageSelected(int position) {
 
-        Log.d("TAG", "onPageSelected: " + position);
+//        Log.d("TAG", "onPageSelected: " + position);
         CalendarPagerAdapter.selectedPage = position;
         WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
         if (weakReference != null) {

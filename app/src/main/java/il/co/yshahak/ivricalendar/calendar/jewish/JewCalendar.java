@@ -67,9 +67,11 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     private void shiftMonthForward(){
         int next = getJewishMonth() + 1;
-        if (next == 14 || (next == 13 && !isJewishLeapYear())) {
-            next = 1;
+        if (next == 7){
             setJewishYear(getJewishYear() + 1);
+        }
+        else if (next == 14 || (next == 13 && !isJewishLeapYear())) {
+            next = 1;
         }
         setJewishMonth(next);
     }
@@ -77,8 +79,9 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     private void shiftMonthBackword() {
         int previous = getJewishMonth() - 1;
         if (previous == 0) {
-            setJewishYear(getJewishYear() - 1);
             previous = isJewishLeapYear() ? 13 : 12;
+        } else if (previous == 6){
+            setJewishYear(getJewishYear() - 1);
         }
         setJewishMonth(previous);
     }
@@ -262,4 +265,14 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         }
         return shift;
     }
+
+    public Object clone() {
+        JewCalendar clone = null;
+
+        clone = (JewCalendar) super.clone();
+        clone.headOffst = this.headOffst;
+        clone.trailOffse = this.trailOffse;
+        return clone;
+    }
+
 }

@@ -147,7 +147,7 @@ public class GoogleManager {
         }
         Time time = new Time();
 
-        time.set(week.getDays()[firstDay].getJewishCalendar().getTime().getTime());
+//        time.set(week.getDays()[firstDay].getJewishCalendar().getTime().getTime());
         time.allDay = true;
         time.hour = 0;
         time.minute = 0;

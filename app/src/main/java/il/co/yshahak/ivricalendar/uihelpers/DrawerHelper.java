@@ -51,7 +51,7 @@ public class DrawerHelper {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         GoogleManager.updateCalendarVisibility(activity.getContentResolver(), calendarAccount, isChecked);
-                        MainActivity.needToRefreshCalendarVisibility = true;
+                        MainActivity.recreateFlag = true;
                     }
                 });
 

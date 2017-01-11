@@ -70,7 +70,7 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
         this.position = getArguments().getInt(KEY_POSITION);
         int offset = position - CURRENT_PAGE;
         jewishCalendar = new JewCalendar(offset);
-        month = new Month(jewishCalendar, offset == 0);
+//        month = new Month(jewishCalendar, offset == 0);
         week = new Week(new JewishCalendar(), offset);
     }
 

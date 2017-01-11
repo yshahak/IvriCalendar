@@ -26,7 +26,8 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
     private final View.OnClickListener clickListener;
-//    private Month month;
+    private final int itemCount;
+    //    private Month month;
     private SparseArray<List<Event>> eventSparseArray;
     private JewCalendar jewCalendar;
     private int transparentColor, primaryColor;
@@ -38,6 +39,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
         this.clickListener = listener;
         this.transparentColor = ((Context)listener).getResources().getColor(android.R.color.transparent);
         this.primaryColor = ((Context)listener).getResources().getColor(R.color.colorPrimary);
+        this.itemCount = jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset();
     }
 
     @Override
@@ -59,6 +61,12 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Object tagPosition = holder.itemView.getTag(R.string.tag_month_position);
+        if (holder.itemView.getTag(R.string.tag_month_position) != null && (int)tagPosition == position + 1){
+            return;
+        } else {
+            holder.itemView.setTag(R.string.tag_month_position, position + 1);
+        }
         holder.cellContainer.removeAllViews();
         switch (holder.getItemViewType()){
             case VIEW_TYPE_DAY_CELL:
@@ -73,7 +81,6 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     private void setDay(ViewHolder holder, int position){
         jewCalendar.setJewishDayOfMonth(position + 1);
-        holder.itemView.setTag(R.string.tag_month_position, position + 1);
         holder.label.setText(jewCalendar.getDayLabel());
         if (jewCalendar.getJewishMonth() == MainActivity.currentJewCalendar.getJewishMonth()) { //todo compare also year...
             if (position + 1 == MainActivity.currentJewCalendar.getJewishDayOfMonth()) {
@@ -100,7 +107,7 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 
     @Override
     public int getItemCount() {
-        return  jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset() ;
+        return itemCount;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

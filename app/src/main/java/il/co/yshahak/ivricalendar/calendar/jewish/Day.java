@@ -20,27 +20,16 @@ public class Day {
     private final String label;
     private long startDayInMillis, endDayInMillis;
     private int dayInMonth;
-    private JewishCalendar jewishCalendar;
-    private Calendar calendarForWeekDisplay;
 
     public Day(JewishCalendar jewishCalendar) {
-        this.jewishCalendar = jewishCalendar;
         this.month = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.label = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth());
         long[] beginAndEnd = getBeginAndEnd(jewishCalendar);
         this.startDayInMillis = beginAndEnd[0];
         this.endDayInMillis = beginAndEnd[1];
         this.dayInMonth = jewishCalendar.getJewishDayOfMonth();
-        calendarForWeekDisplay = Calendar.getInstance();
-        this.calendarForWeekDisplay.setTime(jewishCalendar.getTime());
-        calendarForWeekDisplay.set(Calendar.MINUTE, 0);
-        calendarForWeekDisplay.set(Calendar.SECOND, 0);
-        calendarForWeekDisplay.set(Calendar.MILLISECOND, 0);
     }
 
-    public JewishCalendar getJewishCalendar() {
-        return jewishCalendar;
-    }
 
     public ArrayList<Event> getGoogleEvents() {
         return googleEvents;
@@ -66,9 +55,6 @@ public class Day {
         return endDayInMillis;
     }
 
-    public Calendar getCalendarForWeekDisplay() {
-        return calendarForWeekDisplay;
-    }
 
     private long[] getBeginAndEnd(JewishCalendar jewishCalendar) {
         long[] longs = new long[2];

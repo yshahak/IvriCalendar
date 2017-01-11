@@ -7,14 +7,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.Calendar;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
@@ -61,29 +58,29 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
     }
 
     private void setDay(ViewHolder holder, Day day, int hour){
-        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
-        Calendar cal = day.getCalendarForWeekDisplay();
-        cal.set(Calendar.HOUR, hour);
-        long time = cal.getTimeInMillis();
-        for (Event event : day.getGoogleEvents()){
-            if (event.getBegin() >= time && event.getBegin()  < (time + Hour)) {
-                int emptyWeight =(int)((event.getBegin() - time) / 1000 / 60 / 15);
-                if (emptyWeight > 0){
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.label.getLayoutParams();
-                    params.weight = emptyWeight;
-                    holder.label.setLayoutParams(params);
-                }
-                Log.d("TAG", "hour: " + hour);
-                Log.d("TAG", "event: " + event.getEventTitle() + " , dif:" + (event.getBegin() - time) / 1000 / 60 / 15);
-                TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, holder.cellContainer, false);
-                textView.setText(event.getEventTitle());
-                textView.setBackgroundColor(event.getDisplayColor());
-                holder.cellContainer.addView(textView);
-                textView.setTag(event);
-                textView.setOnClickListener(holder);
-                textView.setOnLongClickListener(holder);
-            }
-        }
+//        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
+//        Calendar cal = day.getCalendarForWeekDisplay();
+//        cal.set(Calendar.HOUR, hour);
+//        long time = cal.getTimeInMillis();
+//        for (Event event : day.getGoogleEvents()){
+//            if (event.getBegin() >= time && event.getBegin()  < (time + Hour)) {
+//                int emptyWeight =(int)((event.getBegin() - time) / 1000 / 60 / 15);
+//                if (emptyWeight > 0){
+//                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.label.getLayoutParams();
+//                    params.weight = emptyWeight;
+//                    holder.label.setLayoutParams(params);
+//                }
+//                Log.d("TAG", "hour: " + hour);
+//                Log.d("TAG", "event: " + event.getEventTitle() + " , dif:" + (event.getBegin() - time) / 1000 / 60 / 15);
+//                TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, holder.cellContainer, false);
+//                textView.setText(event.getEventTitle());
+//                textView.setBackgroundColor(event.getDisplayColor());
+//                holder.cellContainer.addView(textView);
+//                textView.setTag(event);
+//                textView.setOnClickListener(holder);
+//                textView.setOnLongClickListener(holder);
+//            }
+//        }
     }
 
     @Override

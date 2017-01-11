@@ -99,7 +99,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         calendarStartTime.set(Calendar.MINUTE, 0);
         eventStartTime.setText(sdf.format(calendarStartTime.getTime()));
         calendarEndTime = Calendar.getInstance();
-        calendarEndTime.setTime(currentCalendar.getTime());
+calendarEndTime.setTime(currentCalendar.getTime());
         calendarEndTime.set(Calendar.MINUTE, 0);
         calendarEndTime.set(Calendar.HOUR_OF_DAY, calendarEndTime.get(Calendar.HOUR_OF_DAY) + 1);
         eventEndTime.setText(sdf.format(calendarEndTime.getTime()));
@@ -218,6 +218,7 @@ public class CreteIvriEventActivity extends AppCompatActivity implements TimePic
         String title = headerTitleEditText.getText().toString();
         int repeatId = (int) textViewRepeat.getTag();
         GoogleManager.addHebrewEventToGoogleServer(this, title, repeatId, calendarStartTime, calendarEndTime, String.valueOf(eventCountPicker.getValue()));
+        MainActivity.recreateFlag = true;
         finish();
     }
 

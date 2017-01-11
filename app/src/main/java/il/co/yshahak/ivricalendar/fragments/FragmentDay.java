@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDaily;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDayHours;
 import il.co.yshahak.ivricalendar.calendar.google.Event;
@@ -64,7 +65,7 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        jewishCalendar = new JewCalendar();
+        jewishCalendar = (JewCalendar) MainActivity.currentJewCalendar.clone();
         jewishCalendar.shiftDay(position - FRONT_PAGE);
         getLoaderManager().initLoader(0, null, this);
     }
