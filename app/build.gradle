@@ -37,11 +37,16 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.google.android.gms:play-services-auth:9.8.0'
-    compile 'com.google.apis:google-api-services-calendar:v3-rev220-1.22.0' exclude module: 'httpclient'
-    compile 'com.google.api-client:google-api-client-android:1.19.0' exclude module: 'httpclient'
-    compile 'pub.devrel:easypermissions:0.1.5'
+    compile('com.google.apis:google-api-services-calendar:v3-rev249-1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.api-client:google-api-client-android:1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile 'pub.devrel:easypermissions:0.2.1'
     compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:1.0.1'
     compile 'me.angrybyte.picker:picker:1.2.0'
 
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 }
 apply plugin: 'com.google.gms.google-services'

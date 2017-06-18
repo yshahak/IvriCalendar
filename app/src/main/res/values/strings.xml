@@ -12,4 +12,5 @@
     <string name="display_day">יומי</string>
     <string name="display_header">תצוגה:</string>
     <string name="tag_month_position">tagMonthPosition</string>
+    <string name="title_activity_test">TestActivity</string>
 </resources>
