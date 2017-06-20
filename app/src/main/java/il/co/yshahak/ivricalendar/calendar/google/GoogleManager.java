@@ -19,8 +19,12 @@ import android.support.v4.app.ActivityCompat;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.model.Events;
+
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
@@ -73,11 +78,10 @@ public class GoogleManager {
                 accountListNames.clear();
                 while (cur.moveToNext()) {
                     int calID , color;
-                    String displayName = null;
-                    String accountName = null;
-                    String ownerName = null;
+                    String displayName;
+                    String accountName;
+                    String ownerName;
                     boolean visible;
-
                     // Get the field values
                     calID = cur.getInt(PROJECTION_ID_INDEX);
                     displayName = cur.getString(PROJECTION_DISPLAY_NAME_INDEX);
@@ -107,8 +111,7 @@ public class GoogleManager {
                         PreferenceManager.getDefaultSharedPreferences(activity).edit()
                                 .putLong(KEY_HEBREW_ID, calID).apply();
                     }
-//                    getEvent(activity, calID);
-                };
+                }
                 cur.close();
             }
 
@@ -129,6 +132,15 @@ public class GoogleManager {
                 ContentResolver.requestSync(account, authority, extras);
             }
         }
+    }
+
+    public static Uri asSyncAdapter(long begin, long end) {
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
+        ContentUris.appendId(builder, begin);
+        ContentUris.appendId(builder, end);
+        return builder.build();
     }
 
     public static Uri asSyncAdapter(Week week) {
@@ -305,5 +317,38 @@ public class GoogleManager {
                 .putExtra(CalendarContract.Events.TITLE, event.getEventTitle());
         ((Activity)context).startActivityForResult(intent, REQUEST_CODE_EDIT_EVENT);
     }
+
+    /**
+     * Fetch a list of the next 10 events from the primary calendar.
+     *
+     * @return List of Strings describing returned events.
+     * @throws IOException
+     */
+    private List<String> getDataFromApi() throws IOException {
+        // List the next 10 events from the primary calendar.
+        DateTime now = new DateTime(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(365));
+        List<String> eventStrings = new ArrayList<String>();
+        com.google.api.services.calendar.Calendar mService = null;
+        Events events = mService.events().list("primary")
+                .setMaxResults(10)
+                .setTimeMin(now)
+                .setOrderBy("startTime")
+                .setSingleEvents(true)
+                .execute();
+        List<com.google.api.services.calendar.model.Event> items = events.getItems();
+
+        for (com.google.api.services.calendar.model.Event event : items) {
+            DateTime start = event.getStart().getDateTime();
+            if (start == null) {
+                // All-day events don't have start times, so just use
+                // the start date.
+                start = event.getStart().getDate();
+            }
+            eventStrings.add(
+                    String.format("%s (%s)", event.getSummary(), start));
+        }
+        return eventStrings;
+    }
+
 
 }

@@ -1,9 +1,11 @@
 package il.co.yshahak.ivricalendar.calendar.google;
 
 /**
- * Created by yshah on 11/21/2016.
+ * Created by yshahak
+ * on 11/21/2016.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class CalendarAccount {
 
     private int accountId;
