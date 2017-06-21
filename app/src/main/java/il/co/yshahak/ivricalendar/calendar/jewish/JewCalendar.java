@@ -12,7 +12,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by yshahk on 12/28/2016.
+ * Created by yshahak
+ * on 12/28/2016.
  */
 
 @SuppressWarnings("WeakerAccess")
@@ -63,6 +64,18 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
                 shiftDayBackword();
             }
         }
+    }
+
+    private void shiftMonthForward(int offset){
+        int currentMonth = getJewishMonth();
+        int next = getJewishMonth() + 1;
+        if (next == 7){
+            setJewishYear(getJewishYear() + 1);
+        }
+        else if (next == 14 || (next == 13 && !isJewishLeapYear())) {
+            next = 1;
+        }
+        setJewishMonth(next);
     }
 
     private void shiftMonthForward(){

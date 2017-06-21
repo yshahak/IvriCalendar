@@ -10,6 +10,7 @@ import java.lang.ref.WeakReference;
 
 import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
 import il.co.yshahak.ivricalendar.fragments.FragmentDay;
+import il.co.yshahak.ivricalendar.fragments.FragmentHebrewMonth;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
@@ -49,13 +50,14 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
 //        Log.d("TAG", "getItem, position: "  + position);
-        BaseCalendarFragment fragment;
-        if (displayState == DISPLAY.MONTH) {
-            fragment = FragmentMonth.newInstance(position);
-        } else {
-            fragment = FragmentDay.newInstance(position);
-        }
-        fragmentLoaderSparseArray.put(position, new WeakReference<>(fragment));
+//        BaseCalendarFragment fragment;
+//        if (displayState == DISPLAY.MONTH) {
+//            fragment = FragmentMonth.newInstance(position);
+//        } else {
+//            fragment = FragmentDay.newInstance(position);
+//        }
+        Fragment fragment = FragmentHebrewMonth.newInstance(position);
+//        fragmentLoaderSparseArray.put(position, new WeakReference<>(fragment));
         return fragment;
     }
 
