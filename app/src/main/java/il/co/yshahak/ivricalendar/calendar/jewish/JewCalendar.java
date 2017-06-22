@@ -2,7 +2,9 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.util.Pools;
 
+import net.alexandroid.shpref.MyLog;
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
@@ -26,7 +28,20 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
     private int headOffst, trailOffse;
 
+    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(3);
+    private int oldOffset;
 
+    public static JewCalendar obtain() {
+        JewCalendar instance = sPool.acquire();
+        if ((instance == null)){
+            MyLog.d("create new JewCalendar");
+        }
+        return (instance != null) ? instance : new JewCalendar();
+    }
+
+    public void recycle() {
+        sPool.release(this);
+    }
 
     public JewCalendar(int offset){
         shiftMonth(offset);
@@ -41,7 +56,11 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         setOffsets();
     }
 
-    public void shiftMonth(int offset){
+    public JewCalendar shiftMonth(int offset){
+        MyLog.d("offset=" + offset + " | old=" + oldOffset);
+        oldOffset = offset - oldOffset;
+        offset = oldOffset;
+        MyLog.d("offset=" + offset);
         if (offset > 0) {
             for (int i = 0; i < offset; i++) {
                 shiftMonthForward();
@@ -52,6 +71,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             }
         }
         setOffsets();
+        return this;
     }
 
     public void shiftDay(int offset){

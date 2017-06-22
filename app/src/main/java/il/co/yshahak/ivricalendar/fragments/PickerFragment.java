@@ -28,10 +28,10 @@ public class PickerFragment extends BaseCalendarFragment {
         return fragment;
     }
 
-    @Override
-    public void setJewishCalendar(JewCalendar jewishCalendar) {
-        this.jewishCalendar = jewishCalendar;
-    }
+//    @Override
+//    public void setJewishCalendar(JewCalendar jewishCalendar) {
+//        this.jewishCalendar = jewishCalendar;
+//    }
 
     @Nullable
     @Override
@@ -49,7 +49,7 @@ public class PickerFragment extends BaseCalendarFragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(jewishCalendar));
+//        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(jewishCalendar));
         return root;
     }
 }

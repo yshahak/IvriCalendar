@@ -56,8 +56,8 @@ public class HebrewPickerDialog extends DialogFragment {
         viewPager.addOnPageChangeListener(pickerPagerAdapter);
         viewPager.setAdapter(pickerPagerAdapter);
         viewPager.setCurrentItem(FRONT_PAGE);
-        BaseCalendarFragment fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(FRONT_PAGE).get();
-        monthLabel.setText(fragment.getJewishCalendar().getMonthName() + " , " + fragment.getJewishCalendar().getYearName());
+//        BaseCalendarFragment fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(FRONT_PAGE).get();
+//        monthLabel.setText(fragment.getJewishCalendar().getMonthName() + " , " + fragment.getJewishCalendar().getYearName());
         return root;
     }
 
@@ -78,13 +78,13 @@ public class HebrewPickerDialog extends DialogFragment {
         @Override
         public Fragment getItem(int position) {
             BaseCalendarFragment item = PickerFragment.newInstance(position);
-            if (CalendarPagerAdapter.fragmentLoaderSparseArray.get(position) != null && CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get() != null) {
-                BaseCalendarFragment fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
-                item.setJewishCalendar(fragment.getJewishCalendar());
-            } else {
-                item.setJewishCalendar(new JewCalendar());
-                item.getJewishCalendar().shiftMonth(position - FRONT_PAGE);
-            }
+//            if (CalendarPagerAdapter.fragmentLoaderSparseArray.get(position) != null && CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get() != null) {
+//                BaseCalendarFragment fragment = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position).get();
+//                item.setJewishCalendar(fragment.getJewishCalendar());
+//            } else {
+//                item.setJewishCalendar(new JewCalendar());
+//                item.getJewishCalendar().shiftMonth(position - FRONT_PAGE);
+//            }
             return item;
         }
 
@@ -104,9 +104,9 @@ public class HebrewPickerDialog extends DialogFragment {
             // Do we already have this fragment?
             String name = "android:switcher:" + R.id.view_pager + ":" + position;// makeFragmentName(container.getId(), itemId);
             BaseCalendarFragment fragment = (BaseCalendarFragment) supportFragmentManager.findFragmentByTag(name);
-            if (fragment != null) {
-                monthLabel.setText(fragment.getJewishCalendar().getMonthName() + " , " + fragment.getJewishCalendar().getYearName());
-            }
+//            if (fragment != null) {
+//                monthLabel.setText(fragment.getJewishCalendar().getMonthName() + " , " + fragment.getJewishCalendar().getYearName());
+//            }
         }
 
         @Override

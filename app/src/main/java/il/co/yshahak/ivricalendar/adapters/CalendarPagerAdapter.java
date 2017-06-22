@@ -3,8 +3,12 @@ package il.co.yshahak.ivricalendar.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.util.SparseArray;
+import android.view.ViewGroup;
+
+import net.alexandroid.shpref.MyLog;
 
 import java.lang.ref.WeakReference;
 
@@ -14,35 +18,36 @@ import il.co.yshahak.ivricalendar.fragments.FragmentHebrewMonth;
 import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
 
 /**
- * Created by yshahak on 06/10/2016.
+ * Created by yshahak
+ * on 06/10/2016.
  */
 public class CalendarPagerAdapter extends FragmentPagerAdapter {
     public static DISPLAY displayState = DISPLAY.MONTH;
     public static boolean dropPages;
     public final static int FRONT_PAGE = 500;
     public static int selectedPage = FRONT_PAGE;
-    private final FragmentManager mFragmentManager;
+//    private final FragmentManager mFragmentManager;
 
-    public static SparseArray<WeakReference<BaseCalendarFragment>> fragmentLoaderSparseArray = new SparseArray<>();
+//    public static SparseArray<WeakReference<BaseCalendarFragment>> fragmentLoaderSparseArray = new SparseArray<>();
 
 
     public CalendarPagerAdapter(FragmentManager supportFragmentManager) {
         super(supportFragmentManager);
-        mFragmentManager = supportFragmentManager;
+//        mFragmentManager = supportFragmentManager;
     }
 
     @Override
     public void notifyDataSetChanged() {
         if (dropPages) {
-            FragmentTransaction mCurTransaction = mFragmentManager.beginTransaction();
-            if (mCurTransaction != null) {
-                for (Fragment fragment : mFragmentManager.getFragments()) {
-                    if (fragment != null) {
-                        mCurTransaction.remove(fragment);
-                    }
-                }
-                mCurTransaction.commitNow();
-            }
+//            FragmentTransaction mCurTransaction = mFragmentManager.beginTransaction();
+//            if (mCurTransaction != null) {
+//                for (Fragment fragment : mFragmentManager.getFragments()) {
+//                    if (fragment != null) {
+//                        mCurTransaction.remove(fragment);
+//                    }
+//                }
+//                mCurTransaction.commitNow();
+//            }
         }
         super.notifyDataSetChanged();
     }
@@ -61,11 +66,11 @@ public class CalendarPagerAdapter extends FragmentPagerAdapter {
         return fragment;
     }
 
-    @Override
-    public int getItemPosition(Object object) {
-//        Log.d("TAG", "getItemPosition: "  + object.toString());
-        return dropPages ? POSITION_NONE : super.getItemPosition(object);
-    }
+//    @Override
+//    public int getItemPosition(Object object) {
+////        Log.d("TAG", "getItemPosition: "  + object.toString());
+//        return dropPages ? POSITION_NONE : super.getItemPosition(object);
+//    }
 
     @Override
     public int getCount() {

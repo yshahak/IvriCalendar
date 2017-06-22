@@ -13,7 +13,7 @@ import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 public  class BaseCalendarFragment extends Fragment {
     static final String KEY_POSITION = "keyPosition";
 
-    JewCalendar jewishCalendar;
+//    JewCalendar jewishCalendar;
 
     int position;
 
@@ -29,12 +29,12 @@ public  class BaseCalendarFragment extends Fragment {
         this.position = getArguments().getInt(KEY_POSITION);
     }
 
-    public void setJewishCalendar(JewCalendar jewishCalendar){
-        this.jewishCalendar = jewishCalendar;
-    }
-
-    public JewCalendar getJewishCalendar() {
-        return jewishCalendar;
-    }
+//    public void setJewishCalendar(JewCalendar jewishCalendar){
+//        this.jewishCalendar = jewishCalendar;
+//    }
+//
+//    public JewCalendar getJewishCalendar() {
+//        return jewishCalendar;
+//    }
 
 }

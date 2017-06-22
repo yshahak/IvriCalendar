@@ -82,13 +82,13 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private void setDay(ViewHolder holder, int position){
         jewCalendar.setJewishDayOfMonth(position + 1);
         holder.label.setText(jewCalendar.getDayLabel());
-        if (jewCalendar.getJewishMonth() == MainActivity.currentJewCalendar.getJewishMonth()) { //todo compare also year...
-            if (position + 1 == MainActivity.currentJewCalendar.getJewishDayOfMonth()) {
-                holder.label.setBackgroundColor(primaryColor);
-            } else {
-                holder.label.setBackgroundColor(transparentColor);
-            }
-        }
+//        if (jewCalendar.getJewishMonth() == MainActivity.currentJewCalendar.getJewishMonth()) { //todo compare also year...
+//            if (position + 1 == MainActivity.currentJewCalendar.getJewishDayOfMonth()) {
+//                holder.label.setBackgroundColor(primaryColor);
+//            } else {
+//                holder.label.setBackgroundColor(transparentColor);
+//            }
+//        }
         List<Event> events = eventSparseArray.get(position + 1);
         if (events == null) {
             return;

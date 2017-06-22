@@ -65,8 +65,8 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        jewishCalendar = (JewCalendar) MainActivity.currentJewCalendar.clone();
-        jewishCalendar.shiftDay(position - FRONT_PAGE);
+//        jewishCalendar = (JewCalendar) MainActivity.currentJewCalendar.clone();
+//        jewishCalendar.shiftDay(position - FRONT_PAGE);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -78,8 +78,8 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
 
         recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewEvents.setHasFixedSize(true);
-        ((TextView)root.findViewById(R.id.day_label)).setText(jewishCalendar.getDayLabel() + "\n"
-                + JewCalendar.hebrewDateFormatter.formatDayOfWeek(jewishCalendar));
+//        ((TextView)root.findViewById(R.id.day_label)).setText(jewishCalendar.getDayLabel() + "\n"
+//                + JewCalendar.hebrewDateFormatter.formatDayOfWeek(jewishCalendar));
         final RecyclerView recyclerViewHours = (RecyclerView)root.findViewById(R.id.recycler_view_hours);
         recyclerViewHours.setLayoutManager(new LinearLayoutManager(getActivity())
         {
@@ -113,9 +113,9 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-        Uri uri = GoogleManager.asSyncAdapterDay(jewishCalendar);
+//        Uri uri = GoogleManager.asSyncAdapterDay(jewishCalendar);
         return new CursorLoader(getActivity(),  // Context
-                uri, // URI
+                Uri.EMPTY, // URI
                 INSTANCE_PROJECTION,                // Projection
                 WHERE_CALENDARS_SELECTED,                           // Selection
                 WHERE_CALENDARS_ARGS,                           // Selection args

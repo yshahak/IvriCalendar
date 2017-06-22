@@ -64,8 +64,8 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        jewishCalendar = (JewCalendar) MainActivity.currentJewCalendar.clone();
-        jewishCalendar.shiftMonth(position - FRONT_PAGE);
+//        jewishCalendar = (JewCalendar) MainActivity.currentJewCalendar.clone();
+//        jewishCalendar.shiftMonth(position - FRONT_PAGE);
         if (events.size() == 0) {
             getLoaderManager().initLoader(0, null, this);
         }
@@ -103,9 +103,9 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-        Uri uri = GoogleManager.asSyncAdapterMonth(jewishCalendar);
+//        Uri uri = GoogleManager.asSyncAdapterMonth(jewishCalendar);
         return new CursorLoader(getActivity(),  // Context
-                uri, // URI
+                Uri.EMPTY, // URI
                 INSTANCE_PROJECTION,                // Projection
                 WHERE_CALENDARS_SELECTED,                           // Selection
                 WHERE_CALENDARS_ARGS,                           // Selection args
@@ -125,11 +125,11 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
 
     private void setRecyclerView(){
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
-        if (adapter == null) {
-            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(jewishCalendar, events, (View.OnClickListener) getActivity()));
-        } else {
-            adapter.notifyDataSetChanged();
-        }
+//        if (adapter == null) {
+//            recyclerView.setAdapter(new CalendarRecyclerAdapterMonth(jewishCalendar, events, (View.OnClickListener) getActivity()));
+//        } else {
+//            adapter.notifyDataSetChanged();
+//        }
     }
 
     public RecyclerView getRecyclerView() {

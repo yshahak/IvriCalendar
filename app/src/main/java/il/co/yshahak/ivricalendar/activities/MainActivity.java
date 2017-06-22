@@ -44,7 +44,7 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.KEY_HEBREW_CAL
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener {
 
 //    public static boolean needToRefreshCalendarVisibility;
-    public static JewCalendar currentJewCalendar = new JewCalendar();
+//    public static JewCalendar currentJewCalendar = new JewCalendar();
 
     private ViewPager viewPager;
     private DrawerLayout drawerLayout;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.addOnPageChangeListener(this);
-//        viewPager.setOffscreenPageLimit(1);
+        viewPager.setOffscreenPageLimit(1);
         createEventFrameLayout = (LinearLayout) findViewById(R.id.add_event_layout);
         calendarsList = (LinearLayout) findViewById(R.id.calender_list);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         displayChooser.setOnCheckedChangeListener(this);
         currentDay = (TextView) findViewById(R.id.current_day);
         currentDay.setOnClickListener(this);
-        setTitle(currentJewCalendar.getMonthName() + " , " + currentJewCalendar.getYearName());
+//        setTitle(currentJewCalendar.getMonthName() + " , " + currentJewCalendar.getYearName());
 
         setDrawerMenu();
 
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         setPagerAdapter();
         DrawerHelper.setDrawerMenu(calendarsList, this);
-        currentDay.setText(currentJewCalendar.getDayLabel());
+//        currentDay.setText(currentJewCalendar.getDayLabel());
 //        Log.d("TAG", "onResume");
     }
 
@@ -152,18 +152,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case R.id.event_ivri:
                         if (CalendarPagerAdapter.selectedPage == FRONT_PAGE){
-                            Date date = currentJewCalendar.getTime();
-                            CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
+//                            Date date = currentJewCalendar.getTime();
+//                            CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
 
                         } else {
-                            WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
-                            if (weakReference != null) {
-                                BaseCalendarFragment fragmentLoader = weakReference.get();
-                                if (fragmentLoader != null) {
-                                    Date date = fragmentLoader.getJewishCalendar().getTime();
-                                    CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
-                                }
-                            }
+//                            WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
+//                            if (weakReference != null) {
+//                                BaseCalendarFragment fragmentLoader = weakReference.get();
+//                                if (fragmentLoader != null) {
+//                                    Date date = fragmentLoader.getJewishCalendar().getTime();
+//                                    CreteIvriEventActivity.currentCalendar = new JewCalendar(date);
+//                                }
+//                            }
                         }
                         startActivity(new Intent(this, CreteIvriEventActivity.class));
                         break;
@@ -194,13 +194,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             drawerLayout.closeDrawer(GravityCompat.START);
         } else if (backToMonthDisplay) {
             CalendarPagerAdapter.displayState = CalendarPagerAdapter.DISPLAY.MONTH;
-            WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
-            if (weakReference != null && weakReference.get() != null) {
-                JewCalendar current = weakReference.get().getJewishCalendar();
-                int shift = JewCalendar.getMonthDifference(current, new JewCalendar());
-                viewPager.setCurrentItem(FRONT_PAGE + shift);
-                setTitle(current.getMonthName() + " , " + current.getYearName());
-            }
+//            WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(CalendarPagerAdapter.selectedPage);
+//            if (weakReference != null && weakReference.get() != null) {
+//                JewCalendar current = weakReference.get().getJewishCalendar();
+//                int shift = JewCalendar.getMonthDifference(current, new JewCalendar());
+//                viewPager.setCurrentItem(FRONT_PAGE + shift);
+//                setTitle(current.getMonthName() + " , " + current.getYearName());
+//            }
             displayChooser.check(R.id.display_month);
             backToMonthDisplay = false;
 
@@ -277,13 +277,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 //        Log.d("TAG", "onPageSelected: " + position);
         CalendarPagerAdapter.selectedPage = position;
-        WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
-        if (weakReference != null) {
-            BaseCalendarFragment fragmentLoader = weakReference.get();
-            if (fragmentLoader != null) {
-                setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
-            }
-        }
+//        WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
+//        if (weakReference != null) {
+//            BaseCalendarFragment fragmentLoader = weakReference.get();
+//            if (fragmentLoader != null) {
+//                setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
+//            }
+//        }
     }
 
     @Override

@@ -26,10 +26,10 @@ public class ApplicationModule {
         this.application = application;
     }
 
-    @Provides @Singleton
+    @Provides
     public JewCalendar provideJewCalendar(){
         Log.d("TAG", "jew calendar created");
-        return new JewCalendar();
+        return JewCalendar.obtain();
     }
 
 //    @Provides
