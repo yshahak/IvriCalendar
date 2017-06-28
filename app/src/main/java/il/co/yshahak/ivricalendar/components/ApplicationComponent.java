@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.fragments.FragmentHebrewMonth;
+import il.co.yshahak.ivricalendar.fragments.HebrewMonthView;
 import il.co.yshahak.ivricalendar.modules.ApplicationModule;
 
 /**
@@ -17,6 +18,8 @@ import il.co.yshahak.ivricalendar.modules.ApplicationModule;
 @Singleton
 @Component(modules = {ApplicationModule.class})
 public interface ApplicationComponent {
+
+    void inject(HebrewMonthView hebrewMonthView);
 
     void inject(MyApplication target);
 

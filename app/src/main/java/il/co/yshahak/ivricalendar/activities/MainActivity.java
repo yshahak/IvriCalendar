@@ -31,6 +31,7 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.adapters.CalendarMonthPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
@@ -132,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pagerAdapter.notifyDataSetChanged();
             CalendarPagerAdapter.dropPages = false;
         } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
-            viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
+//            viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
+            viewPager.setAdapter(new CalendarMonthPagerAdapter());
             viewPager.setCurrentItem(FRONT_PAGE);
         }
         recreateFlag = false;

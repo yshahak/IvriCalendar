@@ -29,7 +29,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     private int headOffst, trailOffse;
 
     private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(3);
-    private int oldOffset;
+    private int oldPosition;
 
     public static JewCalendar obtain() {
         JewCalendar instance = sPool.acquire();
@@ -56,23 +56,48 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         setOffsets();
     }
 
-    public JewCalendar shiftMonth(int offset){
-        MyLog.d("offset=" + offset + " | old=" + oldOffset);
-        oldOffset = offset - oldOffset;
-        offset = oldOffset;
-        MyLog.d("offset=" + offset);
+    public JewCalendar shiftMonth(int position){
+        int offset = position - oldPosition;
+        MyLog.d("position=" + position + " | old=" + oldPosition + " offset=" + offset);
         if (offset > 0) {
-            for (int i = 0; i < offset; i++) {
-                shiftMonthForward();
-            }
+            shiftForward(offset);
+//            for (int i = 0; i < offset; i++) {
+//                shiftMonthForward();
+//            }
         } else if (offset < 0){
-            for (int i = offset * (-1); i > 0; i--) {
-                shiftMonthBackword();
-            }
+            shiftBackward(offset);
+//            for (int i = offset * (-1); i > 0; i--) {
+//                shiftMonthBackword();
+//            }
         }
         setOffsets();
+        oldPosition = position;
         return this;
     }
+
+    private void shiftForward(int offset){
+        int current = getJewishMonth();
+        int next = getJewishMonth() + offset;
+        if (next >= 7 && current < 7){
+            setJewishYear(getJewishYear() + 1);
+        }
+        else if (next >= 14 || (next >= 13 && !isJewishLeapYear())) {
+            next = next - (isJewishLeapYear() ? 13 : 12);
+        }
+        setJewishMonth(next);
+    }
+
+    private void shiftBackward(int offset) {
+        int current = getJewishMonth();
+        int previous = getJewishMonth() + offset;
+        if (previous <= 0) {
+            previous = previous + (isJewishLeapYear() ? 13 : 12);
+        } else if (current > 6 && previous <= 6){
+            setJewishYear(getJewishYear() - 1);
+        }
+        setJewishMonth(previous);
+    }
+
 
     public void shiftDay(int offset){
         if (offset > 0) {

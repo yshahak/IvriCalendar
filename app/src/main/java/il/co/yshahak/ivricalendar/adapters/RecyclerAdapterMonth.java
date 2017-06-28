@@ -68,10 +68,11 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
         holder.cellContainer.removeAllViews();
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_DAY_CELL:
+                holder.label.setText(hebrewDateFormatter.formatHebrewNumber(position + 1));
                 setDay(holder, position - jewCalendar.getHeadOffset());
                 break;
-            default:
-                holder.label.setBackgroundColor(transparentColor);
+//            default:
+//                holder.label.setBackgroundColor(transparentColor);
 
         }
     }

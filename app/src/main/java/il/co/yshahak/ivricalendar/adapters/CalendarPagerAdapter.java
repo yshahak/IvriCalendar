@@ -21,7 +21,7 @@ import il.co.yshahak.ivricalendar.fragments.FragmentMonth;
  * Created by yshahak
  * on 06/10/2016.
  */
-public class CalendarPagerAdapter extends FragmentPagerAdapter {
+public class CalendarPagerAdapter extends FragmentStatePagerAdapter {
     public static DISPLAY displayState = DISPLAY.MONTH;
     public static boolean dropPages;
     public final static int FRONT_PAGE = 500;
