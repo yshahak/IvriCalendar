@@ -27,16 +27,11 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
-import java.util.Date;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.adapters.CalendarMonthPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
-import il.co.yshahak.ivricalendar.fragments.BaseCalendarFragment;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
@@ -133,8 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pagerAdapter.notifyDataSetChanged();
             CalendarPagerAdapter.dropPages = false;
         } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
-//            viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
-            viewPager.setAdapter(new CalendarMonthPagerAdapter());
+            viewPager.setAdapter(new CalendarPagerAdapter(getSupportFragmentManager()));
             viewPager.setCurrentItem(FRONT_PAGE);
         }
         recreateFlag = false;

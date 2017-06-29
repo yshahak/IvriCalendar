@@ -39,26 +39,38 @@ public class FragmentHebrewMonth extends BaseCalendarFragment {
 
     @Inject
     JewCalendar jewCalendar;
+    @Inject
+    DividerItemDecoration itemDecoration;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ((MyApplication)getActivity().getApplication()).getComponent().inject(this);
-        jewCalendar.shiftMonth(position - FRONT_PAGE);
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
+        ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
+
+        final ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
         RecyclerView daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
-        RecyclerView recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
         daysRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-//        daysRecycler.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        daysRecycler.addItemDecoration(itemDecoration);
         daysRecycler.setHasFixedSize(true);
         daysRecycler.setAdapter(new DaysHeaderAdapter());
+        final RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
+        recyclerView.addItemDecoration(itemDecoration);
 
-//        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-////        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
-//        recyclerView.setHasFixedSize(true);
-//        recyclerView.setAdapter(new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary)));
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                jewCalendar.shiftMonth(position - FRONT_PAGE);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.setAdapter(new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary)));
+                    }
+                });
+            }
+        }).start();
         return root;
     }
 

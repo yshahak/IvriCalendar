@@ -11,6 +11,7 @@ import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -28,8 +29,9 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
     private int headOffst, trailOffse;
 
-    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(3);
+    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(5);
     private int oldPosition;
+    HashSet indexes = new HashSet();
 
     public static JewCalendar obtain() {
         JewCalendar instance = sPool.acquire();
@@ -60,15 +62,15 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         int offset = position - oldPosition;
         MyLog.d("position=" + position + " | old=" + oldPosition + " offset=" + offset);
         if (offset > 0) {
-            shiftForward(offset);
-//            for (int i = 0; i < offset; i++) {
-//                shiftMonthForward();
-//            }
+//            shiftForward(offset);
+            for (int i = 0; i < offset; i++) {
+                shiftMonthForward();
+            }
         } else if (offset < 0){
-            shiftBackward(offset);
-//            for (int i = offset * (-1); i > 0; i--) {
-//                shiftMonthBackword();
-//            }
+//            shiftBackward(offset);
+            for (int i = offset * (-1); i > 0; i--) {
+                shiftMonthBackword();
+            }
         }
         setOffsets();
         oldPosition = position;

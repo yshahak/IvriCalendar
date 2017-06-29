@@ -10,7 +10,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+
+import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 
 /**
  * Created by Yaakov Shahak
@@ -32,10 +35,10 @@ public class ApplicationModule {
         return JewCalendar.obtain();
     }
 
-//    @Provides
-//    public JewCalendar provideJewCalendarWithDate(Date date){
-//        return new JewCalendar(date);
-//    }
+    @Provides @Singleton
+    public DividerItemDecoration getItemDecoration(Context context){
+        return new DividerItemDecoration(context, GRID);
+    }
 
     @Provides @Singleton
     public Context provideContext() {
