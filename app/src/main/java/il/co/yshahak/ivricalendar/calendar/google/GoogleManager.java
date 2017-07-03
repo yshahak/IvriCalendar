@@ -310,11 +310,11 @@ public class GoogleManager {
         return values;
     }
 
-    public static void openEvent(Context context, Event event){
-        Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
+    public static void openEvent(Context context, EventInstance eventInstance){
+        Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventInstance.getEventId());
         Intent intent = new Intent(Intent.ACTION_VIEW)
                 .setData(uri)
-                .putExtra(CalendarContract.Events.TITLE, event.getEventTitle());
+                .putExtra(CalendarContract.Events.TITLE, eventInstance.getEventTitle());
         ((Activity)context).startActivityForResult(intent, REQUEST_CODE_EDIT_EVENT);
     }
 
@@ -349,6 +349,8 @@ public class GoogleManager {
         }
         return eventStrings;
     }
+
+
 
 
 }

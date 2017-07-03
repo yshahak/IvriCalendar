@@ -22,7 +22,7 @@ import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
@@ -165,10 +165,10 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
                 if (allDayEvent){
                     end = start;
                 }
-                Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
+                EventInstance eventInstance = new EventInstance(eventId, title, allDayEvent, start, end, displayColor, calendarName);
                 for (Day day : month.getDays()){
                     if (start > day.getStartDayInMillis() && end < day.getEndDayInMillis()){
-                        day.getGoogleEvents().add(event);
+                        day.getGoogleEventInstances().add(eventInstance);
                         break;
                     }
                 }

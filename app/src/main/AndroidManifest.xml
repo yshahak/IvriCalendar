@@ -30,13 +30,13 @@
             <!-- <action android:name="android.intent.action.EDIT" /> -->
             <!-- <action android:name="android.intent.action.INSERT" /> -->
             <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-            <!-- <data android:mimeType="com.android.calendar/events" /> -->
+            <!-- <data android:mimeType="com.android.calencustomEventsents" /> -->
 
 
             <!-- <data android:mimeType="time/epoch" /> -->
             <!-- <data android:host="com.android.calendar"/> -->
             <!-- <data android:scheme="content"/> -->
-            <!-- <data android:mimeType="com.android.calendar/events" /> -->
+            <!-- <data android:mimeType="com.android.calencustomEventsents" /> -->
             <!-- </intent-filter> -->
         </activity>
         <activity

@@ -1,20 +1,13 @@
 package il.co.yshahak.ivricalendar.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.List;
-
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
-import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar.hebrewDateFormatter;

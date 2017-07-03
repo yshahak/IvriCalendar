@@ -22,4 +22,11 @@ public class ExampleUnitTest {
         assertEquals((System.currentTimeMillis() - now < 18), true);
 //        assertEquals(4, 2 + 2);
     }
+
+    @Test
+    public void testTimes(){
+        JewCalendar jewCalendar = new JewCalendar();
+        jewCalendar.getBeginOfMonth();
+        jewCalendar.getEndOfMonth();
+    }
 }

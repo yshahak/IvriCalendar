@@ -16,22 +16,17 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDaily;
 import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterDayHours;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
-import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
-import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
-import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_COLOR_INDEX;
@@ -50,8 +45,8 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
 
     private RecyclerView recyclerViewEvents;
 
-    private ArrayList<Event> dayEvents = new ArrayList<>();
-    private SparseArray<List<Event>> eventToHourMap = new SparseArray<>();
+    private ArrayList<EventInstance> dayEventInstances = new ArrayList<>();
+    private SparseArray<List<EventInstance>> eventToHourMap = new SparseArray<>();
     private ArrayList<Section> sections = new ArrayList<>();
     private boolean enableScrolling = true;
 
@@ -172,19 +167,19 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
                     end = start;
                 }
 //                Log.d("TAG", "begin: " + start + " end: " + end);
-                Event event = new Event(eventId, title, allDayEvent, start, end, displayColor, calendarName);
-                event.setBeginDate(new Date(start));
-                event.setEndDate(new Date(end));
-                int endHour = event.getEndDate().getMinutes() > 0 ? event.getEndDate().getHours() + 1 : event.getEndDate().getHours();
-                for (int i = event.getBeginDate().getHours() ; i < endHour; i++){
-                    List<Event> eventList= eventToHourMap.get(i);
-                    if (eventList == null) {
-                        eventList = new ArrayList<>();
-                        eventToHourMap.put(i, eventList);
+                EventInstance eventInstance = new EventInstance(eventId, title, allDayEvent, start, end, displayColor, calendarName);
+                eventInstance.setBeginDate(new Date(start));
+                eventInstance.setEndDate(new Date(end));
+                int endHour = eventInstance.getEndDate().getMinutes() > 0 ? eventInstance.getEndDate().getHours() + 1 : eventInstance.getEndDate().getHours();
+                for (int i = eventInstance.getBeginDate().getHours(); i < endHour; i++){
+                    List<EventInstance> eventInstanceList = eventToHourMap.get(i);
+                    if (eventInstanceList == null) {
+                        eventInstanceList = new ArrayList<>();
+                        eventToHourMap.put(i, eventInstanceList);
                     }
-                    eventList.add(event);
+                    eventInstanceList.add(eventInstance);
                 }
-                dayEvents.add(event);
+                dayEventInstances.add(eventInstance);
 
             }
             processDay();
@@ -203,13 +198,13 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
         boolean activeRange = false;
         section.range.x = 0;
         for (int hour = 0; hour < 23; hour++) {
-            List<Event> events = eventToHourMap.get(hour);
-            if (events == null || events.size() == 0) {
+            List<EventInstance> eventInstances = eventToHourMap.get(hour);
+            if (eventInstances == null || eventInstances.size() == 0) {
                 if (activeRange) {
                     activeRange = false;
                     Section newSection = new Section();
-                    for (Event event : section.sectionEvents){
-                        int eventTime = (event.getEndDate().getHours() * 60) + event.getEndDate().getMinutes();
+                    for (EventInstance eventInstance : section.sectionEventInstances){
+                        int eventTime = (eventInstance.getEndDate().getHours() * 60) + eventInstance.getEndDate().getMinutes();
                         if (section.range.y == 0){
                             section.range.y = eventTime;
                             newSection.range.x = eventTime;
@@ -226,8 +221,8 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
                 if (!activeRange) {
                     activeRange = true;
                     Section newSection = new Section();
-                    for(Event event : events){
-                        int eventTime = (event.getBeginDate().getHours() * 60) + event.getBeginDate().getMinutes();
+                    for(EventInstance eventInstance : eventInstances){
+                        int eventTime = (eventInstance.getBeginDate().getHours() * 60) + eventInstance.getBeginDate().getMinutes();
                         if (newSection.range.x == 0){
                             section.range.y = eventTime;
                             newSection.range.x = eventTime;
@@ -239,9 +234,9 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
                     sections.add(section);
                     section = newSection;
                 }
-                for (Event event : events) {
-                    if (!section.sectionEvents.contains(event)) {
-                        section.sectionEvents.add(event);
+                for (EventInstance eventInstance : eventInstances) {
+                    if (!section.sectionEventInstances.contains(eventInstance)) {
+                        section.sectionEventInstances.add(eventInstance);
                     }
                 }
             }
@@ -251,7 +246,7 @@ public class FragmentDay extends BaseCalendarFragment implements LoaderManager.L
     }
 
     public class Section {
-        public List<Event> sectionEvents = new ArrayList<>();
+        public List<EventInstance> sectionEventInstances = new ArrayList<>();
         public Point range = new Point();
     }
 

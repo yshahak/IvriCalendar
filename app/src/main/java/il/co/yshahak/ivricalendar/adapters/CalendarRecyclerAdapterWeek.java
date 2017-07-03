@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.activities.MainActivity;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
@@ -62,7 +62,7 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
 //        Calendar cal = day.getCalendarForWeekDisplay();
 //        cal.set(Calendar.HOUR, hour);
 //        long time = cal.getTimeInMillis();
-//        for (Event event : day.getGoogleEvents()){
+//        for (EventInstance event : day.getGoogleEventInstances()){
 //            if (event.getBegin() >= time && event.getBegin()  < (time + Hour)) {
 //                int emptyWeight =(int)((event.getBegin() - time) / 1000 / 60 / 15);
 //                if (emptyWeight > 0){
@@ -101,9 +101,9 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
 
         @Override
         public void onClick(View view) {
-            Event event = (Event) view.getTag();
-            if (event != null) {
-                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
+            EventInstance eventInstance = (EventInstance) view.getTag();
+            if (eventInstance != null) {
+                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventInstance.getEventId());
                 Intent intent = new Intent(Intent.ACTION_VIEW)
                         .setData(uri);
                 itemView.getContext().startActivity(intent);
@@ -113,12 +113,12 @@ public class CalendarRecyclerAdapterWeek extends RecyclerView.Adapter<CalendarRe
 
         @Override
         public boolean onLongClick(View view) {
-            Event event = (Event) view.getTag();
-            if (event != null) {
-                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId());
+            EventInstance eventInstance = (EventInstance) view.getTag();
+            if (eventInstance != null) {
+                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventInstance.getEventId());
                 Intent intent = new Intent(Intent.ACTION_EDIT)
                         .setData(uri)
-                        .putExtra(CalendarContract.Events.TITLE, event.getEventTitle());
+                        .putExtra(CalendarContract.Events.TITLE, eventInstance.getEventTitle());
                 ((Activity)itemView.getContext()).startActivityForResult(intent, REQUEST_CODE_EDIT_EVENT);
             }
             return true;

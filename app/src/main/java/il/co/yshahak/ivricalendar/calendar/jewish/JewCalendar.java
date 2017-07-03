@@ -8,11 +8,12 @@ import net.alexandroid.shpref.MyLog;
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by yshahak
@@ -31,7 +32,10 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(5);
     private int oldPosition;
-    HashSet indexes = new HashSet();
+
+    public JewCalendar(int jewishYear, int jewishMonth, int day) {
+        super(jewishYear, jewishMonth, day);
+    }
 
     public static JewCalendar obtain() {
         JewCalendar instance = sPool.acquire();
@@ -213,17 +217,17 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         return hebrewDateFormatter.formatHebrewNumber(getJewishDayOfMonth());
     }
 
-    public long getBeginInMillis() {
+    public long getBeginOfDay() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(getTime());
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis();
     }
 
-    public long getEndInMillis() {
+    public long getEndOfDay() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(getTime());
         calendar.set(Calendar.HOUR_OF_DAY, 23);
@@ -327,7 +331,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public Object clone() {
-        JewCalendar clone = null;
+        JewCalendar clone;
 
         clone = (JewCalendar) super.clone();
         clone.headOffst = this.headOffst;
@@ -335,4 +339,34 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         return clone;
     }
 
+    public static int getDayOfMonth(long date) {
+        JewCalendar jewCalendar = new JewCalendar(new Date(date));
+        return jewCalendar.getJewishDayOfMonth();
+    }
+
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss", Locale.US);
+
+    public Calendar getTime(boolean reset) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(getGregorianYear(), getGregorianMonth() - 1, getGregorianDayOfMonth(), 0, 0, 0);
+        return cal;
+    }
+
+    public long getBeginOfMonth(){
+        JewCalendar copy = new JewCalendar(this.getJewishYear(), this.getJewishMonth(), 1);
+        System.out.println(hebrewDateFormatter.format(copy));
+        System.out.println(simpleDateFormat.format(copy.getTime(true).getTime()));
+
+        return copy.getTime().getTime();
+    }
+
+    public long getEndOfMonth(){
+        JewCalendar copy = (JewCalendar) clone();
+        copy.shiftForward(1);
+        copy.setJewishDate(copy.getJewishYear(), copy.getJewishMonth(), 1);
+        System.out.println(hebrewDateFormatter.format(copy));
+        System.out.println(simpleDateFormat.format(copy.getTime(true).getTime()));
+        return copy.getTime().getTime();
+    }
 }

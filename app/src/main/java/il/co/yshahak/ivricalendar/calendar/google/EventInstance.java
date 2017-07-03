@@ -6,9 +6,9 @@ import java.util.Date;
  * Created by yshahak on 14/10/2016.
  */
 
-public class Event {
+public class EventInstance {
 
-    private int eventId;
+    private long eventId;
     private String eventTitle;
     private boolean allDayEvent;
     private long begin, end;
@@ -17,7 +17,7 @@ public class Event {
     private int dayOfMonth;
     private Date beginDate, endDate;
 
-    public Event(int eventId, String eventTitle, boolean allDayEvent, long begin, long end, int displayColor, String calendarDisplayName) {
+    public EventInstance(long eventId, String eventTitle, boolean allDayEvent, long begin, long end, int displayColor, String calendarDisplayName) {
         this.eventId = eventId;
         this.eventTitle = (eventTitle != null && eventTitle.length() > 0) ? eventTitle : "(ללא כותרת)";
         this.allDayEvent = allDayEvent;
@@ -27,7 +27,7 @@ public class Event {
         this.calendarDisplayName = calendarDisplayName;
     }
 
-    public Event(int eventId, String eventTitle, boolean allDayEvent, long begin, long end, int displayColor, String calendarDisplayName, int dayOfMonth) {
+    public EventInstance(long eventId, String eventTitle, boolean allDayEvent, long begin, long end, int displayColor, String calendarDisplayName, int dayOfMonth) {
         this.eventId = eventId;
         this.eventTitle = (eventTitle != null && eventTitle.length() > 0) ? eventTitle : "(ללא כותרת)";
         this.allDayEvent = allDayEvent;
@@ -46,7 +46,7 @@ public class Event {
         this.endDate = endDate;
     }
 
-    public int getEventId() {
+    public long getEventId() {
         return eventId;
     }
 

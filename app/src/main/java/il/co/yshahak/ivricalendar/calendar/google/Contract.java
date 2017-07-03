@@ -89,6 +89,7 @@ public class Contract {
 
 
     // The indices for the projection array above.
+    public static final int PROJECTION_EVENT_ID = 0;
     public static final int PROJECTION_BEGIN_INDEX = 1;
     public static final int PROJECTION_END_INDEX = 2;
     public static final int PROJECTION_TITLE_INDEX = 3;
@@ -142,7 +143,7 @@ public class Contract {
             title = cur.getString(PROJECTION_TITLE_INDEX);
 
             // Do something with the values.
-            Log.i("TAG", "Event:  " + title);
+            Log.i("TAG", "EventInstance:  " + title);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(beginVal);
             DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -188,7 +189,7 @@ public class Contract {
             String title;
             title = cur.getString(PROJECTION_TITLE_INDEX);
             arrayList.add(title);
-            Log.i("TAG", "Event:  " + title);
+            Log.i("TAG", "EventInstance:  " + title);
         }
         cur.close();
         return arrayList;

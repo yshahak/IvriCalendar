@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.fragments.FragmentDay;
 
@@ -31,7 +31,7 @@ public class CalendarRecyclerAdapterDaily extends RecyclerView.Adapter<CalendarR
 
     @Override
     public int getItemViewType(int position) {
-        if (sections.get(position).sectionEvents.size() == 0){
+        if (sections.get(position).sectionEventInstances.size() == 0){
             return VIEW_TYPE_EMPTY_RANGE;
         } else {
             return VIEW_TYPE_EVENTS_RANGE;
@@ -98,18 +98,18 @@ public class CalendarRecyclerAdapterDaily extends RecyclerView.Adapter<CalendarR
                 rootParams.height =(int) ((range / 60f) * hourHeight);
                 LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
                 holder.eventContainer.setOrientation(LinearLayout.HORIZONTAL);
-                for (Event event : section.sectionEvents){
-                    int start = event.getBeginDate().getHours() * 60 + event.getBeginDate().getMinutes();
-                    int length = event.getEndDate().getHours() * 60 + event.getEndDate().getMinutes() - start;
+                for (EventInstance eventInstance : section.sectionEventInstances){
+                    int start = eventInstance.getBeginDate().getHours() * 60 + eventInstance.getBeginDate().getMinutes();
+                    int length = eventInstance.getEndDate().getHours() * 60 + eventInstance.getEndDate().getMinutes() - start;
                     CardView eventContainer = (CardView) inflater.inflate(R.layout.text_view_event_for_day, holder.eventContainer, false);
                     LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) eventContainer.getLayoutParams();
                     params.height = (int)((length / 60f) * hourHeight);
                     params.topMargin = (int) (((start - section.range.x) / 60f) * hourHeight);
-                    eventContainer.setCardBackgroundColor(event.getDisplayColor());
+                    eventContainer.setCardBackgroundColor(eventInstance.getDisplayColor());
                     TextView textView = (TextView) eventContainer.findViewById(R.id.event_title);
-                    textView.setText(event.getEventTitle());
+                    textView.setText(eventInstance.getEventTitle());
                     holder.eventContainer.addView(eventContainer);
-                    textView.setTag(event);
+                    textView.setTag(eventInstance);
                     textView.setOnClickListener(holder);
                 }
                 break;
@@ -132,9 +132,9 @@ public class CalendarRecyclerAdapterDaily extends RecyclerView.Adapter<CalendarR
 
         @Override
         public void onClick(View view) {
-            Event event = (Event) view.getTag();
-            if (event != null) {
-                GoogleManager.openEvent(itemView.getContext(), event);
+            EventInstance eventInstance = (EventInstance) view.getTag();
+            if (eventInstance != null) {
+                GoogleManager.openEvent(itemView.getContext(), eventInstance);
             }
         }
     }

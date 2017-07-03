@@ -12,8 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.activities.MainActivity;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
@@ -28,12 +27,12 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
     private final View.OnClickListener clickListener;
     private final int itemCount;
     //    private Month month;
-    private SparseArray<List<Event>> eventSparseArray;
+    private SparseArray<List<EventInstance>> eventSparseArray;
     private JewCalendar jewCalendar;
     private int transparentColor, primaryColor;
 
 
-    public CalendarRecyclerAdapterMonth(JewCalendar jewCalendar, SparseArray<List<Event>> eventSparseArray, View.OnClickListener listener) {
+    public CalendarRecyclerAdapterMonth(JewCalendar jewCalendar, SparseArray<List<EventInstance>> eventSparseArray, View.OnClickListener listener) {
         this.jewCalendar = jewCalendar;
         this.eventSparseArray = eventSparseArray;
         this.clickListener = listener;
@@ -89,17 +88,17 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
 //                holder.label.setBackgroundColor(transparentColor);
 //            }
 //        }
-        List<Event> events = eventSparseArray.get(position + 1);
-        if (events == null) {
+        List<EventInstance> eventInstances = eventSparseArray.get(position + 1);
+        if (eventInstances == null) {
             return;
         }
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
-        for (Event event : events){
+        for (EventInstance eventInstance : eventInstances){
             TextView textView = (TextView) inflater.inflate(R.layout.text_view_event_for_month, holder.cellContainer, false);
-            textView.setText(event.getEventTitle());
-            textView.setBackgroundColor(event.getDisplayColor());
+            textView.setText(eventInstance.getEventTitle());
+            textView.setBackgroundColor(eventInstance.getDisplayColor());
             holder.cellContainer.addView(textView);
-            textView.setTag(event);
+            textView.setTag(eventInstance);
             textView.setOnClickListener(holder);
         }
 
@@ -132,9 +131,9 @@ public class CalendarRecyclerAdapterMonth extends RecyclerView.Adapter<CalendarR
                     clickListener.onClick(view);
                 }
             } else {
-                Event event = (Event) view.getTag();
-                if (event != null) {
-                    GoogleManager.openEvent(itemView.getContext(), event);
+                EventInstance eventInstance = (EventInstance) view.getTag();
+                if (eventInstance != null) {
+                    GoogleManager.openEvent(itemView.getContext(), eventInstance);
                 }
             }
         }

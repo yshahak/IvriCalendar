@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.calendar.google.Event;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 
 /**
@@ -56,36 +56,36 @@ public class CustomLinearLayout extends LinearLayout {
 
     public void setDay(Day day){
 //        Calendar cal = day.getCalendarForWeekDisplay();
-//        List<List<Event>> dayEvents = new ArrayList<>();
+//        List<List<EventInstance>> dayEvents = new ArrayList<>();
 //        for (int i =0 ; i < 24 ; i++) {
 //            cal.set(Calendar.HOUR, i);
 //            long time = cal.getTimeInMillis();
-//            List<Event> hourEvents = new ArrayList<>();
-//            for (Event event : day.getGoogleEvents()) {
+//            List<EventInstance> hourEvents = new ArrayList<>();
+//            for (EventInstance event : day.getGoogleEventInstances()) {
 //                if (event.getBegin() >= time && event.getBegin() < (time + Hour)) {
 //                    hourEvents.add(event);
 //                }
 //            }
 //            dayEvents.add(hourEvents);
 //        }
-//        for (List<Event> list : dayEvents){
-//            for (Event event : list) {
+//        for (List<EventInstance> list : dayEvents){
+//            for (EventInstance event : list) {
 //
 //            }
 //
 //        }
         LayoutInflater inflater = LayoutInflater.from(getContext());
         List<Point> intervals = new ArrayList<>();
-        for (Event event : day.getGoogleEvents()){
+        for (EventInstance eventInstance : day.getGoogleEventInstances()){
             Point point = new Point();
-            point.x = (int)event.getBegin();
-            point.y = (int)event.getEnd();
+            point.x = (int) eventInstance.getBegin();
+            point.y = (int) eventInstance.getEnd();
             intervals.add(point);
             TextView textView = (TextView) inflater.inflate(R.layout.text_view_event, this, false);
-            textView.setText(event.getEventTitle());
-            textView.setBackgroundColor(event.getDisplayColor());
+            textView.setText(eventInstance.getEventTitle());
+            textView.setBackgroundColor(eventInstance.getDisplayColor());
             addView(textView);
-            textView.setTag(event);
+            textView.setTag(eventInstance);
         }
     }
 
