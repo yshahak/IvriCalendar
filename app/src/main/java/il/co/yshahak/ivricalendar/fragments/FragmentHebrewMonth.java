@@ -1,8 +1,13 @@
 package il.co.yshahak.ivricalendar.fragments;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +16,8 @@ import android.view.ViewGroup;
 
 import net.alexandroid.shpref.MyLog;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
@@ -18,10 +25,12 @@ import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.adapters.RecyclerAdapterMonth;
+import il.co.yshahak.ivricalendar.calendar.EventsRepo;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
-import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
+import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 
 
 /**
@@ -29,7 +38,7 @@ import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAG
  * on 21/06/17.
  */
 
-public class FragmentHebrewMonth extends BaseCalendarFragment {
+public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     public static BaseCalendarFragment newInstance(int position) {
         FragmentHebrewMonth fragment = new FragmentHebrewMonth();
@@ -41,6 +50,8 @@ public class FragmentHebrewMonth extends BaseCalendarFragment {
     JewCalendar jewCalendar;
     @Inject
     DividerItemDecoration itemDecoration;
+    @Inject
+    EventsRepo eventsRepo;
 
     @Nullable
     @Override
@@ -66,6 +77,7 @@ public class FragmentHebrewMonth extends BaseCalendarFragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        getLoaderManager().initLoader(0, null, FragmentHebrewMonth.this);
                         recyclerView.setAdapter(new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary)));
                     }
                 });
@@ -80,4 +92,30 @@ public class FragmentHebrewMonth extends BaseCalendarFragment {
         jewCalendar.recycle();
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        Uri uri = eventsRepo.getInstanceUriForJewishMonth(jewCalendar);
+        String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
+        String[] WHERE_CALENDARS_ARGS = {"1"};//
+        return new CursorLoader(getActivity(),
+                uri,
+                INSTANCE_PROJECTION,
+                WHERE_CALENDARS_SELECTED,
+                WHERE_CALENDARS_ARGS,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        List<EventInstance> list = eventsRepo.getEvents(cursor);
+        MyLog.d("size = " + list.size());
+        for (EventInstance event: list){
+            MyLog.d(event.toString());
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

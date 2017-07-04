@@ -1,13 +1,17 @@
 package il.co.yshahak.ivricalendar.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import il.co.yshahak.ivricalendar.R;
+import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar.hebrewDateFormatter;
@@ -23,6 +27,7 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
     private static final int VIEW_TYPE_TAIL = 3;
     private final JewCalendar jewCalendar;
     private final int transparentColor, primaryColor;
+    private SparseArray<List<EventInstance>> eventSparseArray;
 
 
     public RecyclerAdapterMonth(JewCalendar jewCalendar, int transparentColor, int primaryColor) {

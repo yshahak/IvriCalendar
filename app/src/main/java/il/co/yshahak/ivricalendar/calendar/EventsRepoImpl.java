@@ -22,7 +22,7 @@ import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
  * on 03/07/17.
  */
 
-public class EventsInterfaceImpl implements EventsInterface {
+public class EventsRepoImpl implements EventsRepo {
 
     public static final String[] INSTANCE_PROJECTION = new String[] {
             Instances.EVENT_ID,       // 0
@@ -79,6 +79,11 @@ public class EventsInterfaceImpl implements EventsInterface {
         if (cur == null) {
             return null;
         }
+        return getEvents(cur);
+    }
+
+    @Override
+    public List<EventInstance> getEvents(Cursor cur) {
         List<EventInstance> list = new ArrayList<>();
         while (cur.moveToNext()) {
             EventInstance eventInstance = convertCursorToEvent(cur);
@@ -107,7 +112,7 @@ public class EventsInterfaceImpl implements EventsInterface {
 
     @Override
     public Uri getInstanceUriForJewishMonth(JewCalendar jewCalendar) {
-        Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
         ContentUris.appendId(builder, jewCalendar.getBeginOfMonth());

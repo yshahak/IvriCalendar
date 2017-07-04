@@ -14,7 +14,7 @@ import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
  * on 18/06/17.
  */
 
-public interface EventsInterface {
+public interface EventsRepo {
 
     int addEvent();
 
@@ -25,6 +25,8 @@ public interface EventsInterface {
     EventInstance getEvent(int id);
 
     List<EventInstance> getEvents(Context context, long begin, long end);
+
+    List<EventInstance> getEvents(Cursor cursor);
 
     EventInstance convertCursorToEvent(Cursor cursor);
 

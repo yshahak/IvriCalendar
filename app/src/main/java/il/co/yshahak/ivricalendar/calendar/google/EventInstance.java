@@ -1,12 +1,16 @@
 package il.co.yshahak.ivricalendar.calendar.google;
 
+import android.support.annotation.NonNull;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by yshahak on 14/10/2016.
  */
 
-public class EventInstance {
+public class EventInstance implements Comparable<EventInstance> {
 
     private long eventId;
     private String eventTitle;
@@ -84,5 +88,22 @@ public class EventInstance {
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss", Locale.US);
+
+    @Override
+    public String toString() {
+        String result = String.format(Locale.US, "\neventId=%d" +
+                "\neventTitle=%s" +
+                "\nbegin=%s" +
+                "\nend=%s",
+                eventId,eventTitle, simpleDateFormat.format(begin), simpleDateFormat.format(end));
+        return result;
+    }
+
+    @Override
+    public int compareTo(@NonNull EventInstance o) {
+        return 0;
     }
 }

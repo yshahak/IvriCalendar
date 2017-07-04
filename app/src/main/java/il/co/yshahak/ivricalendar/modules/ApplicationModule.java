@@ -4,13 +4,13 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.Date;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
+import il.co.yshahak.ivricalendar.calendar.EventsRepo;
+import il.co.yshahak.ivricalendar.calendar.EventsRepoImpl;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
@@ -43,6 +43,11 @@ public class ApplicationModule {
     @Provides @Singleton
     public Context provideContext() {
         return application;
+    }
+
+    @Provides @Singleton
+    public EventsRepo provideEventInterface(){
+        return new EventsRepoImpl();
     }
 
 }
