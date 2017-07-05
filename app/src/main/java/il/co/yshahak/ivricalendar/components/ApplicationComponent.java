@@ -1,11 +1,10 @@
 package il.co.yshahak.ivricalendar.components;
 
-import android.support.v4.app.Fragment;
-
 import javax.inject.Singleton;
 
 import dagger.Component;
 import il.co.yshahak.ivricalendar.MyApplication;
+import il.co.yshahak.ivricalendar.activities.CreteIvriEventActivity;
 import il.co.yshahak.ivricalendar.fragments.FragmentHebrewMonth;
 import il.co.yshahak.ivricalendar.modules.ApplicationModule;
 
@@ -21,4 +20,6 @@ public interface ApplicationComponent {
     void inject(MyApplication target);
 
     void inject(FragmentHebrewMonth fragment);
+
+    void inject(CreteIvriEventActivity creteIvriEventActivity);
 }

@@ -10,11 +10,7 @@ import android.view.ViewGroup;
 
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
-import il.co.yshahak.ivricalendar.adapters.CalendarRecyclerAdapterPicker;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
-import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
-
-import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 
 /**
  * Created by B.E.L on 27/11/2016.
@@ -42,12 +38,12 @@ public class PickerFragment extends BaseCalendarFragment {
 
 
         days.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-        days.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        days.addItemDecoration(new DividerItemDecoration(getContext()));
         days.setHasFixedSize(true);
         days.setAdapter(new DaysHeaderAdapter());
 
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext()));
         recyclerView.setHasFixedSize(true);
 //        recyclerView.setAdapter(new CalendarRecyclerAdapterPicker(jewishCalendar));
         return root;

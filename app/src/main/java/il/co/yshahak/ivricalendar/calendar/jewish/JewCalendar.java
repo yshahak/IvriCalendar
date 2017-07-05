@@ -3,6 +3,7 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.util.Pools;
+import android.util.SparseArray;
 
 import net.alexandroid.shpref.MyLog;
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
@@ -14,6 +15,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 
 /**
  * Created by yshahak
@@ -32,7 +35,10 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     private int headOffst, trailOffse;
 
     private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(5);
+    private static SparseArray<JewCalendar> jewCalendarSparseArray = new SparseArray<>();
     private int oldPosition;
+    private boolean isRcycled;
+    public boolean flagCurrentMonth;
 
     public JewCalendar(int jewishYear, int jewishMonth, int day) {
         super(jewishYear, jewishMonth, day);
@@ -46,12 +52,21 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         JewCalendar instance = sPool.acquire();
         if ((instance == null)) {
             MyLog.d("create new JewCalendar");
+            instance = new JewCalendar();
         }
-        return (instance != null) ? instance : new JewCalendar();
+        instance.isRcycled = false;
+        return instance;
     }
 
     public void recycle() {
-        sPool.release(this);
+        if (!isRcycled) {
+            sPool.release(this);
+        }
+        isRcycled = true;
+    }
+
+    public boolean isRecycled() {
+        return isRcycled;
     }
 
     public JewCalendar(int offset) {
@@ -68,8 +83,8 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public JewCalendar shiftMonth(int position) {
+        jewCalendarSparseArray.put(position + FRONT_PAGE, this);
         int offset = position - oldPosition;
-        MyLog.d("position=" + position + " | old=" + oldPosition + " offset=" + offset);
         if (offset > 0) {
 //            shiftForward(offset);
             for (int i = 0; i < offset; i++) {
@@ -80,6 +95,8 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             for (int i = offset * (-1); i > 0; i--) {
                 shiftMonthBackword();
             }
+        } else {
+            flagCurrentMonth = true;
         }
         setOffsets();
         oldPosition = position;
@@ -132,7 +149,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         setJewishMonth(next);
     }
 
-    private void shiftMonthForward() {
+    public void shiftMonthForward() {
         int next = getJewishMonth() + 1;
         if (next == 7) {
             setJewishYear(getJewishYear() + 1);
@@ -142,7 +159,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         setJewishMonth(next);
     }
 
-    private void shiftMonthBackword() {
+    public void shiftMonthBackword() {
         int previous = getJewishMonth() - 1;
         if (previous == 0) {
             previous = isJewishLeapYear() ? 13 : 12;
@@ -196,6 +213,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public String getYearName() {
+        MyLog.d("year=" + getJewishYear());
         return hebrewDateFormatter.formatHebrewNumber(getJewishYear());
     }
 
@@ -362,9 +380,9 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     public long getBeginOfMonth() {
         JewCalendar copy = (JewCalendar) clone();
         copy.setJewishDate(getJewishYear(), getJewishMonth(), 1);
-        System.out.println(hebrewDateFormatter.format(copy));
+//        System.out.println(hebrewDateFormatter.format(copy));
         Date date = copy.getTime(true);
-        System.out.println(simpleDateFormat.format(date));
+//        System.out.println(simpleDateFormat.format(date));
         return date.getTime();
     }
 
@@ -372,9 +390,18 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         JewCalendar copy = (JewCalendar) clone();
         copy.shiftForward(1);
         copy.setJewishDate(copy.getJewishYear(), copy.getJewishMonth(), 1);
-        System.out.println(hebrewDateFormatter.format(copy));
+//        System.out.println(hebrewDateFormatter.format(copy));
         Date date = copy.getTime(true);
-        System.out.println(simpleDateFormat.format(date));
+//        System.out.println(simpleDateFormat.format(date));
         return date.getTime();
+    }
+
+    public static String getTitle(int position) {
+        JewCalendar current = jewCalendarSparseArray.get(position);
+        if (current == null) {
+            MyLog.d("current is null");
+            current = new JewCalendar();
+        }
+        return current.getMonthName() + " , " + current.getYearName();
     }
 }

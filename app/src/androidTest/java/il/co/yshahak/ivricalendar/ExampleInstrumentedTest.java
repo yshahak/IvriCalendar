@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import il.co.yshahak.ivricalendar.calendar.EventsRepoImpl;
+import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
@@ -38,7 +38,7 @@ public class ExampleInstrumentedTest {
     @Test
     public void testEvents() {
         JewCalendar jewCalendar = new JewCalendar();
-        EventsRepoImpl eventsInterface = new EventsRepoImpl();
+        EventsProviderImpl eventsInterface = new EventsProviderImpl();
         List<EventInstance> list = eventsInterface.getEvents(cycleContext, jewCalendar.getBeginOfMonth(), jewCalendar.getEndOfMonth());
         assertTrue(list != null);
         for (EventInstance eventInstance : list){

@@ -103,7 +103,15 @@ public class EventInstance implements Comparable<EventInstance> {
     }
 
     @Override
-    public int compareTo(@NonNull EventInstance o) {
-        return 0;
+    public int compareTo(@NonNull EventInstance instance) {
+        return (int) (this.begin - instance.begin);
+    }
+
+    public enum Repeat{
+        SINGLE,
+        DAY,
+        WEEK,
+        MONTH,
+        YEAR
     }
 }

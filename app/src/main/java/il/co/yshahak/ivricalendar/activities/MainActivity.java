@@ -32,6 +32,7 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.Contract;
 import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.uihelpers.DrawerHelper;
 
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
@@ -270,16 +271,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPageSelected(int position) {
-
 //        Log.d("TAG", "onPageSelected: " + position);
         CalendarPagerAdapter.selectedPage = position;
-//        WeakReference<BaseCalendarFragment> weakReference = CalendarPagerAdapter.fragmentLoaderSparseArray.get(position);
-//        if (weakReference != null) {
-//            BaseCalendarFragment fragmentLoader = weakReference.get();
-//            if (fragmentLoader != null) {
-//                setTitle(fragmentLoader.getJewishCalendar().getMonthName() + " , " + fragmentLoader.getJewishCalendar().getYearName());
-//            }
-//        }
+        String title = JewCalendar.getTitle(position);
+        setTitle(title);
     }
 
     @Override

@@ -3,8 +3,10 @@ package il.co.yshahak.ivricalendar;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -18,21 +20,15 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             android.R.attr.listDivider
     };
 
-    public static final int GRID = 2;
+//    public static final int GRID = 2;
 
     private Drawable mDivider;
 
-    private int mOrientation;
 
-    public DividerItemDecoration(Context context, int orientation) {
+    public DividerItemDecoration(Context context) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
-        mDivider = a.getDrawable(0);
+        mDivider = setTint(a.getDrawable(0), Color.BLACK);
         a.recycle();
-        setOrientation(orientation);
-    }
-
-    public void setOrientation(int orientation) {
-        mOrientation = orientation;
     }
 
     @Override
@@ -54,21 +50,28 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
                 (RecyclerView.LayoutParams) child.getLayoutParams();
         int top = child.getBottom() + params.bottomMargin + mDivider.getIntrinsicHeight();
         int bottom = top + mDivider.getIntrinsicHeight();
-
         final int parentBottom = parent.getHeight() - parent.getPaddingBottom();
-        while (bottom < parentBottom) {
+
+        mDivider.setBounds(left, parent.getPaddingTop(), right, parent.getPaddingTop() + mDivider.getIntrinsicHeight());
+        mDivider.draw(c);
+        do {
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
 
             top += mDivider.getIntrinsicHeight() + params.topMargin + child.getHeight() + params.bottomMargin + mDivider.getIntrinsicHeight();
             bottom = top + mDivider.getIntrinsicHeight();
-        }
+        }while (bottom < parentBottom);
+        mDivider.setBounds(left, parentBottom - mDivider.getIntrinsicHeight(), right, parentBottom);
+        mDivider.draw(c);
     }
 
     public void drawHorizontal(Canvas c, RecyclerView parent) {
         final int top = parent.getPaddingTop();
         final int bottom = parent.getHeight() - parent.getPaddingBottom();
-
+//        mDivider.setBounds(0, top, parent.getWidth(), bottom);
+//        MyLog.d("height=" + (bottom - top));
+//        MyLog.d("width=" + (parent.getWidth()));
+//        mDivider.draw(c);
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
@@ -84,5 +87,11 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         outRect.set(0, 0, mDivider.getIntrinsicWidth(), mDivider.getIntrinsicHeight());
+    }
+
+    public Drawable setTint(Drawable d, int color) {
+        Drawable wrappedDrawable = DrawableCompat.wrap(d);
+        DrawableCompat.setTint(wrappedDrawable, color);
+        return wrappedDrawable;
     }
 }

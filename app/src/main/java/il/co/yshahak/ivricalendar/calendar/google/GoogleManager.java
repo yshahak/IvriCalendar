@@ -264,7 +264,6 @@ public class GoogleManager {
                     contentValues[i] = getContentValueForSingleEvent(title, calID, R.id.repeat_single, start, end, count);
                 }
                 cr.bulkInsert(CalendarContract.Events.CONTENT_URI, contentValues);
-                syncCalendars(context);
                 break;
             case R.id.repeat_yearly:
                 contentValues = new ContentValues[Integer.valueOf(count)];

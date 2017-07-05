@@ -30,7 +30,6 @@ import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 
-import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_COLOR_INDEX;
@@ -77,11 +76,11 @@ public class FragmentMonth extends BaseCalendarFragment implements LoaderManager
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
         daysRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-        daysRecycler.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        daysRecycler.addItemDecoration(new DividerItemDecoration(getContext()));
         daysRecycler.setHasFixedSize(true);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext()));
         recyclerView.setHasFixedSize(true);
         daysRecycler.setAdapter(new DaysHeaderAdapter());
         setRecyclerView();

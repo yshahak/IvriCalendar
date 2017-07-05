@@ -3,6 +3,7 @@ package il.co.yshahak.ivricalendar.fragments;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 
 import net.alexandroid.shpref.MyLog;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -25,7 +27,8 @@ import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 import il.co.yshahak.ivricalendar.adapters.RecyclerAdapterMonth;
-import il.co.yshahak.ivricalendar.calendar.EventsRepo;
+import il.co.yshahak.ivricalendar.calendar.EventsHelper;
+import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
@@ -51,13 +54,21 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     @Inject
     DividerItemDecoration itemDecoration;
     @Inject
-    EventsRepo eventsRepo;
+    EventsProvider eventsProvider;
+
+    private RecyclerView recyclerView;
+    private Handler handler;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
+        handler = new Handler();
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
-
         final ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
         RecyclerView daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
 
@@ -65,7 +76,7 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         daysRecycler.addItemDecoration(itemDecoration);
         daysRecycler.setHasFixedSize(true);
         daysRecycler.setAdapter(new DaysHeaderAdapter());
-        final RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(itemDecoration);
@@ -73,12 +84,13 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         new Thread(new Runnable() {
             @Override
             public void run() {
+                MyLog.d("shifting=" + (position - FRONT_PAGE));
                 jewCalendar.shiftMonth(position - FRONT_PAGE);
-                getActivity().runOnUiThread(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         getLoaderManager().initLoader(0, null, FragmentHebrewMonth.this);
-                        recyclerView.setAdapter(new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary)));
+                        recyclerView.setAdapter(new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight()));
                     }
                 });
             }
@@ -94,7 +106,7 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        Uri uri = eventsRepo.getInstanceUriForJewishMonth(jewCalendar);
+        Uri uri = eventsProvider.getInstanceUriForJewishMonth(jewCalendar);
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
         return new CursorLoader(getActivity(),
@@ -106,16 +118,36 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        List<EventInstance> list = eventsRepo.getEvents(cursor);
-        MyLog.d("size = " + list.size());
-        for (EventInstance event: list){
-            MyLog.d(event.toString());
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor cursor) {
+        if (!isAdded()){
+            return;
         }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final HashMap<Integer, List<EventInstance>> eventsMap = EventsHelper.getEventsMap(cursor);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isAdded()) {
+                            MyLog.d("size = " + eventsMap.size());
+                            RecyclerAdapterMonth adapterMonth = (RecyclerAdapterMonth) recyclerView.getAdapter();
+                            if (adapterMonth == null) {
+                                adapterMonth = new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight());
+                                recyclerView.setAdapter(adapterMonth);
+                            }
+                            adapterMonth.setEventsMap(eventsMap);
+                        }
+                    }
+                });
+            }
+        }).start();
+
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        loader.reset();
     }
 }

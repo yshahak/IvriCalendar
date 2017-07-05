@@ -9,11 +9,9 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import il.co.yshahak.ivricalendar.DividerItemDecoration;
-import il.co.yshahak.ivricalendar.calendar.EventsRepo;
-import il.co.yshahak.ivricalendar.calendar.EventsRepoImpl;
+import il.co.yshahak.ivricalendar.calendar.EventsProvider;
+import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
-
-import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 
 /**
  * Created by Yaakov Shahak
@@ -37,7 +35,7 @@ public class ApplicationModule {
 
     @Provides @Singleton
     public DividerItemDecoration getItemDecoration(Context context){
-        return new DividerItemDecoration(context, GRID);
+        return new DividerItemDecoration(context);
     }
 
     @Provides @Singleton
@@ -46,8 +44,8 @@ public class ApplicationModule {
     }
 
     @Provides @Singleton
-    public EventsRepo provideEventInterface(){
-        return new EventsRepoImpl();
+    public EventsProvider provideEventInterface(){
+        return new EventsProviderImpl();
     }
 
 }

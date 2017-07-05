@@ -29,7 +29,6 @@ import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.calendar.jewish.Month;
 import il.co.yshahak.ivricalendar.calendar.jewish.Week;
 
-import static il.co.yshahak.ivricalendar.DividerItemDecoration.GRID;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_BEGIN_INDEX;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.PROJECTION_CALENDAR_COLOR_INDEX;
@@ -82,11 +81,11 @@ public class FragmentWeek extends Fragment implements LoaderManager.LoaderCallba
         recyclerView = (RecyclerView)root.findViewById(R.id.recycler_view);
 
         days.setLayoutManager(new GridLayoutManager(getActivity(), 8 ));
-        days.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        days.addItemDecoration(new DividerItemDecoration(getContext()));
         days.setHasFixedSize(true);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),  8));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), GRID));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext()));
         recyclerView.setHasFixedSize(true);
         if (CalendarPagerAdapter.selectedPage == position) {
             getActivity().setTitle(month.getMonthName() + " , " + month.getYearName());
