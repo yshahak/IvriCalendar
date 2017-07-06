@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
-import il.co.yshahak.ivricalendar.DividerItemDecoration;
+import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;

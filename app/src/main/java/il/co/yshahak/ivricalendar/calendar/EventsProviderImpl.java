@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
@@ -12,7 +11,6 @@ import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Instances;
 
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.calendar.google.CalendarAccount;
@@ -139,24 +137,21 @@ public class EventsProviderImpl implements EventsProvider {
         return null;
     }
 
-
-
     @Override
-    public List<EventInstance> getEvents(Context context, long begin, long end) {
-        ContentResolver cr = context.getContentResolver();
+    public Cursor getEvents(ContentResolver cr, long begin, long end) {
         Uri uri = GoogleManager.asSyncAdapter(begin, end);
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-        Cursor cur;
-        cur = cr.query(uri,
+//        Cursor cur;
+        return cr.query(uri,
                 INSTANCE_PROJECTION,
                 WHERE_CALENDARS_SELECTED,
                 WHERE_CALENDARS_ARGS,
                 null);
-        if (cur == null) {
-            return null;
-        }
-        return EventsHelper.getEvents(cur);
+//        if (cur == null) {
+//            return null;
+//        }
+//        return EventsHelper.getEvents(cur);
     }
 
     @Override

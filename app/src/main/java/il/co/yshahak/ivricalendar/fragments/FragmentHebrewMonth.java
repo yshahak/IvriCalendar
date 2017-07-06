@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import il.co.yshahak.ivricalendar.DividerItemDecoration;
+import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;

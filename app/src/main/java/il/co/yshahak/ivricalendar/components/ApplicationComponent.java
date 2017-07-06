@@ -7,6 +7,7 @@ import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.activities.CreteIvriEventActivity;
 import il.co.yshahak.ivricalendar.fragments.FragmentHebrewMonth;
 import il.co.yshahak.ivricalendar.modules.ApplicationModule;
+import il.co.yshahak.ivricalendar.repo.DaysRepoImpl;
 
 /**
  * Created by Yaakov Shahak
@@ -22,4 +23,6 @@ public interface ApplicationComponent {
     void inject(FragmentHebrewMonth fragment);
 
     void inject(CreteIvriEventActivity creteIvriEventActivity);
+
+    void inject(DaysRepoImpl daysRepo);
 }

@@ -4,6 +4,7 @@ import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 
@@ -15,7 +16,7 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatt
 
 public class Day {
 
-    private ArrayList<EventInstance> googleEventInstances = new ArrayList<>();
+    private List<EventInstance> googleEventInstances = new ArrayList<>();
     private String month;
     private final String label;
     private long startDayInMillis, endDayInMillis;
@@ -31,8 +32,12 @@ public class Day {
     }
 
 
-    public ArrayList<EventInstance> getGoogleEventInstances() {
+    public List<EventInstance> getGoogleEventInstances() {
         return googleEventInstances;
+    }
+
+    public void setGoogleEventInstances(List<EventInstance> googleEventInstances) {
+        this.googleEventInstances = googleEventInstances;
     }
 
     public String getMonth() {

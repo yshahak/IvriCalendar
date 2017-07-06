@@ -1,4 +1,4 @@
-package il.co.yshahak.ivricalendar;
+package il.co.yshahak.ivricalendar.uihelpers;
 
 import android.content.Context;
 import android.content.res.TypedArray;

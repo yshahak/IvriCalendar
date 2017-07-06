@@ -1,6 +1,7 @@
 package il.co.yshahak.ivricalendar.modules;
 
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.util.Log;
 
@@ -8,7 +9,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import il.co.yshahak.ivricalendar.DividerItemDecoration;
+import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
@@ -46,6 +47,11 @@ public class ApplicationModule {
     @Provides @Singleton
     public EventsProvider provideEventInterface(){
         return new EventsProviderImpl();
+    }
+
+    @Provides @Singleton
+    public ContentResolver provideContentRsolver(){
+        return application.getContentResolver();
     }
 
 }

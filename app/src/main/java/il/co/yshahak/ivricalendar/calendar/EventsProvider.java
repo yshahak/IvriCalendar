@@ -1,10 +1,8 @@
 package il.co.yshahak.ivricalendar.calendar;
 
 import android.content.ContentResolver;
-import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
-
-import java.util.List;
 
 import il.co.yshahak.ivricalendar.calendar.google.CalendarAccount;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
@@ -37,7 +35,7 @@ public interface EventsProvider {
 
     EventInstance getEvent(int id);
 
-    List<EventInstance> getEvents(Context context, long begin, long end);
+    Cursor getEvents(ContentResolver cr, long begin, long end);
 
     //    HashMap<Integer, List<EventInstance>> getEventsMap(Cursor cur);
 

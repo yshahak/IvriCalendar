@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import il.co.yshahak.ivricalendar.DividerItemDecoration;
+import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
 

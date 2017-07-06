@@ -1,5 +1,6 @@
 package il.co.yshahak.ivricalendar;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -39,7 +40,8 @@ public class ExampleInstrumentedTest {
     public void testEvents() {
         JewCalendar jewCalendar = new JewCalendar();
         EventsProviderImpl eventsInterface = new EventsProviderImpl();
-        List<EventInstance> list = eventsInterface.getEvents(cycleContext, jewCalendar.getBeginOfMonth(), jewCalendar.getEndOfMonth());
+        ContentResolver cr = cycleContext.getContentResolver();
+        List<EventInstance> list = eventsInterface.getEvents(cr , jewCalendar.getBeginOfMonth(), jewCalendar.getEndOfMonth());
         assertTrue(list != null);
         for (EventInstance eventInstance : list){
             System.out.println(eventInstance.toString());
