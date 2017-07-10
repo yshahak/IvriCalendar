@@ -32,12 +32,12 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         hebrewDateFormatter.setHebrewFormat(true);
     }
 
-    private int headOffst, trailOffse;
+    private int headOffset, trailOffset;
 
     private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(5);
     private static SparseArray<JewCalendar> jewCalendarSparseArray = new SparseArray<>();
     private int oldPosition;
-    private boolean isRcycled;
+    private boolean isRecycled;
     public boolean flagCurrentMonth;
 
     public JewCalendar(int jewishYear, int jewishMonth, int day) {
@@ -54,19 +54,19 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             MyLog.d("create new JewCalendar");
             instance = new JewCalendar();
         }
-        instance.isRcycled = false;
+        instance.isRecycled = false;
         return instance;
     }
 
     public void recycle() {
-        if (!isRcycled) {
+        if (!isRecycled) {
             sPool.release(this);
         }
-        isRcycled = true;
+        isRecycled = true;
     }
 
     public boolean isRecycled() {
-        return isRcycled;
+        return isRecycled;
     }
 
     public JewCalendar(int offset) {
@@ -85,6 +85,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     public JewCalendar shiftMonth(int position) {
         jewCalendarSparseArray.put(position + FRONT_PAGE, this);
         int offset = position - oldPosition;
+        MyLog.d("offset=" + offset);
         if (offset > 0) {
 //            shiftForward(offset);
             for (int i = 0; i < offset; i++) {
@@ -195,15 +196,15 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             date.setTime(date.getTime() - 1000 * 60 * 60 * 24 * (--dayInMonth));
             JewishCalendar mockCalendar = new JewishCalendar(date);
             int dayInWeek = mockCalendar.getDayOfWeek();
-            headOffst = --dayInWeek;
+            headOffset = --dayInWeek;
         }
         {//calculate trail
             JewishCalendar mock = new JewishCalendar(getTime());
             mock.setJewishDayOfMonth(isFullMonth() ? 30 : 29);
             int dayOfWeek = mock.getDayOfWeek();
-            trailOffse = 7 - dayOfWeek;
+            trailOffset = 7 - dayOfWeek;
         }
-//        Log.d("TAG", getMonthName() +  ", headOffst:" + headOffst + ", trailOffse:" + trailOffse);
+//        Log.d("TAG", getMonthName() +  ", headOffset:" + headOffset + ", trailOffset:" + trailOffset);
     }
 
     public void setHour(int hour) {
@@ -226,11 +227,11 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public int getHeadOffset() {
-        return headOffst;
+        return headOffset;
     }
 
     public int getTrailOffset() {
-        return trailOffse;
+        return trailOffset;
     }
 
     public String getDayLabel() {
@@ -359,8 +360,8 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     public Object clone() {
         JewCalendar clone;
         clone = (JewCalendar) super.clone();
-        clone.headOffst = this.headOffst;
-        clone.trailOffse = this.trailOffse;
+        clone.headOffset = this.headOffset;
+        clone.trailOffset = this.trailOffset;
         return clone;
     }
 

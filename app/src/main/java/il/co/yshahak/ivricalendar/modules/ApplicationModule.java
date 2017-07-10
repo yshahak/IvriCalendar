@@ -45,12 +45,12 @@ public class ApplicationModule {
         return application;
     }
 
-    @Provides @Singleton
+    @Provides
     public EventsProvider provideEventInterface(){
         return new EventsProviderImpl();
     }
 
-    @Provides @Singleton
+    @Provides
     public DaysRepo provideDaysRepo(){
         return new DaysRepoImpl(provideEventInterface(), provideContentResolver());
     }

@@ -1,5 +1,6 @@
 package il.co.yshahak.ivricalendar.fragments;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.database.Cursor;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import il.co.yshahak.ivricalendar.adapters.RecyclerAdapterMonth;
 import il.co.yshahak.ivricalendar.calendar.EventsHelper;
 import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
+import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.repo.DaysRepo;
 import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
@@ -44,7 +46,7 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJE
  * on 21/06/17.
  */
 
-public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private MonthViewModel monthViewModel;
 
@@ -65,22 +67,19 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
 
     private RecyclerView recyclerView;
     private Handler handler;
+    private LiveData<List<Day>> dayList;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
         handler = new Handler();
-        monthViewModel = ViewModelProviders.of(getActivity()).get(MonthViewModel.class);
+        monthViewModel = ViewModelProviders.of(this).get(MonthViewModel.class);
         monthViewModel.setDaysRepo(daysRepo);
-        new Thread(() -> {
-            MyLog.d("shifting=" + (position - FRONT_PAGE));
-            jewCalendar.shiftMonth(position - FRONT_PAGE);
-            monthViewModel.getDayList(jewCalendar).observe(FragmentHebrewMonth.this, days -> {
-                handler.post(() -> recyclerView.setAdapter(new RecyclerAdapterMonth(days, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight())));
-            });
+        dayList = monthViewModel.getDayList(jewCalendar, position - FRONT_PAGE);
+        dayList.observe(FragmentHebrewMonth.this,
+                days -> setRecyclerView());
 
-        }).start();
     }
 
     @Nullable
@@ -88,7 +87,6 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_month, container, false);
         RecyclerView daysRecycler = (RecyclerView) root.findViewById(R.id.recycler_view_days);
-
         daysRecycler.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         daysRecycler.addItemDecoration(itemDecoration);
         daysRecycler.setHasFixedSize(true);
@@ -97,9 +95,14 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(itemDecoration);
-
-
+        setRecyclerView();
         return root;
+    }
+
+    private void setRecyclerView() {
+        if (dayList.getValue() != null && dayList.getValue().size() > 0) {
+            recyclerView.setAdapter(new RecyclerAdapterMonth(dayList.getValue(), getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight()));
+        }
     }
 
     @Override
@@ -123,7 +126,7 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor cursor) {
-        if (!isAdded()){
+        if (!isAdded()) {
             return;
         }
         new Thread(new Runnable() {

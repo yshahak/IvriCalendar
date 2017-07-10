@@ -4,6 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import net.alexandroid.shpref.MyLog;
+
 import java.util.List;
 
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
@@ -20,25 +22,28 @@ public class MonthViewModel extends ViewModel {
     private DaysRepo daysRepo;
     private MutableLiveData<List<Day>> dayList;
 
-//    public MonthViewModel(DaysRepo daysRepo) {
-//        this.daysRepo = daysRepo;
-//    }
-
-
     public void setDaysRepo(DaysRepo daysRepo) {
         this.daysRepo = daysRepo;
     }
 
-    public LiveData<List<Day>> getDayList(JewCalendar jewCalendar) {
+    public LiveData<List<Day>> getDayList(JewCalendar jewCalendar, int position) {
         if (dayList == null) {
             dayList = new MutableLiveData<>();
-            loadDays(jewCalendar);
+            loadDays(jewCalendar, position);
         }
         return dayList;
     }
 
-    private void loadDays(JewCalendar jewCalendar) {
-        List<Day> days =daysRepo.getMonthDays(jewCalendar);
-        dayList.postValue(days);
+    private void loadDays(JewCalendar jewCalendar, int position) {
+        new Thread(() -> {
+            long start = System.currentTimeMillis();
+            jewCalendar.shiftMonth(position);
+            MyLog.d( "#1 position=" + position + " | elapsed=" + (System.currentTimeMillis() - start));
+            start = System.currentTimeMillis();
+            List<Day> days = daysRepo.getMonthDays(jewCalendar);
+            MyLog.d( "#2 position=" + position + " | elapsed=" + (System.currentTimeMillis() - start));
+            dayList.postValue(days);
+        }).start();
+
     }
 }

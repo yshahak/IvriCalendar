@@ -36,6 +36,7 @@ public class DaysRepoImpl implements DaysRepo {
 
     @Override
     public List<Day> getMonthDays(JewCalendar jewCalendar) {
+        MyLog.d("getDays");
         List<Day> days = jewCalendar.getMonthDays();
         long start = days.get(0).getStartDayInMillis();
 //        MyLog.d(simpleDateFormat.format(new Date(start)));
@@ -45,11 +46,11 @@ public class DaysRepoImpl implements DaysRepo {
             do {
                 EventInstance eventInstance = EventsHelper.convertCursorToEvent(cur);
                 for (Day day : days){
-                    if (eventInstance.getBegin() > day.getStartDayInMillis() && eventInstance.getEnd() < day.getEndDayInMillis()){
+                    if (eventInstance.getBegin() >= day.getStartDayInMillis() && eventInstance.getEnd() <= day.getEndDayInMillis()){
                         day.getGoogleEventInstances().add(eventInstance);
                         break;
                     }
-                    MyLog.w("event not matched month range");
+//                    MyLog.w("event not matched month range:" + eventInstance.toString());
                 }
             }while (cur.moveToNext());
         }

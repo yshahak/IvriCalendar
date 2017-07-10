@@ -16,6 +16,8 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.Month.hebrewDateFormatt
 
 public class Day {
 
+    private static Calendar calendar = Calendar.getInstance();
+
     private List<EventInstance> googleEventInstances = new ArrayList<>();
     private String month;
     private final String label;
@@ -71,8 +73,7 @@ public class Day {
 
     private long[] getBeginAndEnd(JewishCalendar jewishCalendar) {
         long[] longs = new long[2];
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(jewishCalendar.getTime());
+        calendar.set(jewishCalendar.getGregorianYear(), jewishCalendar.getGregorianMonth(), jewishCalendar.getGregorianDayOfMonth());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
