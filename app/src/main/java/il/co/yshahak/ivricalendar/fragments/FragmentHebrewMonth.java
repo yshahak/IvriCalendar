@@ -1,5 +1,6 @@
 package il.co.yshahak.ivricalendar.fragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,7 +23,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
@@ -31,6 +31,9 @@ import il.co.yshahak.ivricalendar.calendar.EventsHelper;
 import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+import il.co.yshahak.ivricalendar.repo.DaysRepo;
+import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
+import il.co.yshahak.ivricalendar.views.MonthViewModel;
 
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJECTION;
@@ -42,6 +45,8 @@ import static il.co.yshahak.ivricalendar.calendar.google.Contract.INSTANCE_PROJE
  */
 
 public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+
+    private MonthViewModel monthViewModel;
 
     public static BaseCalendarFragment newInstance(int position) {
         FragmentHebrewMonth fragment = new FragmentHebrewMonth();
@@ -55,6 +60,8 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     DividerItemDecoration itemDecoration;
     @Inject
     EventsProvider eventsProvider;
+    @Inject
+    DaysRepo daysRepo;
 
     private RecyclerView recyclerView;
     private Handler handler;
@@ -64,6 +71,16 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         super.onCreate(savedInstanceState);
         ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
         handler = new Handler();
+        monthViewModel = ViewModelProviders.of(getActivity()).get(MonthViewModel.class);
+        monthViewModel.setDaysRepo(daysRepo);
+        new Thread(() -> {
+            MyLog.d("shifting=" + (position - FRONT_PAGE));
+            jewCalendar.shiftMonth(position - FRONT_PAGE);
+            monthViewModel.getDayList(jewCalendar).observe(FragmentHebrewMonth.this, days -> {
+                handler.post(() -> recyclerView.setAdapter(new RecyclerAdapterMonth(days, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight())));
+            });
+
+        }).start();
     }
 
     @Nullable
@@ -81,20 +98,7 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 7));
         recyclerView.addItemDecoration(itemDecoration);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                MyLog.d("shifting=" + (position - FRONT_PAGE));
-                jewCalendar.shiftMonth(position - FRONT_PAGE);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        getLoaderManager().initLoader(0, null, FragmentHebrewMonth.this);
-                        recyclerView.setAdapter(new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight()));
-                    }
-                });
-            }
-        }).start();
+
         return root;
     }
 

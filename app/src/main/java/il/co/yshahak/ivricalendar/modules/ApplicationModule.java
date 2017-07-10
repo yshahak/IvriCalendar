@@ -3,22 +3,24 @@ package il.co.yshahak.ivricalendar.modules;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.util.Log;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+import il.co.yshahak.ivricalendar.repo.DaysRepo;
+import il.co.yshahak.ivricalendar.repo.DaysRepoImpl;
+import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 
 /**
  * Created by Yaakov Shahak
  * on 21/06/17.
  */
 
+@SuppressWarnings("WeakerAccess")
 @Module
 public class ApplicationModule {
 
@@ -30,7 +32,6 @@ public class ApplicationModule {
 
     @Provides
     public JewCalendar provideJewCalendar(){
-        Log.d("TAG", "jew calendar created");
         return JewCalendar.obtain();
     }
 
@@ -50,7 +51,12 @@ public class ApplicationModule {
     }
 
     @Provides @Singleton
-    public ContentResolver provideContentRsolver(){
+    public DaysRepo provideDaysRepo(){
+        return new DaysRepoImpl(provideEventInterface(), provideContentResolver());
+    }
+
+    @Provides @Singleton
+    public ContentResolver provideContentResolver(){
         return application.getContentResolver();
     }
 

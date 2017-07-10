@@ -1,16 +1,15 @@
 package il.co.yshahak.ivricalendar.fragments;
 
+import android.arch.lifecycle.LifecycleFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-
-import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 /**
  * Created by yshah on 1/3/2017.
  */
 
-public  class BaseCalendarFragment extends Fragment {
+public  class BaseCalendarFragment extends LifecycleFragment {
     static final String KEY_POSITION = "keyPosition";
 
 //    JewCalendar jewishCalendar;

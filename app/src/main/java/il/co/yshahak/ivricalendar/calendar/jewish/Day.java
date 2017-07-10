@@ -21,6 +21,7 @@ public class Day {
     private final String label;
     private long startDayInMillis, endDayInMillis;
     private int dayInMonth;
+    private boolean isOutOfMonthRange;
 
     public Day(JewishCalendar jewishCalendar) {
         this.month = hebrewDateFormatter.formatMonth(jewishCalendar);
@@ -60,6 +61,13 @@ public class Day {
         return endDayInMillis;
     }
 
+    public void setOutOfMonthRange(boolean outOfMonthRange) {
+        isOutOfMonthRange = outOfMonthRange;
+    }
+
+    public boolean isOutOfMonthRange() {
+        return isOutOfMonthRange;
+    }
 
     private long[] getBeginAndEnd(JewishCalendar jewishCalendar) {
         long[] longs = new long[2];

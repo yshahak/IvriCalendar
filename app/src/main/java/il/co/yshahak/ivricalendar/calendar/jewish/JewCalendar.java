@@ -23,7 +23,7 @@ import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAG
  * on 12/28/2016.
  */
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class JewCalendar extends JewishCalendar implements Parcelable {
 
     public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
@@ -181,14 +181,14 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     private void shiftDayBackword() {
         int previous = getJewishDayOfMonth() - 1;
         if (previous == 0) {
-            shiftMonthForward();
+            shiftMonthBackword();
             previous = isFullMonth() ? 30 : 29;
         }
         setJewishDayOfMonth(previous);
     }
 
 
-    private void setOffsets() {
+    public void setOffsets() {
         { //calculate head
             int dayInMonth = getJewishDayOfMonth() % 7;
             Date date = getTime();
@@ -257,23 +257,29 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         return calendar.getTimeInMillis();
     }
 
-    public List<Day> getDays(int offset) {
+    public List<Day> getMonthDays() {
+        JewCalendar copy = (JewCalendar) clone();
+        copy.setJewishDayOfMonth(1);
+        copy.shiftDay(copy.getHeadOffset()*(-1));
         List<Day> days = new ArrayList<>();
-//        Calendar calendar = null;
-//        int dayOfMonth = 0;
-//        if (offset == 0){
-//            calendar = Calendar.getInstance();
-//            dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-//        }
-        for (int i = 0; i < getDaysInJewishMonth(); i++) {
-            setJewishDayOfMonth(i + 1);
-            days.add(new Day((JewishCalendar) clone()));
-//            if (offset == 0){
-//                calendar.setTime(getTime());
-//                if (dayOfMonth == calendar.get(Calendar.DAY_OF_MONTH)){
-//                    FragmentMonth.currentDay = days.get(i);
-//                }
-//            }
+        for (int i = 0; i < copy.getHeadOffset(); i++) {
+            Day day = new Day(copy);
+            day.setOutOfMonthRange(true);
+            copy.shiftDay(1);
+            days.add(day);
+        }
+        int daysSum = copy.getDaysInJewishMonth();
+        for (int i = 1; i <= daysSum; i++) {
+            copy.setJewishDayOfMonth(i);
+            Day day = new Day(copy);
+            days.add(day);
+        }
+        copy.shiftDay(1);
+        for (int i = 0; i < copy.getTrailOffset(); i++){
+            Day day = new Day(copy);
+            day.setOutOfMonthRange(true);
+            copy.shiftDay(1);
+            days.add(day);
         }
         return days;
     }
@@ -352,7 +358,6 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     public Object clone() {
         JewCalendar clone;
-
         clone = (JewCalendar) super.clone();
         clone.headOffst = this.headOffst;
         clone.trailOffse = this.trailOffse;

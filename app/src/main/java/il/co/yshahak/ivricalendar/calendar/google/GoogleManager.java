@@ -135,7 +135,7 @@ public class GoogleManager {
     }
 
     public static Uri asSyncAdapter(long begin, long end) {
-        Uri.Builder builder = CalendarContract.Instances.CONTENT_BY_DAY_URI.buildUpon()
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
         ContentUris.appendId(builder, begin);

@@ -1,5 +1,6 @@
 package il.co.yshahak.ivricalendar.adapters;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
+import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar.hebrewDateFormatter;
@@ -21,14 +23,15 @@ import static il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar.hebrewDateF
  */
 public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMonth.ViewHolder> {
 
-    private final int itemCount;
+    private int itemCount;
     private final static int VIEW_TYPE_DAY_CELL = 1;
     private final static int VIEW_TYPE_HEAD = 2;
     private static final int VIEW_TYPE_TAIL = 3;
-    private final JewCalendar jewCalendar;
+    private JewCalendar jewCalendar;
     private final int transparentColor, primaryColor;
     private final int cellHeight;
     private HashMap<Integer, List<EventInstance>> eventsMap;
+    private List<Day> dayList;
 
 
     public RecyclerAdapterMonth(JewCalendar jewCalendar, int transparentColor, int primaryColor, int height) {
@@ -37,6 +40,14 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
         this.primaryColor = primaryColor;
         this.itemCount = jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset();
         cellHeight = height / (itemCount / 7);
+    }
+
+    public RecyclerAdapterMonth(List<Day> days, int transparentColor, int primaryColor, int height) {
+        this.transparentColor = transparentColor;
+        this.primaryColor = primaryColor;
+//        this.itemCount = jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth() + jewCalendar.getTrailOffset();
+        cellHeight = height / (days.size() / 7);
+        this.dayList = days;
     }
 
     public void setEventsMap(HashMap<Integer, List<EventInstance>> eventsMap) {
@@ -49,13 +60,13 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
     @Override
     public int getItemViewType(int position) {
 
-        if (position < jewCalendar.getHeadOffset()) {
-            return VIEW_TYPE_HEAD;
-        }
-        if (position < jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth()) {
+//        if (position < jewCalendar.getHeadOffset()) {
+//            return VIEW_TYPE_HEAD;
+//        }
+//        if (position < jewCalendar.getHeadOffset() + jewCalendar.getDaysInJewishMonth()) {
             return VIEW_TYPE_DAY_CELL;
-        }
-        return VIEW_TYPE_TAIL;
+//        }
+//        return VIEW_TYPE_TAIL;
     }
 
     @Override
@@ -65,21 +76,38 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Object tagPosition = holder.itemView.getTag(R.string.tag_month_position);
-        if (holder.itemView.getTag(R.string.tag_month_position) != null && (int) tagPosition == position + 1) {
-            return;
-        } else {
-            holder.itemView.setTag(R.string.tag_month_position, position + 1);
-        }
-        holder.cellContainer.removeAllViews();
-        switch (holder.getItemViewType()) {
-            case VIEW_TYPE_DAY_CELL:
-                holder.label.setText(hebrewDateFormatter.formatHebrewNumber(position + 1));
-                setDay(holder, position - jewCalendar.getHeadOffset());
-                break;
-//            default:
-//                holder.label.setBackgroundColor(transparentColor);
 
+//        Object tagPosition = holder.itemView.getTag(R.string.tag_month_position);
+//        if (holder.itemView.getTag(R.string.tag_month_position) != null && (int) tagPosition == position + 1) {
+//            return;
+//        } else {
+//            holder.itemView.setTag(R.string.tag_month_position, position + 1);
+//        }
+//        holder.cellContainer.removeAllViews();
+//        switch (holder.getItemViewType()) {
+//            case VIEW_TYPE_DAY_CELL:
+//                holder.label.setText(hebrewDateFormatter.formatHebrewNumber(position + 1));
+//                setDay(holder, position - jewCalendar.getHeadOffset());
+//                break;
+////            default:
+////                holder.label.setBackgroundColor(transparentColor);
+//
+//        }
+        Day day = dayList.get(position);
+        holder.itemView.setBackgroundColor(day.isOutOfMonthRange() ? Color.LTGRAY: Color.TRANSPARENT);
+        holder.label.setText(day.getLabel());
+        List<EventInstance> eventInstances = day.getGoogleEventInstances();
+        if (eventInstances == null || eventInstances.size() == 0) {
+            return;
+        }
+        LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
+        for (EventInstance eventInstance : eventInstances){
+            TextView textView = (TextView) inflater.inflate(R.layout.text_view_event_for_month, holder.cellContainer, false);
+            textView.setText(eventInstance.getEventTitle());
+            textView.setBackgroundColor(eventInstance.getDisplayColor());
+            holder.cellContainer.addView(textView);
+            textView.setTag(eventInstance);
+//            textView.setOnClickListener(holder);
         }
     }
 
@@ -113,7 +141,7 @@ public class RecyclerAdapterMonth extends RecyclerView.Adapter<RecyclerAdapterMo
 
     @Override
     public int getItemCount() {
-        return itemCount;
+        return dayList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

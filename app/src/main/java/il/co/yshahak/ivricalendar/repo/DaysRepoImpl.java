@@ -3,9 +3,11 @@ package il.co.yshahak.ivricalendar.repo;
 import android.content.ContentResolver;
 import android.database.Cursor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import net.alexandroid.shpref.MyLog;
+
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -22,24 +24,34 @@ import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 public class DaysRepoImpl implements DaysRepo {
 
+    private final EventsProvider eventsProvider;
+    private final ContentResolver contentResolver;
+
     @Inject
-    EventsProvider eventsProvider;
-    @Inject
-    ContentResolver contentResolver;
+    public DaysRepoImpl(EventsProvider eventsProvider, ContentResolver contentResolver) {
+        this.eventsProvider = eventsProvider;
+        this.contentResolver = contentResolver;
+    }
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss", Locale.US);
 
     @Override
     public List<Day> getMonthDays(JewCalendar jewCalendar) {
-        List<Day> days = new ArrayList<>();
-        int daysSum = jewCalendar.getDaysInJewishMonth();
-        for (int i = 1; i <= daysSum; i++) {
-            jewCalendar.setJewishDayOfMonth(i);
-            Day day = new Day(jewCalendar);
-            days.add(day);
-        }
-        Cursor cursor = eventsProvider.getEvents(contentResolver, jewCalendar.getBeginOfMonth(), jewCalendar.getEndOfMonth());
-        final HashMap<Integer, List<EventInstance>> eventsMap = EventsHelper.getEventsMap(cursor);
-        for (int key : eventsMap.keySet()) {
-            days.get(key).setGoogleEventInstances(eventsMap.get(key));
+        List<Day> days = jewCalendar.getMonthDays();
+        long start = days.get(0).getStartDayInMillis();
+//        MyLog.d(simpleDateFormat.format(new Date(start)));
+        long end = days.get(days.size() - 1).getEndDayInMillis();
+        Cursor cur = eventsProvider.getEvents(contentResolver, start, end);
+        if (cur.moveToFirst()){
+            do {
+                EventInstance eventInstance = EventsHelper.convertCursorToEvent(cur);
+                for (Day day : days){
+                    if (eventInstance.getBegin() > day.getStartDayInMillis() && eventInstance.getEnd() < day.getEndDayInMillis()){
+                        day.getGoogleEventInstances().add(eventInstance);
+                        break;
+                    }
+                    MyLog.w("event not matched month range");
+                }
+            }while (cur.moveToNext());
         }
         return days;
     }

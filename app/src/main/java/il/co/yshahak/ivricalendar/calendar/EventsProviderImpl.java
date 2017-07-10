@@ -15,7 +15,6 @@ import java.util.TimeZone;
 
 import il.co.yshahak.ivricalendar.calendar.google.CalendarAccount;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
-import il.co.yshahak.ivricalendar.calendar.google.GoogleManager;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 /**
@@ -139,19 +138,18 @@ public class EventsProviderImpl implements EventsProvider {
 
     @Override
     public Cursor getEvents(ContentResolver cr, long begin, long end) {
-        Uri uri = GoogleManager.asSyncAdapter(begin, end);
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google");
+        ContentUris.appendId(builder, begin);
+        ContentUris.appendId(builder, end);
         String WHERE_CALENDARS_SELECTED = CalendarContract.Calendars.VISIBLE + " = ? "; //AND " +
         String[] WHERE_CALENDARS_ARGS = {"1"};//
-//        Cursor cur;
-        return cr.query(uri,
+        return cr.query(builder.build(),
                 INSTANCE_PROJECTION,
                 WHERE_CALENDARS_SELECTED,
                 WHERE_CALENDARS_ARGS,
                 null);
-//        if (cur == null) {
-//            return null;
-//        }
-//        return EventsHelper.getEvents(cur);
     }
 
     @Override

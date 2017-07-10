@@ -2,6 +2,7 @@ package il.co.yshahak.ivricalendar;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.text.format.Time;
@@ -12,11 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 
 import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
-import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static org.junit.Assert.assertTrue;
@@ -41,11 +40,8 @@ public class ExampleInstrumentedTest {
         JewCalendar jewCalendar = new JewCalendar();
         EventsProviderImpl eventsInterface = new EventsProviderImpl();
         ContentResolver cr = cycleContext.getContentResolver();
-        List<EventInstance> list = eventsInterface.getEvents(cr , jewCalendar.getBeginOfMonth(), jewCalendar.getEndOfMonth());
-        assertTrue(list != null);
-        for (EventInstance eventInstance : list){
-            System.out.println(eventInstance.toString());
-        }
+        Cursor cursor = eventsInterface.getEvents(cr , jewCalendar.getBeginOfMonth(), jewCalendar.getEndOfMonth());
+        assertTrue(cursor != null);
 
     }
 
