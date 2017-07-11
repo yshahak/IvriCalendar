@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import il.co.yshahak.ivricalendar.MonthViewModelFactory;
 import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
@@ -58,6 +59,11 @@ public class ApplicationModule {
     @Provides @Singleton
     public ContentResolver provideContentResolver(){
         return application.getContentResolver();
+    }
+
+    @Provides @Singleton
+    public MonthViewModelFactory provideMonthViewModelFactory(){
+        return new MonthViewModelFactory(provideDaysRepo());
     }
 
 }

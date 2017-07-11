@@ -35,7 +35,7 @@ public class DaysRepoImpl implements DaysRepo {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss", Locale.US);
 
     @Override
-    public List<Day> getMonthDays(JewCalendar jewCalendar) {
+    public void setMonthEvents(JewCalendar jewCalendar) {
         MyLog.d("getDays");
         List<Day> days = jewCalendar.getMonthDays();
         long start = days.get(0).getStartDayInMillis();
@@ -54,6 +54,5 @@ public class DaysRepoImpl implements DaysRepo {
                 }
             }while (cur.moveToNext());
         }
-        return days;
     }
 }

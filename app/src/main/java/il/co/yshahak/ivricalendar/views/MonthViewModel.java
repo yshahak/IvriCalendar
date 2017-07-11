@@ -19,10 +19,10 @@ import il.co.yshahak.ivricalendar.repo.DaysRepo;
 
 public class MonthViewModel extends ViewModel {
 
-    private DaysRepo daysRepo;
+    private final DaysRepo daysRepo;
     private MutableLiveData<List<Day>> dayList;
 
-    public void setDaysRepo(DaysRepo daysRepo) {
+    public MonthViewModel(DaysRepo daysRepo) {
         this.daysRepo = daysRepo;
     }
 
@@ -35,14 +35,15 @@ public class MonthViewModel extends ViewModel {
     }
 
     private void loadDays(JewCalendar jewCalendar, int position) {
+//        long time = System.currentTimeMillis();
+//        jewCalendar.shiftMonth(position);
+//        MyLog.d( "#1 position=" + position + " | elapsed=" + (System.currentTimeMillis() - time));
+        dayList.setValue(jewCalendar.getMonthDays());
         new Thread(() -> {
             long start = System.currentTimeMillis();
-            jewCalendar.shiftMonth(position);
-            MyLog.d( "#1 position=" + position + " | elapsed=" + (System.currentTimeMillis() - start));
-            start = System.currentTimeMillis();
-            List<Day> days = daysRepo.getMonthDays(jewCalendar);
+            daysRepo.setMonthEvents(jewCalendar);
             MyLog.d( "#2 position=" + position + " | elapsed=" + (System.currentTimeMillis() - start));
-            dayList.postValue(days);
+            dayList.postValue(jewCalendar.getMonthDays());
         }).start();
 
     }

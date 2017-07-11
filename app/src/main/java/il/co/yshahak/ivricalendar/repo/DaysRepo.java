@@ -1,8 +1,5 @@
 package il.co.yshahak.ivricalendar.repo;
 
-import java.util.List;
-
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 /**
@@ -12,6 +9,6 @@ import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 public interface DaysRepo {
 
-    List<Day> getMonthDays(JewCalendar jewCalendar);
+    void setMonthEvents(JewCalendar jewCalendar);
 
 }

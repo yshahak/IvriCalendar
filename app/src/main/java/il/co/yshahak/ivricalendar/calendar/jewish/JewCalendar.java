@@ -2,7 +2,6 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.util.Pools;
 import android.util.SparseArray;
 
 import net.alexandroid.shpref.MyLog;
@@ -34,11 +33,14 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     private int headOffset, trailOffset;
 
-    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(5);
+    private static final int POOL_SIZE = 10;
+//    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(POOL_SIZE);
     private static SparseArray<JewCalendar> jewCalendarSparseArray = new SparseArray<>();
     private int oldPosition;
-    private boolean isRecycled;
+//    private boolean isRecycled;
     public boolean flagCurrentMonth;
+    private static SparseArray<JewCalendar> calendars = new SparseArray<>();
+    private List<Day> dayList = new ArrayList<>();
 
     public JewCalendar(int jewishYear, int jewishMonth, int day) {
         super(jewishYear, jewishMonth, day);
@@ -48,26 +50,44 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         super(calendar);
     }
 
+    public static void initPool(){
+        for (int i = 0 ; i < POOL_SIZE; i++){
+            obtain(POOL_SIZE/2 + i);
+        }
+    }
+
     public static JewCalendar obtain() {
-        JewCalendar instance = sPool.acquire();
+//        JewCalendar instance = sPool.acquire();
+//        if ((instance == null)) {
+//            MyLog.d("create new JewCalendar");
+//            instance = new JewCalendar();
+//        }
+//        instance.isRecycled = false;
+        return null;
+    }
+
+    public static JewCalendar obtain(int position) {
+        JewCalendar instance = jewCalendarSparseArray.get(position);
         if ((instance == null)) {
             MyLog.d("create new JewCalendar");
             instance = new JewCalendar();
+            instance.shiftMonth(position);
+            jewCalendarSparseArray.put(position, instance);
         }
-        instance.isRecycled = false;
+//        instance.isRecycled = false;
         return instance;
     }
 
     public void recycle() {
-        if (!isRecycled) {
-            sPool.release(this);
-        }
-        isRecycled = true;
+//        if (!isRecycled) {
+//            sPool.release(this);
+//        }
+//        isRecycled = true;
     }
 
-    public boolean isRecycled() {
-        return isRecycled;
-    }
+//    public boolean isRecycled() {
+//        return isRecycled;
+//    }
 
     public JewCalendar(int offset) {
         shiftMonth(offset);
@@ -100,6 +120,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
             flagCurrentMonth = true;
         }
         setOffsets();
+        setMonthDays();
         oldPosition = position;
         return this;
     }
@@ -259,30 +280,33 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public List<Day> getMonthDays() {
+        return dayList;
+    }
+
+    public void setMonthDays() {
+        dayList.clear();
         JewCalendar copy = (JewCalendar) clone();
         copy.setJewishDayOfMonth(1);
         copy.shiftDay(copy.getHeadOffset()*(-1));
-        List<Day> days = new ArrayList<>();
         for (int i = 0; i < copy.getHeadOffset(); i++) {
             Day day = new Day(copy);
             day.setOutOfMonthRange(true);
             copy.shiftDay(1);
-            days.add(day);
+            dayList.add(day);
         }
         int daysSum = copy.getDaysInJewishMonth();
         for (int i = 1; i <= daysSum; i++) {
             copy.setJewishDayOfMonth(i);
             Day day = new Day(copy);
-            days.add(day);
+            dayList.add(day);
         }
         copy.shiftDay(1);
         for (int i = 0; i < copy.getTrailOffset(); i++){
             Day day = new Day(copy);
             day.setOutOfMonthRange(true);
             copy.shiftDay(1);
-            days.add(day);
+            dayList.add(day);
         }
-        return days;
     }
 
 

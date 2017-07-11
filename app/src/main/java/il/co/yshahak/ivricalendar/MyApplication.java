@@ -5,6 +5,7 @@ import android.app.Application;
 import net.alexandroid.shpref.MyLog;
 import net.alexandroid.shpref.ShPref;
 
+import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.components.ApplicationComponent;
 import il.co.yshahak.ivricalendar.components.DaggerApplicationComponent;
 import il.co.yshahak.ivricalendar.modules.ApplicationModule;
@@ -24,6 +25,7 @@ public class MyApplication extends Application {
         ShPref.init(this, ShPref.APPLY);
         MyLog.setTag("ZAQ");
         MyLog.showLogs(BuildConfig.DEBUG);
+        JewCalendar.initPool();
         component = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .build();

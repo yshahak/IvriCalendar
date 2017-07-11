@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import il.co.yshahak.ivricalendar.MonthViewModelFactory;
 import il.co.yshahak.ivricalendar.MyApplication;
 import il.co.yshahak.ivricalendar.R;
 import il.co.yshahak.ivricalendar.adapters.DaysHeaderAdapter;
@@ -33,7 +34,6 @@ import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
-import il.co.yshahak.ivricalendar.repo.DaysRepo;
 import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.views.MonthViewModel;
 
@@ -56,14 +56,14 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         return fragment;
     }
 
-    @Inject
+//    @Inject
     JewCalendar jewCalendar;
     @Inject
     DividerItemDecoration itemDecoration;
     @Inject
     EventsProvider eventsProvider;
     @Inject
-    DaysRepo daysRepo;
+    MonthViewModelFactory viewModelFactory;
 
     private RecyclerView recyclerView;
     private Handler handler;
@@ -73,9 +73,9 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
+        jewCalendar = JewCalendar.obtain(position - FRONT_PAGE);
         handler = new Handler();
-        monthViewModel = ViewModelProviders.of(this).get(MonthViewModel.class);
-        monthViewModel.setDaysRepo(daysRepo);
+        monthViewModel = ViewModelProviders.of(this, viewModelFactory).get(MonthViewModel.class);
         dayList = monthViewModel.getDayList(jewCalendar, position - FRONT_PAGE);
         dayList.observe(FragmentHebrewMonth.this,
                 days -> setRecyclerView());
