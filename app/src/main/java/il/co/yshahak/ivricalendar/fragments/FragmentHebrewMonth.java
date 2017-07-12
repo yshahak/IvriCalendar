@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -16,8 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import net.alexandroid.shpref.MyLog;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +31,7 @@ import il.co.yshahak.ivricalendar.calendar.EventsProvider;
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
+import il.co.yshahak.ivricalendar.room.database.CalendarDataBase;
 import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 import il.co.yshahak.ivricalendar.views.MonthViewModel;
 
@@ -64,16 +62,18 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     EventsProvider eventsProvider;
     @Inject
     MonthViewModelFactory viewModelFactory;
+    @Inject
+    CalendarDataBase calendarDataBase;
 
     private RecyclerView recyclerView;
-    private Handler handler;
     private LiveData<List<Day>> dayList;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
-        handler = new Handler();
+        jewCalendar.shiftMonth(position - FRONT_PAGE);
+//        Month month = calendarDataBase.monthDao().getByHashCode(jewCalendar.monthHashCode());
         monthViewModel = ViewModelProviders.of(this, viewModelFactory).get(MonthViewModel.class);
         dayList = monthViewModel.getDayList(jewCalendar, position - FRONT_PAGE);
         dayList.observe(FragmentHebrewMonth.this,
@@ -132,20 +132,20 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
             @Override
             public void run() {
                 final HashMap<Integer, List<EventInstance>> eventsMap = EventsHelper.getEventsMap(cursor);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isAdded()) {
-                            MyLog.d("size = " + eventsMap.size());
-                            RecyclerAdapterMonth adapterMonth = (RecyclerAdapterMonth) recyclerView.getAdapter();
-                            if (adapterMonth == null) {
-                                adapterMonth = new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight());
-                                recyclerView.setAdapter(adapterMonth);
-                            }
-                            adapterMonth.setEventsMap(eventsMap);
-                        }
-                    }
-                });
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (isAdded()) {
+//                            MyLog.d("size = " + eventsMap.size());
+//                            RecyclerAdapterMonth adapterMonth = (RecyclerAdapterMonth) recyclerView.getAdapter();
+//                            if (adapterMonth == null) {
+//                                adapterMonth = new RecyclerAdapterMonth(jewCalendar, getActivity().getResources().getColor(android.R.color.transparent), getActivity().getResources().getColor(R.color.colorPrimary), recyclerView.getHeight());
+//                                recyclerView.setAdapter(adapterMonth);
+//                            }
+//                            adapterMonth.setEventsMap(eventsMap);
+//                        }
+//                    }
+//                });
             }
         }).start();
 

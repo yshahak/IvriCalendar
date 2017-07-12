@@ -51,24 +51,33 @@ public class MyApplication extends Application {
             @Override
             public void run() {
                 calendarDataBase.monthDao().deleteAll();
+                int numOfMonthInDb = calendarDataBase.monthDao().getCount().length;
+                if (numOfMonthInDb > 5){
+                    return;
+                }
                 JewCalendar calendar = new JewCalendar();
                 calendar.setJewishDayOfMonth(1);
                 for (int i = 0; i <= 20; i++) {
-                    Month month = calendarDataBase.monthDao().getByHashCode(calendar.hashCode());
+                    Month month = calendarDataBase.monthDao().getByHashCode(calendar.monthHashCode());
                     if (month == null) {
                         calendar.setOffsets();
                         month = new Month(calendar);
                         calendarDataBase.monthDao().insertMonth(month);
+                        calendar.setMonthDays();
+                        calendarDataBase.dayDao().insertAll(calendar.getMonthDays());
                     }
                     calendar.shiftMonthForward();
                 }
                 calendar = new JewCalendar();
                 for (int i = 0; i >= -20; i--) {
                     calendar.shiftMonthBackword();
-                    Month month = calendarDataBase.monthDao().getByHashCode(calendar.hashCode());
+                    Month month = calendarDataBase.monthDao().getByHashCode(calendar.monthHashCode());
                     if (month == null) {
+                        calendar.setOffsets();
                         month = new Month(calendar);
                         calendarDataBase.monthDao().insertMonth(month);
+                        calendar.setMonthDays();
+                        calendarDataBase.dayDao().insertAll(calendar.getMonthDays());
                     }
                 }
             }

@@ -22,7 +22,7 @@ public class Week {
         for (int i = 0 ; i < 7 ; i++){
             date = jewishCalendar.getTime();
             date.setTime(date.getTime() + (i + 1 - dayOfWeek) * DAY_IN_MS);
-            JewishCalendar calendar = new JewishCalendar(date);
+            JewCalendar calendar = new JewCalendar(date);
             days[i] = new Day(calendar);
         }
 

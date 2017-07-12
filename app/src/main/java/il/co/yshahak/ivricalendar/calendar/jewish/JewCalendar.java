@@ -118,8 +118,8 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         } else {
             flagCurrentMonth = true;
         }
-        setOffsets();
-        setMonthDays();
+//        setOffsets();
+//        setMonthDays();
         oldPosition = position;
         return this;
     }
@@ -446,38 +446,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         return current.getMonthName() + " , " + current.getYearName();
     }
 
-    public int monthHashCode(){
-
-        int result = 17;
-        result = 37 * result + this.getClass().hashCode();
-        int absDate = 1;
-        int year = getGregorianYear();
-        for(int m = getJewishMonth() - 1; m > 0; --m) {
-            absDate += getLastDayOfGregorianMonth(m, year);
-        }
-        absDate = absDate + 365 * (year - 1) + (year - 1) / 4 - (year - 1) / 100 + (year - 1) / 400;
-        result += 37 * result + absDate + (this.getInIsrael()?1:3);
-        return result;
-
+    public int monthHashCode() {
+        return (getJewishYear() - 5700) * 1000 + getJewishMonth() * 100;
     }
-
-    private static int getLastDayOfGregorianMonth(int month, int year) {
-        switch(month) {
-            case 2:
-                return (year % 4 != 0 || year % 100 == 0) && year % 400 != 0?28:29;
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            default:
-                return 31;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                return 30;
-        }
-    }
-
 }

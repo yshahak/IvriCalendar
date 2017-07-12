@@ -28,9 +28,8 @@ public class Month {
     @Ignore
     private int monthNumberOfDays;
 
-    @PrimaryKey
-    @ColumnInfo(name = "hash_code")
-    private int hashCode;
+    @PrimaryKey @ColumnInfo(name = "id")
+    private int id;
     @ColumnInfo(name = "year_name")
     private String yearName;
     @ColumnInfo(name = "month_name")
@@ -51,13 +50,13 @@ public class Month {
     }
 
     public Month(JewCalendar jewishCalendar) {
+        this.id = jewishCalendar.monthHashCode();
         this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
         this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
         int monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
         this.isFullMonth = (monthNumberOfDays == 30);
         this.headOffst = jewishCalendar.getHeadOffset();
         this.trailOffse = jewishCalendar.getHeadOffset();
-        this.hashCode = jewishCalendar.hashCode();
         this.beginOfMonth = jewishCalendar.getBeginOfMonth();
         this.endOfMonth = jewishCalendar.getEndOfMonth();
     }
@@ -175,8 +174,8 @@ public class Month {
         this.monthNumberOfDays = monthNumberOfDays;
     }
 
-    public void setHashCode(int hashCode) {
-        this.hashCode = hashCode;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setYearName(String yearName) {
@@ -227,9 +226,9 @@ public class Month {
         return hebrewDateFormatter;
     }
 
-//    public int getHashCode() {
-//        return hashCode;
-//    }
+    public int getId() {
+        return id;
+    }
 
     public int getHeadOffst() {
         return headOffst;
