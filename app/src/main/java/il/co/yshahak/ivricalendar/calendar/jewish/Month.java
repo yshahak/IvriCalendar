@@ -1,7 +1,9 @@
 package il.co.yshahak.ivricalendar.calendar.jewish;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
 import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
@@ -13,23 +15,53 @@ import java.util.List;
 /**
  * Created by yshahak on 07/10/2016.
  */
-
-public class Month implements Parcelable {
-
+@Entity
+public class Month {
+    @Ignore
     public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
 
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
+    @Ignore
     private List<Day> days = new ArrayList<>();
-    private String yearName;
-    private String monthName;
+    @Ignore
     private int monthNumberOfDays;
-    private int headOffst, trailOffse;
 
-//    private int headOffsetMonth;
-//    private int trailOffsetMonth;
+    @PrimaryKey
+    @ColumnInfo(name = "hash_code")
+    private int hashCode;
+    @ColumnInfo(name = "year_name")
+    private String yearName;
+    @ColumnInfo(name = "month_name")
+    private String monthName;
+    @ColumnInfo (name = "head_offset")
+    private int headOffst;
+    @ColumnInfo(name = "trail_offset")
+    private int trailOffse;
+    @ColumnInfo(name = "full_month")
     private boolean isFullMonth;
+    @ColumnInfo(name = "begin")
+    private long beginOfMonth;
+    @ColumnInfo(name = "end")
+    private long endOfMonth;
+
+
+    public Month() {
+    }
+
+    public Month(JewCalendar jewishCalendar) {
+        this.yearName = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishYear());
+        this.monthName = hebrewDateFormatter.formatMonth(jewishCalendar);
+        int monthNumberOfDays = jewishCalendar.getDaysInJewishMonth();
+        this.isFullMonth = (monthNumberOfDays == 30);
+        this.headOffst = jewishCalendar.getHeadOffset();
+        this.trailOffse = jewishCalendar.getHeadOffset();
+        this.hashCode = jewishCalendar.hashCode();
+        this.beginOfMonth = jewishCalendar.getBeginOfMonth();
+        this.endOfMonth = jewishCalendar.getEndOfMonth();
+    }
+
 
     public Month(JewCalendar jewishCalendar, int offset) {
         int currrentYear = jewishCalendar.getJewishYear();
@@ -44,8 +76,6 @@ public class Month implements Parcelable {
         setOffsets(jewishCalendar);
         jewishCalendar.setJewishDate(currrentYear, currentMonth, curretnDay);
     }
-
-
 
     public static JewishCalendar shiftMonth(JewishCalendar jewishCalendar, int offst) {
         int currentMonth = jewishCalendar.getJewishMonth();
@@ -96,7 +126,7 @@ public class Month implements Parcelable {
         }
     }
 
-    private void shiftMonthForward(JewCalendar jewishCalendar){
+    public void shiftMonthForward(JewCalendar jewishCalendar){
         int next = jewishCalendar.getJewishMonth() + 1;
         if (next == 14 || (next == 13 && !jewishCalendar.isJewishLeapYear())) {
             next = 1;
@@ -105,7 +135,7 @@ public class Month implements Parcelable {
         jewishCalendar.setJewishMonth(next);
     }
 
-    private void shiftMonthBackword(JewCalendar jewishCalendar) {
+    public void shiftMonthBackword(JewCalendar jewishCalendar) {
         int previous = jewishCalendar.getJewishMonth() - 1;
         if (previous == 0) {
             jewishCalendar.setJewishYear(jewishCalendar.getJewishYear() - 1);
@@ -141,6 +171,41 @@ public class Month implements Parcelable {
         }
     }
 
+    public void setMonthNumberOfDays(int monthNumberOfDays) {
+        this.monthNumberOfDays = monthNumberOfDays;
+    }
+
+    public void setHashCode(int hashCode) {
+        this.hashCode = hashCode;
+    }
+
+    public void setYearName(String yearName) {
+        this.yearName = yearName;
+    }
+
+    public void setMonthName(String monthName) {
+        this.monthName = monthName;
+    }
+
+    public void setHeadOffst(int headOffst) {
+        this.headOffst = headOffst;
+    }
+
+    public void setTrailOffse(int trailOffse) {
+        this.trailOffse = trailOffse;
+    }
+
+    public void setFullMonth(boolean fullMonth) {
+        isFullMonth = fullMonth;
+    }
+
+    public void setBeginOfMonth(long beginOfMonth) {
+        this.beginOfMonth = beginOfMonth;
+    }
+
+    public void setEndOfMonth(long endOfMonth) {
+        this.endOfMonth = endOfMonth;
+    }
 
     public String getYearName() {
         return yearName;
@@ -154,60 +219,35 @@ public class Month implements Parcelable {
         return monthNumberOfDays;
     }
 
-//    public int getHeadOffsetMonth() {
-//        return headOffsetMonth;
-//    }
-//
-//    public int getTrailOffsetMonth() {
-//        return trailOffsetMonth;
-//    }
-
     public List<Day> getDays() {
         return days;
     }
 
-//    public JewishCalendar getJewishCalendar() {
-//        return jewishCalendar;
+    public static HebrewDateFormatter getHebrewDateFormatter() {
+        return hebrewDateFormatter;
+    }
+
+//    public int getHashCode() {
+//        return hashCode;
 //    }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getHeadOffst() {
+        return headOffst;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeParcelable(this.jewishCalendar, flags);
-        dest.writeList(this.days);
-        dest.writeString(this.yearName);
-        dest.writeString(this.monthName);
-        dest.writeInt(this.monthNumberOfDays);
-//        dest.writeInt(this.headOffsetMonth);
-//        dest.writeInt(this.trailOffsetMonth);
-        dest.writeByte(this.isFullMonth ? (byte) 1 : (byte) 0);
+    public int getTrailOffse() {
+        return trailOffse;
     }
 
-    protected Month(Parcel in) {
-//        this.jewishCalendar = in.readParcelable(JewishCalendar.class.getClassLoader());
-        this.days = new ArrayList<>();
-        in.readList(this.days, Day.class.getClassLoader());
-        this.yearName = in.readString();
-        this.monthName = in.readString();
-        this.monthNumberOfDays = in.readInt();
-//        this.headOffsetMonth = in.readInt();
-//        this.trailOffsetMonth = in.readInt();
-        this.isFullMonth = in.readByte() != 0;
+    public boolean isFullMonth() {
+        return isFullMonth;
     }
 
-    public static final Parcelable.Creator<Month> CREATOR = new Parcelable.Creator<Month>() {
-        @Override
-        public Month createFromParcel(Parcel source) {
-            return new Month(source);
-        }
+    public long getBeginOfMonth() {
+        return beginOfMonth;
+    }
 
-        @Override
-        public Month[] newArray(int size) {
-            return new Month[size];
-        }
-    };
+    public long getEndOfMonth() {
+        return endOfMonth;
+    }
 }

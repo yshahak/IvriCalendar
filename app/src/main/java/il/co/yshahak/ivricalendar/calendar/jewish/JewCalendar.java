@@ -2,7 +2,7 @@ package il.co.yshahak.ivricalendar.calendar.jewish;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.SparseArray;
+import android.support.v4.util.Pools;
 
 import net.alexandroid.shpref.MyLog;
 import net.sourceforge.zmanim.hebrewcalendar.HebrewDateFormatter;
@@ -12,8 +12,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
+
+import il.co.yshahak.ivricalendar.room.database.CalendarDataBase;
 
 import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAGE;
 
@@ -25,21 +30,23 @@ import static il.co.yshahak.ivricalendar.adapters.CalendarPagerAdapter.FRONT_PAG
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class JewCalendar extends JewishCalendar implements Parcelable {
 
-    public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
+    @Inject
+    CalendarDataBase calendarDataBase;
 
+    public static HebrewDateFormatter hebrewDateFormatter = new HebrewDateFormatter();
+    private static JewCalendar calculatorCalendar = new JewCalendar();
     static {
         hebrewDateFormatter.setHebrewFormat(true);
     }
 
     private int headOffset, trailOffset;
 
-    private static final int POOL_SIZE = 10;
-//    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(POOL_SIZE);
-    private static SparseArray<JewCalendar> jewCalendarSparseArray = new SparseArray<>();
+    private static final int POOL_SIZE = 5;
+    private static final Pools.SynchronizedPool<JewCalendar> sPool = new Pools.SynchronizedPool<>(POOL_SIZE);
+    private static HashMap<Integer, JewCalendar> jewCalendarMap = new HashMap<>();
     private int oldPosition;
-//    private boolean isRecycled;
+    private boolean isRecycled;
     public boolean flagCurrentMonth;
-    private static SparseArray<JewCalendar> calendars = new SparseArray<>();
     private List<Day> dayList = new ArrayList<>();
 
     public JewCalendar(int jewishYear, int jewishMonth, int day) {
@@ -51,43 +58,37 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public static void initPool(){
+        List<JewCalendar> calendars = new ArrayList<>();
         for (int i = 0 ; i < POOL_SIZE; i++){
-            obtain(POOL_SIZE/2 + i);
+            JewCalendar instance = obtain();
+            instance.shiftMonth(POOL_SIZE / 2 + i);
+            calendars.add(instance);
+        }
+        for (JewCalendar jewCalendar: calendars){
+            jewCalendar.recycle();
         }
     }
 
     public static JewCalendar obtain() {
-//        JewCalendar instance = sPool.acquire();
-//        if ((instance == null)) {
-//            MyLog.d("create new JewCalendar");
-//            instance = new JewCalendar();
-//        }
-//        instance.isRecycled = false;
-        return null;
-    }
-
-    public static JewCalendar obtain(int position) {
-        JewCalendar instance = jewCalendarSparseArray.get(position);
+        JewCalendar instance = sPool.acquire();
         if ((instance == null)) {
             MyLog.d("create new JewCalendar");
             instance = new JewCalendar();
-            instance.shiftMonth(position);
-            jewCalendarSparseArray.put(position, instance);
         }
-//        instance.isRecycled = false;
+        instance.isRecycled = false;
         return instance;
     }
 
     public void recycle() {
-//        if (!isRecycled) {
-//            sPool.release(this);
-//        }
-//        isRecycled = true;
+        if (!isRecycled) {
+            sPool.release(this);
+        }
+        isRecycled = true;
     }
 
-//    public boolean isRecycled() {
-//        return isRecycled;
-//    }
+    public boolean isRecycled() {
+        return isRecycled;
+    }
 
     public JewCalendar(int offset) {
         shiftMonth(offset);
@@ -103,16 +104,14 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public JewCalendar shiftMonth(int position) {
-        jewCalendarSparseArray.put(position + FRONT_PAGE, this);
+        jewCalendarMap.put(position + FRONT_PAGE, this);
         int offset = position - oldPosition;
         MyLog.d("offset=" + offset);
         if (offset > 0) {
-//            shiftForward(offset);
             for (int i = 0; i < offset; i++) {
                 shiftMonthForward();
             }
         } else if (offset < 0) {
-//            shiftBackward(offset);
             for (int i = offset * (-1); i > 0; i--) {
                 shiftMonthBackword();
             }
@@ -125,27 +124,27 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
         return this;
     }
 
-    private void shiftForward(int offset) {
-        int current = getJewishMonth();
-        int next = getJewishMonth() + offset;
-        if (next >= 7 && current < 7) {
-            setJewishYear(getJewishYear() + 1);
-        } else if (next >= 14 || (next >= 13 && !isJewishLeapYear())) {
-            next = next - (isJewishLeapYear() ? 13 : 12);
-        }
-        setJewishMonth(next);
-    }
-
-    private void shiftBackward(int offset) {
-        int current = getJewishMonth();
-        int previous = getJewishMonth() + offset;
-        if (previous <= 0) {
-            previous = previous + (isJewishLeapYear() ? 13 : 12);
-        } else if (current > 6 && previous <= 6) {
-            setJewishYear(getJewishYear() - 1);
-        }
-        setJewishMonth(previous);
-    }
+//    private void shiftForward(int offset) {
+//        int current = getJewishMonth();
+//        int next = getJewishMonth() + offset;
+//        if (next >= 7 && current < 7) {
+//            setJewishYear(getJewishYear() + 1);
+//        } else if (next >= 14 || (next >= 13 && !isJewishLeapYear())) {
+//            next = next - (isJewishLeapYear() ? 13 : 12);
+//        }
+//        setJewishMonth(next);
+//    }
+//
+//    private void shiftBackward(int offset) {
+//        int current = getJewishMonth();
+//        int previous = getJewishMonth() + offset;
+//        if (previous <= 0) {
+//            previous = previous + (isJewishLeapYear() ? 13 : 12);
+//        } else if (current > 6 && previous <= 6) {
+//            setJewishYear(getJewishYear() - 1);
+//        }
+//        setJewishMonth(previous);
+//    }
 
 
     public void shiftDay(int offset) {
@@ -285,28 +284,40 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     public void setMonthDays() {
         dayList.clear();
-        JewCalendar copy = (JewCalendar) clone();
+        JewCalendar copy = this;
         copy.setJewishDayOfMonth(1);
         copy.shiftDay(copy.getHeadOffset()*(-1));
         for (int i = 0; i < copy.getHeadOffset(); i++) {
             Day day = new Day(copy);
             day.setOutOfMonthRange(true);
             copy.shiftDay(1);
+            if (dayList.size() ==0 ){
+                day.setBeginAndEnd(copy);
+            } else {
+                day.setBeginAndEnd(dayList.get(dayList.size() - 1));
+            }
             dayList.add(day);
         }
         int daysSum = copy.getDaysInJewishMonth();
         for (int i = 1; i <= daysSum; i++) {
             copy.setJewishDayOfMonth(i);
             Day day = new Day(copy);
+            if (dayList.size() ==0 ){
+                day.setBeginAndEnd(copy);
+            } else {
+                day.setBeginAndEnd(dayList.get(dayList.size() - 1));
+            }
             dayList.add(day);
         }
         copy.shiftDay(1);
         for (int i = 0; i < copy.getTrailOffset(); i++){
             Day day = new Day(copy);
             day.setOutOfMonthRange(true);
+            day.setBeginAndEnd(dayList.get(dayList.size() - 1));
             copy.shiftDay(1);
             dayList.add(day);
         }
+        copy.shiftMonthBackword();
     }
 
 
@@ -418,7 +429,7 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
 
     public long getEndOfMonth() {
         JewCalendar copy = (JewCalendar) clone();
-        copy.shiftForward(1);
+        copy.shiftMonthForward(1);
         copy.setJewishDate(copy.getJewishYear(), copy.getJewishMonth(), 1);
 //        System.out.println(hebrewDateFormatter.format(copy));
         Date date = copy.getTime(true);
@@ -427,11 +438,46 @@ public class JewCalendar extends JewishCalendar implements Parcelable {
     }
 
     public static String getTitle(int position) {
-        JewCalendar current = jewCalendarSparseArray.get(position);
+        JewCalendar current = jewCalendarMap.get(position);
         if (current == null) {
             MyLog.d("current is null");
             current = new JewCalendar();
         }
         return current.getMonthName() + " , " + current.getYearName();
     }
+
+    public int monthHashCode(){
+
+        int result = 17;
+        result = 37 * result + this.getClass().hashCode();
+        int absDate = 1;
+        int year = getGregorianYear();
+        for(int m = getJewishMonth() - 1; m > 0; --m) {
+            absDate += getLastDayOfGregorianMonth(m, year);
+        }
+        absDate = absDate + 365 * (year - 1) + (year - 1) / 4 - (year - 1) / 100 + (year - 1) / 400;
+        result += 37 * result + absDate + (this.getInIsrael()?1:3);
+        return result;
+
+    }
+
+    private static int getLastDayOfGregorianMonth(int month, int year) {
+        switch(month) {
+            case 2:
+                return (year % 4 != 0 || year % 100 == 0) && year % 400 != 0?28:29;
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            default:
+                return 31;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                return 30;
+        }
+    }
+
 }

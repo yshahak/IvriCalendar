@@ -2,10 +2,6 @@ package il.co.yshahak.ivricalendar;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import il.co.yshahak.ivricalendar.calendar.jewish.Day;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 
 import static junit.framework.Assert.assertEquals;
@@ -36,29 +32,8 @@ public class ExampleUnitTest {
 
     @Test
     public void testDays(){
-        JewCalendar jewCalendar = new JewCalendar();
-        jewCalendar.setOffsets();
-        jewCalendar.setJewishDayOfMonth(1);
-        jewCalendar.shiftDay(jewCalendar.getHeadOffset()*(-1));
-        List<Day> days = new ArrayList<>();
-        for (int i = 0; i < jewCalendar.getHeadOffset(); i++) {
-            Day day = new Day(jewCalendar);
-            day.setOutOfMonthRange(true);
-            jewCalendar.shiftDay(1);
-            days.add(day);
-        }
-        int daysSum = jewCalendar.getDaysInJewishMonth();
-        for (int i = 1; i <= daysSum; i++) {
-            jewCalendar.setJewishDayOfMonth(i);
-            Day day = new Day(jewCalendar);
-            days.add(day);
-        }
-        jewCalendar.shiftDay(1);
-        for (int i = 0; i < jewCalendar.getTrailOffset(); i++){
-            Day day = new Day(jewCalendar);
-            day.setOutOfMonthRange(true);
-            jewCalendar.shiftDay(1);
-            days.add(day);
-        }
+        long now = System.currentTimeMillis();
+        JewCalendar.initPool();
+        System.out.println("time=" + (System.currentTimeMillis() - now));
     }
 }

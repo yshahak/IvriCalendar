@@ -5,6 +5,7 @@ import net.sourceforge.zmanim.hebrewcalendar.JewishCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import il.co.yshahak.ivricalendar.calendar.google.EventInstance;
 
@@ -19,19 +20,17 @@ public class Day {
     private static Calendar calendar = Calendar.getInstance();
 
     private List<EventInstance> googleEventInstances = new ArrayList<>();
-    private String month;
+//    private String month;
     private final String label;
     private long startDayInMillis, endDayInMillis;
     private int dayInMonth;
     private boolean isOutOfMonthRange;
 
     public Day(JewishCalendar jewishCalendar) {
-        this.month = hebrewDateFormatter.formatMonth(jewishCalendar);
-        this.label = hebrewDateFormatter.formatHebrewNumber(jewishCalendar.getJewishDayOfMonth());
-        long[] beginAndEnd = getBeginAndEnd(jewishCalendar);
-        this.startDayInMillis = beginAndEnd[0];
-        this.endDayInMillis = beginAndEnd[1];
+//        this.month = hebrewDateFormatter.formatMonth(jewishCalendar);
         this.dayInMonth = jewishCalendar.getJewishDayOfMonth();
+        this.label = hebrewDateFormatter.formatHebrewNumber(dayInMonth);
+        setBeginAndEnd(jewishCalendar);
     }
 
 
@@ -43,9 +42,9 @@ public class Day {
         this.googleEventInstances = googleEventInstances;
     }
 
-    public String getMonth() {
-        return month;
-    }
+//    public String getMonth() {
+//        return month;
+//    }
 
     public String getLabel() {
         return label;
@@ -71,19 +70,18 @@ public class Day {
         return isOutOfMonthRange;
     }
 
-    private long[] getBeginAndEnd(JewishCalendar jewishCalendar) {
-        long[] longs = new long[2];
+    public void setBeginAndEnd(JewishCalendar jewishCalendar) {
         calendar.set(jewishCalendar.getGregorianYear(), jewishCalendar.getGregorianMonth(), jewishCalendar.getGregorianDayOfMonth());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        longs[0] = calendar.getTimeInMillis();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-        longs[1] = calendar.getTimeInMillis();
-        return longs;
+        this.startDayInMillis = calendar.getTimeInMillis();
+        this.endDayInMillis = startDayInMillis + TimeUnit.DAYS.toMillis(1);
+    }
+
+    public void setBeginAndEnd(Day day) {
+        this.startDayInMillis = day.endDayInMillis;
+        this.endDayInMillis = startDayInMillis + TimeUnit.DAYS.toMillis(1);
     }
 }

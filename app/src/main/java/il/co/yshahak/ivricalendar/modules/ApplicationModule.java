@@ -1,6 +1,7 @@
 package il.co.yshahak.ivricalendar.modules;
 
 import android.app.Application;
+import android.arch.persistence.room.Room;
 import android.content.ContentResolver;
 import android.content.Context;
 
@@ -14,6 +15,7 @@ import il.co.yshahak.ivricalendar.calendar.EventsProviderImpl;
 import il.co.yshahak.ivricalendar.calendar.jewish.JewCalendar;
 import il.co.yshahak.ivricalendar.repo.DaysRepo;
 import il.co.yshahak.ivricalendar.repo.DaysRepoImpl;
+import il.co.yshahak.ivricalendar.room.database.CalendarDataBase;
 import il.co.yshahak.ivricalendar.uihelpers.DividerItemDecoration;
 
 /**
@@ -64,6 +66,12 @@ public class ApplicationModule {
     @Provides @Singleton
     public MonthViewModelFactory provideMonthViewModelFactory(){
         return new MonthViewModelFactory(provideDaysRepo());
+    }
+
+    @Provides @Singleton
+    public CalendarDataBase provideDataBase(){
+        return Room.databaseBuilder(application,
+                CalendarDataBase.class, "calendarDB").build();
     }
 
 }

@@ -56,7 +56,7 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
         return fragment;
     }
 
-//    @Inject
+    @Inject
     JewCalendar jewCalendar;
     @Inject
     DividerItemDecoration itemDecoration;
@@ -73,7 +73,6 @@ public class FragmentHebrewMonth extends BaseCalendarFragment implements LoaderM
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
-        jewCalendar = JewCalendar.obtain(position - FRONT_PAGE);
         handler = new Handler();
         monthViewModel = ViewModelProviders.of(this, viewModelFactory).get(MonthViewModel.class);
         dayList = monthViewModel.getDayList(jewCalendar, position - FRONT_PAGE);
